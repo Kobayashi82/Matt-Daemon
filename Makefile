@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/11 19:13:18 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/11 19:58:09 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/11 20:00:05 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,7 +37,7 @@ COUNTER 			= 0
 # ── NAME ── #
 # ────────── #
 
-NAME		= ft_matt-daemon
+NAME		= matt-daemon
 
 # ─────────── #
 # ── FLAGS ── #
@@ -115,18 +115,18 @@ _show_title:
 #	Check if source exists and needs recompiling
 	@if  [ ! -n "$(NAME)" ] || [ ! -n "$(SRCS)" ] || [ ! -d "$(SRC_DIR)" ]; then \
         printf "\t$(CYAN)Source files don't exist$(NC)"; \
-		printf "\n\t$(WHITE)────────────────────────────$(NC)"; \
+		printf "\n\t$(WHITE)───────────────────────────$(NC)"; \
 		$(MAKE) -s _progress; printf "\n" \
 		$(MAKE) -s _show_cursor; \
 	elif [ -f "$(NAME)" ] && \
 		[ -z "$$(find $(SRC_PATHS) -newer "$(NAME)" 2>/dev/null; find inc -name '*.h' -newer "$(NAME)" 2>/dev/null)" ] && \
 		[ $$(find $(OBJS) 2>/dev/null | wc -l) -eq $$(echo "$(OBJS)" | wc -w) ]; then \
         printf "\t$(GREEN)✓ $(YELLOW)$(NAME)$(CYAN) is up to date$(NC)"; \
-		printf "\n\t$(WHITE)────────────────────────────$(NC)"; \
+		printf "\n\t$(WHITE)───────────────────────────$(NC)"; \
 		$(MAKE) -s _progress; printf "\n" \
 		$(MAKE) -s _show_cursor; \
 	else \
-		printf "\n\t$(WHITE)────────────────────────────$(NC)\033[1A\r"; \
+		printf "\n\t$(WHITE)───────────────────────────$(NC)\033[1A\r"; \
 		$(MAKE) -s _compile; \
 	fi
 	@$(MAKE) -s _show_cursor
@@ -146,7 +146,7 @@ re:
 #	Check if source exists and needs recompiling
 	@if  [ ! -n "$(NAME)" ] || [ ! -n "$(SRCS)" ] || [ ! -d "$(SRC_DIR)" ]; then \
         printf "\t$(CYAN)Source files don't exist$(NC)"; \
-		printf "\n\t$(WHITE)────────────────────────────$(NC)"; \
+		printf "\n\t$(WHITE)───────────────────────────$(NC)"; \
 		$(MAKE) -s _progress; \
 		$(MAKE) -s _show_cursor; \
 	fi
@@ -160,7 +160,7 @@ re:
 	@printf "\r%50s\r\t$(CYAN)Deleted     $(GREEN)✓ $(YELLOW)$(NAME)$(NC)\n"
 	@$(MAKE) -s _progress; printf "\n"
 	@-find $(BLD_DIR) -type d -empty -delete >/dev/null 2>&1 || true
-	@printf "\t$(WHITE)────────────────────────────\n$(NC)"
+	@printf "\t$(WHITE)───────────────────────────\n$(NC)"
 	@printf "\033[1A\033[1A\r"
 
 #	Compile
@@ -211,9 +211,9 @@ fclean:
 _title:
 	@clear
 	@printf "\n$(NC)\t$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★\
-	$(INV_CYAN) $(NC)$(INV_CYAN)$(shell echo $(NAME) | tr a-z A-Z | tr '_' ' ')$(INV_CYAN) \
+	$(INV_CYAN)  $(NC)$(INV_CYAN)$(shell echo $(NAME) | tr a-z A-Z | tr '_' ' ')$(INV_CYAN)  \
 	$(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(NC)\n"
-	@printf "\t$(WHITE)────────────────────────────\n$(NC)"
+	@printf "\t$(WHITE)───────────────────────────\n$(NC)"
 
 # ───────────── #
 # ── CURSORS ── #
@@ -230,7 +230,7 @@ _show_cursor:
 # ──────────────────── #
 
 _delete_objects:
-	@printf "\n\t$(WHITE)────────────────────────────$(NC)\033[1A\r"
+	@printf "\n\t$(WHITE)───────────────────────────$(NC)\033[1A\r"
 	@if [ -n "$(shell find $(OBJ_DIR) -type f -name '*.o' 2>/dev/null)" ]; then \
 		COUNTER=0; \
 		find $(OBJ_DIR) -type f -name '*.o' | while read -r file; do \
