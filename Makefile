@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/11 19:13:18 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/11 20:00:05 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/11 20:38:58 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,8 +43,8 @@ NAME		= matt-daemon
 # ── FLAGS ── #
 # ─────────── #
 
-CC			= clang
-CFLAGS		= -Wall -Wextra -Werror -O2
+CC			= clang++
+CFLAGS		= -Wall -Wextra -Werror -std=c++98 -g -O2
 
 # ───────────────── #
 # ── DIRECTORIES ── #
@@ -59,7 +59,7 @@ SRC_DIR		= src/
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= main/main.c main/options.c
+SRCS		= main/main.cpp
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #
@@ -69,7 +69,7 @@ all: _show_title
 $(NAME): _show_title
 
 SRC_PATHS	= $(addprefix $(SRC_DIR), $(SRCS))
-OBJS		= $(SRCS:%.c=$(OBJ_DIR)%.o)
+OBJS		= $(SRCS:%.cpp=$(OBJ_DIR)%.o)
 DEPS		= $(OBJS:.o=.d)
 -include $(DEPS)
 
@@ -92,7 +92,7 @@ _compile: $(OBJS)
 
 -include $(DEPS)
 
-$(OBJ_DIR)%.o: $(SRC_DIR)%.c
+$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
 	@$(MAKE) -s _hide_cursor
 #	Create folder
 	@mkdir -p $(@D)
