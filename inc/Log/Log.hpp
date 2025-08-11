@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:17 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 00:53:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/12 00:56:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@
 
 #pragma endregion
 
-#pragma region "Log"
+#pragma region "Tintin_reporter"
 
-	class Log {
+	class Tintin_reporter {
 
 		public:
 
@@ -29,16 +29,16 @@
 			enum e_level { DEBUG, INFO, LOG, WARNING, ERROR, FATAL };
 
 			//	Constructors
-			Log();
-			Log(uint8_t logLevel);
-			Log(const std::string& logPath);
-			Log(const std::string& logPath, uint8_t logLevel);
-			Log(const Log& src);
-			~Log();
+			Tintin_reporter();
+			Tintin_reporter(uint8_t logLevel);
+			Tintin_reporter(const std::string& logPath);
+			Tintin_reporter(const std::string& logPath, uint8_t logLevel);
+			Tintin_reporter(const Tintin_reporter& src);
+			~Tintin_reporter();
 
 			//	Overloads
-			Log&			operator=(const Log& rhs);
-			bool			operator==(const Log& rhs) const;
+			Tintin_reporter&	operator=(const Tintin_reporter& rhs);
+			bool				operator==(const Tintin_reporter& rhs) const;
 
 			// Methods
 			void			open();
@@ -46,7 +46,7 @@
 			void			clear();
 
 			void			set_logLevel(uint8_t logLevel);
-			void			set_logPath(std::string& logPath);
+			void			set_logPath(const std::string& logPath);
 			uint8_t			get_logLevel() const;
 			std::string		get_logPath() const;
 

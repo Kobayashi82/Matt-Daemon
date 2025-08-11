@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 00:30:04 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/12 00:58:15 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@
 		// }
 
 		try {
-			Log	Log("mylog", Log.LOG);
+			Tintin_reporter	Log("mylog", Log.LOG);
 
 			Log.warning("Probando");
 			Log.error("una");
