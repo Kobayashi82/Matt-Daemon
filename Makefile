@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/11 19:13:18 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/11 22:53:11 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/12 01:25:56 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,7 +44,7 @@ NAME		= MattDaemon
 # ─────────── #
 
 CC			= clang++
-CFLAGS		= -Wall -Wextra -Werror
+CFLAGS		= -Wall -Wextra -Werror -std=c++17
 
 # ───────────────── #
 # ── DIRECTORIES ── #
@@ -62,7 +62,7 @@ SRC_DIR		= src/
 SRCS		= Main/Main.cpp				\
 			  Daemon/Daemon.cpp			\
 			  Network/Network.cpp		\
-			  Log/Log.cpp
+			  Log/Tintin_reporter.cpp
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #

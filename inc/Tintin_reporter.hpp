@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Log.hpp                                            :+:      :+:    :+:   */
+/*   Tintin_reporter.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:17 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 00:56:52 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/12 01:22:31 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 
 	#include <fstream>
 	#include <cstdint>
+	#include <mutex>
 
 #pragma endregion
 
@@ -63,6 +64,11 @@
 			std::string		_logPath;
     		std::ofstream	_logFile;
 			uint8_t			_logLevel;
+			std::mutex		_mutex;
+
+			// Methods
+			static void createDirectory(const std::string& filePath);
+			static std::string getTimestamp();
 	};
 
 #pragma endregion

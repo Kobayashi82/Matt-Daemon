@@ -6,14 +6,14 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 00:58:15 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/12 01:22:45 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "Main/MattDaemon.hpp"
-	#include "Log/Log.hpp"
+	#include "Tintin_reporter.hpp"
 
 	#include <iostream>
 	#include <unistd.h>
