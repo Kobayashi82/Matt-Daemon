@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/11 19:13:18 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/11 22:31:53 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/11 22:53:11 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,7 +44,7 @@ NAME		= MattDaemon
 # ─────────── #
 
 CC			= clang++
-CFLAGS		= -Wall -Wextra -Werror -std=c++98 -g -O2
+CFLAGS		= -Wall -Wextra -Werror
 
 # ───────────────── #
 # ── DIRECTORIES ── #
@@ -62,7 +62,7 @@ SRC_DIR		= src/
 SRCS		= Main/Main.cpp				\
 			  Daemon/Daemon.cpp			\
 			  Network/Network.cpp		\
-			  Logging/Logging.cpp
+			  Log/Log.cpp
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #
