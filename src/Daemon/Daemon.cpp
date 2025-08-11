@@ -1,27 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   Daemon.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/11 20:39:12 by vzurera-         ###   ########.fr       */
+/*   Created: 2025/08/11 22:28:55 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/08/11 22:29:41 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "main/matt.hpp"
-
-#pragma endregion
-
-#pragma region "Main"
-
-	int main(int argc, char **argv) {
-		(void) argc;
-		(void) argv;
-		return (0);
-	}
+	#include "Daemon/Daemon.hpp"
 
 #pragma endregion
