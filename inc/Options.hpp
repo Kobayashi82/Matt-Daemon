@@ -6,16 +6,17 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:15 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 21:55:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/12 23:33:23 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#pragma region "Defines"
+#pragma region "Include"
 
 	#include <string>
 	#include <cstdint>
+	#include <unistd.h>
 
 #pragma endregion
 

@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Tintin_reporter.cpp                                :+:      :+:    :+:   */
+/*   Logging.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:53 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 21:44:04 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/12 23:35:13 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "Tintin_reporter.hpp"
+	#include "Logging.hpp"
 
 	#include <cstring>
 	#include <filesystem>
@@ -20,59 +20,11 @@
 
 #pragma endregion
 
-#pragma region "Log"
+#pragma region "Tintin Reporter"
 
 	#pragma region "Constructors"
 
 		#pragma region "Default"
-
-			Tintin_reporter::Tintin_reporter() : _logPath("/var/log/matt_daemon/matt_daemon.log"), _logLevel(LOG) {
-				createDirectory(_logPath);
-
-				_logFile.open(_logPath, std::ios::app);
-				if (!_logFile.is_open()) {
-					std::string errorMsg = "Cannot open log file: " + _logPath + " - " + strerror(errno);
-					throw std::runtime_error(errorMsg);
-				}
-
-				_logFile << std::unitbuf;	// Auto-Flush
-			}
-
-		#pragma endregion
-
-		#pragma region "Path"
-
-			Tintin_reporter::Tintin_reporter(const std::string& logPath) : _logPath(logPath), _logLevel(LOG) {
-				createDirectory(_logPath);
-
-				_logFile.open(_logPath, std::ios::app);
-				if (!_logFile.is_open()) {
-					std::string errorMsg = "Cannot open log file: " + _logPath + " - " + strerror(errno);
-					throw std::runtime_error(errorMsg);
-				}
-
-				_logFile << std::unitbuf;
-			}
-
-		#pragma endregion
-
-		#pragma region "Level"
-
-			Tintin_reporter::Tintin_reporter(uint8_t logLevel) : _logPath("/var/log/matt_daemon/matt_daemon.log"), _logLevel(logLevel) {
-				createDirectory(_logPath);
-
-				_logFile.open(_logPath, std::ios::app);
-				if (!_logFile.is_open()) {
-					std::string errorMsg = "Cannot open log file: " + _logPath + " - " + strerror(errno);
-					throw std::runtime_error(errorMsg);
-				}
-
-				_logFile << std::unitbuf;
-			}
-
-		#pragma endregion
-
-		#pragma region "Path & Level"
 
 			Tintin_reporter::Tintin_reporter(const std::string& logPath, uint8_t logLevel) : _logPath(logPath), _logLevel(logLevel) {
 				createDirectory(_logPath);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:32 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 21:57:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/12 23:29:15 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,11 +136,12 @@
 			std::string l = level;
 			std::transform(l.begin(), l.end(), l.begin(), ::tolower);
 
-			if		(level == "debug")		logLevel = DEBUG;
-			else if	(level == "info")		logLevel = INFO;
-			else if	(level == "log")		logLevel = LOG;
-			else if	(level == "warning")	logLevel = WARNING;
-			else if	(level == "critical")	logLevel = CRITICAL;
+			if		(l == "debug")		logLevel = DEBUG;
+			else if	(l == "info")		logLevel = INFO;
+			else if	(l == "log")		logLevel = LOG;
+			else if	(l == "warning")	logLevel = WARNING;
+			else if	(l == "error")		logLevel = ERROR;
+			else if	(l == "critical")	logLevel = CRITICAL;
 			else return (1);
 
 			return (0);
@@ -170,7 +171,7 @@
 		};
 
 		int opt;
-		while ((opt = getopt_long(argc, argv, "ch?uV", long_options, NULL)) != -1) {
+		while ((opt = getopt_long(argc, argv, "esc:p:f:l:h?uV", long_options, NULL)) != -1) {
 			switch (opt) {
 				case 'e':	disabledEncryption = false;															break;
 				case 's':	disabledShell = false;																break;
@@ -186,6 +187,8 @@
 			}
 		}
 
+		// This is used when an argument (not option) is required
+		// 
 		// if (optind >= argc) {
 		// 	std::cerr << NAME << ": missing argument\n";
 		// 	invalid(); return (2);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:17 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 21:43:44 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/12 23:30:30 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,19 @@
 
 #pragma endregion
 
-#pragma region "Tintin_reporter"
+#pragma region "Enumarators"
+
+	enum e_level { DEBUG, INFO, LOG, WARNING, ERROR, CRITICAL };
+
+#pragma endregion
+
+#pragma region "Tintin Reporter"
 
 	class Tintin_reporter {
 
 		public:
 
-			//	Enumarators
-			enum e_level { DEBUG, INFO, LOG, WARNING, ERROR, CRITICAL };
-
 			//	Constructors
-			Tintin_reporter();
-			Tintin_reporter(uint8_t logLevel);
-			Tintin_reporter(const std::string& logPath);
 			Tintin_reporter(const std::string& logPath, uint8_t logLevel);
 			Tintin_reporter(const Tintin_reporter& src);
 			~Tintin_reporter();
