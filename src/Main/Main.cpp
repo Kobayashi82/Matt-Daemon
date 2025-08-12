@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 23:57:57 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 00:36:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,43 +45,44 @@
 			return (1);
 		}
 		if (pid > 0) std::exit(0);
+		Log->debug("First fork() completed");
 
 		// 2. setsid()
-		if (setsid() < 0) {
-			Log->critical("setuid() failed");
-			std::exit(1);
-		}
+		if (setsid() < 0) { Log->critical("setuid() failed"); std::exit(1); }
+		Log->debug("setsid() completed");
 
 		// 3. fork()
 		pid = fork();
-		if (pid < 0) {
-			Log->critical("Second fork() failed");
-			std::exit(1);
-		}
+		if (pid < 0) { Log->critical("Second fork() failed"); std::exit(1); }
 		if (pid > 0) std::exit(0);
+		Log->debug("Second fork() completed");
 
 		// 4. signal()
-		std::signal(SIGCHLD, SIG_IGN);
-		std::signal(SIGHUP, SIG_IGN);
+		int signals = 0;
+		if (std::signal(SIGCHLD, SIG_IGN) == SIG_ERR)	{ signals++; Log->warning("Signal SIGCHLD failed"); }
+		if (std::signal(SIGHUP, SIG_IGN) == SIG_ERR)	{ signals++; Log->warning("Signal SIGHUP failed");  }
+		if (signals != 2) Log->debug("Signals set");
 
 		// 5. umask()
 		umask(022);
+		Log->debug("umask() set");
 
 		// 6. chdir()
-		chdir("/");
+		if (chdir("/"))	Log->warning("chdir() failed");
+		else			Log->debug("Working directory changed");
 
 		// 7. close()
-		close(0);
-		close(1); 
-		close(2);
+		close(0); close(1); close(2);
+		Log->debug("Standard file descriptors closed");
 
 		// 8. flock()
 		int lockfd = open("/var/lock/matt_daemon.lock", O_RDWR|O_CREAT|O_TRUNC, 0640);
 		if (lockfd < 0 || flock(lockfd, LOCK_EX|LOCK_NB)) {
-			Log->error("Daemon locked");
+			Log->critical("Daemon already running");
 			std::exit(1);
 		}
 		dprintf(lockfd, "%d\n", getpid());
+		Log->debug("Daemon lock set");
 
 		return (0);
 	}
@@ -91,20 +92,24 @@
 #pragma region "Main"
 
 	int main(int argc, char **argv) {
-		if (getuid()) {
-			std::cerr << "This program must be run as root" << std::endl;
-			return (1);
-		}
-
 		try {
+			if (getuid()) { std::cerr << "This program must be run as root" << std::endl; return (1); }
+		
 			int result = 0;
 			if ((result = Options::parse(argc, argv))) return (result - 1);
-			std::cout << Options::logPath << " - " << static_cast<int>(Options::logLevel) << "\n";
+
 			Tintin_reporter	Tintin_logger(Options::logPath, Options::logLevel);
 			Log = &Tintin_logger;
+
+			Log->debug("Initiating daemon");
 			if (daemonize()) return (1);
-			sleep(10);
+			Log->info("Daemon started");
+
+			Log->debug("Initializing network");
 			// connection
+
+			// epoll
+			Log->info("Daemon closed");
 		} catch(const std::exception& e) {
 			std::cerr << e.what() << '\n';
 			return (1);
@@ -114,21 +119,3 @@
 	}
 
 #pragma endregion
-
-	// try {
-	// 	if (authenticate(argv[1], argv[2])) {
-	// 		std::cout << "Autenticación OK\n";
-	// 	} else {
-	// 		std::cout << "Autenticación fallida\n";
-	// 	}
-	// } catch(const std::exception& e) {
-	// 	std::cerr << e.what() << '\n';
-	// }
-	
-
-	// std::string popo1 = encrypt("Hola, como estás #~@{<`}");
-	// std::cout << popo1 << "\n";
-	// std::string popo2 = decrypt(popo1);
-	// std::cout << popo2 << "\n";
-
-	// popo(std::string(argv[1]));

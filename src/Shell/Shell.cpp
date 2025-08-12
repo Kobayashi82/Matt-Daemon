@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 19:09:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 19:13:13 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 00:18:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,3 +62,21 @@ int popo(const std::string user) {
 	}
 	return (0);
 }
+
+	// try {
+	// 	if (authenticate(argv[1], argv[2])) {
+	// 		std::cout << "Autenticación OK\n";
+	// 	} else {
+	// 		std::cout << "Autenticación fallida\n";
+	// 	}
+	// } catch(const std::exception& e) {
+	// 	std::cerr << e.what() << '\n';
+	// }
+	
+
+	// std::string popo1 = encrypt("Hola, como estás #~@{<`}");
+	// std::cout << popo1 << "\n";
+	// std::string popo2 = decrypt(popo1);
+	// std::cout << popo2 << "\n";
+
+	// popo(std::string(argv[1]));

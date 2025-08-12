@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:53 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 23:35:13 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 00:26:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,31 +162,31 @@
 		void Tintin_reporter::debug(const std::string& msg) {
 			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > DEBUG) return;
-			_logFile << "[" << getTimestamp() << "]   [ DEBUG ] - " << msg << std::endl;
+			_logFile << "[" << getTimestamp() << "]      [ DEBUG ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::info(const std::string& msg) {
 			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > INFO) return;
-			_logFile << "[" << getTimestamp() << "]    [ INFO ] - " << msg << std::endl;
+			_logFile << "[" << getTimestamp() << "]       [ INFO ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::log(const std::string& msg) {
 			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > LOG) return;
-			_logFile << "[" << getTimestamp() << "]     [ LOG ] - " << msg << std::endl;
+			_logFile << "[" << getTimestamp() << "]        [ LOG ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::warning(const std::string& msg) {
 			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > WARNING) return;
-			_logFile << "[" << getTimestamp() << "] [ WARNING ] - " << msg << std::endl;
+			_logFile << "[" << getTimestamp() << "]    [ WARNING ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::error(const std::string& msg) {
 			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > ERROR) return;
-			_logFile << "[" << getTimestamp() << "]   [ ERROR ] - " << msg << std::endl;
+			_logFile << "[" << getTimestamp() << "]      [ ERROR ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::critical(const std::string& msg) {
