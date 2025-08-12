@@ -1,17 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Network.cpp                                        :+:      :+:    :+:   */
+/*   Shell.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/11 22:28:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 12:47:20 by vzurera-         ###   ########.fr       */
+/*   Created: 2025/08/12 18:02:22 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/08/12 19:15:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
+
 #pragma region "Includes"
 
-	#include "Network.hpp"
+
+
+#pragma endregion
+
+#pragma region "Methods"
+
+	int popo(const std::string user);
 
 #pragma endregion

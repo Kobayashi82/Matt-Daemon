@@ -6,12 +6,12 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:55 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/11 22:29:41 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/12 12:47:16 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "Daemon/Daemon.hpp"
+	#include "Daemon.hpp"
 
 #pragma endregion

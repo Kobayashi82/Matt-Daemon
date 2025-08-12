@@ -1,0 +1,197 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Options.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/12 12:15:32 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/08/12 21:57:09 by vzurera-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#pragma region "Includes"
+
+	#include "Options.hpp"
+
+	#include <algorithm>
+	#include <iostream>
+	#include <cstring>
+	#include <getopt.h>
+
+#pragma endregion
+
+#pragma region "Variables"
+
+	bool		Options::disabledEncryption	= false;
+	bool		Options::disabledShell		= false;
+	uint16_t	Options::maxClients			= 3;
+	uint16_t	Options::portNumber			= 4242;
+	uint8_t		Options::logLevel			= INFO;
+	std::string	Options::logPath			= "/var/log/matt_daemon/matt_daemon.log";
+	std::string	Options::_fullName			= "MattDaemon";
+
+#pragma endregion
+
+#pragma region "Strtoul"
+
+	template<typename T>
+	int Options::ft_strtoul(char **argv, const char *optarg, T *value, unsigned long max_value, bool allow_zero) {
+		try {
+			size_t			idx;
+			unsigned long	tmp = std::stoul(optarg, &idx, 0);
+
+			if (idx != std::strlen(optarg)) {
+				std::cerr << argv[0] << ": invalid value (`" << optarg << "' near `" << (optarg + idx) << "')\n";
+				return (1);
+			}
+
+			if (!tmp && !allow_zero) {
+				std::cerr << argv[0] << ": option value too small: " << optarg << "\n";
+				return (1);
+			}
+
+			if (max_value && tmp > max_value) {
+				std::cerr << argv[0] << ": option value too big: " << optarg << "\n";
+				return (1);
+			}
+
+			*value = static_cast<T>(tmp);
+			return (0);
+		} catch (const std::exception &) {
+			std::cerr << argv[0] << ": invalid number: " << optarg << "\n";
+			return (1);
+		}
+	}
+
+#pragma endregion
+
+#pragma region "Messages"
+
+	#pragma region "Help"
+
+		int Options::help() {
+			std::cerr << "Usage: " << NAME << " [ -esh?uV ] [ -c max_clients ]  [ -p port ] [ -f log_file ] [ -l log_level ]\n";
+			std::cerr << "\n";
+			std::cerr << " Options:\n";
+			std::cerr << "\n";
+			std::cerr << "  -e,  --disable-encryption   disable encryption for remote shell\n";
+			std::cerr << "  -s,  --disable-shell        disable remote shell access\n";
+			std::cerr << "  -c,  --max-clients=NUM      maximum number of simultaneous clients    (default: 3, unlimited = 0)\n";
+			std::cerr << "  -p,  --port=NUM             port number to listen on                  (default: 4242)\n";
+			std::cerr << "  -f,  --log-file=PATH        path to the log file                      (default: /var/log/matt_daemon/matt_daemon.log)\n";
+			std::cerr << "  -l,  --log-level=LEVEL      logging verbosity level                   (default: INFO)\n";
+			std::cerr << "\n";
+			std::cerr << "  -h?, --help                 give this help list\n";
+      		std::cerr << "  -u,  --usage                give a short usage message\n";
+  			std::cerr << "  -V,  --version              print program version\n";
+			std::cerr << "\n";
+			std::cerr << "Report bugs to <kobayashi82@outlook.com>\n";
+
+			return (1);
+		}
+
+	#pragma endregion
+
+	#pragma region "Usage"
+
+		int Options::usage() {
+			std::cerr << "Usage: " << NAME << " [-e, --disable-encryption] [-s, --disable-shell] [-c NUM, --max-clients=NUM]\n";
+			std::cerr << "                  [-p NUM, --port=NUM] [-f PATH, --log-file=PATH] [-l LEVEL, --log-level=LEVEL]\n";
+			std::cerr << "                  [-h? --help] [-u --usage] [-V --version]\n";
+
+			return (1);
+		}
+
+	#pragma endregion
+
+	#pragma region "Version"
+
+		int Options::version() {
+			std::cerr << NAME << " 1.0\n";
+			std::cerr << "Copyright (C) 2025 Kobayashi Corp ⓒ.\n";
+			std::cerr << "License WTFPL: DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE.\n";
+			std::cerr << "This is free software: you are free to change and redistribute it.\n";
+			std::cerr << "There is NO WARRANTY, to the extent permitted by law.\n";
+			std::cerr << "\n";
+			std::cerr << "Written by Kobayashi82 (vzurera-).\n";
+
+			return (1);
+		}
+
+	#pragma endregion
+
+	#pragma region "Invalid"
+
+		int Options::invalid() {
+			std::cerr << "Try '" << _fullName << " --help' or '" << _fullName << " --usage' for more information.\n";
+			return (2);
+		}
+
+	#pragma endregion
+
+	#pragma region "Log Level"
+
+		int Options::log_level(const std::string &level) {
+			std::string l = level;
+			std::transform(l.begin(), l.end(), l.begin(), ::tolower);
+
+			if		(level == "debug")		logLevel = DEBUG;
+			else if	(level == "info")		logLevel = INFO;
+			else if	(level == "log")		logLevel = LOG;
+			else if	(level == "warning")	logLevel = WARNING;
+			else if	(level == "critical")	logLevel = CRITICAL;
+			else return (1);
+
+			return (0);
+		}
+
+	#pragma endregion
+
+#pragma endregion
+
+#pragma region "Parse"
+
+	int Options::parse(int argc, char **argv) {
+		_fullName = argv[0];
+
+		struct option long_options[] = {
+			{"disable-encryption",	no_argument,		0, 'e'},	// [-e, --disable-encryption]
+			{"disable-shell",		no_argument,		0, 's'},	// [-s, --disable-shell]
+			{"max-clients",			required_argument,	0, 'c'},	// [-c, --max-clients=NUM]
+			{"port",				required_argument,	0, 'p'},	// [-p, --port=NUM]
+			{"log-file",			required_argument,	0, 'f'},	// [-c, --log-file=PATH]
+			{"log-level",			required_argument,	0, 'l'},	// [-c, --log-level=LEVEL]
+
+			{"help",				no_argument,		0, 'h'},	// [-h?, --help]
+			{"usage",				no_argument,		0, 'u'},	// [	--usage]
+			{"version",				no_argument,		0, 'V'},	// [-V, --version]
+			{0, 0, 0, 0}
+		};
+
+		int opt;
+		while ((opt = getopt_long(argc, argv, "ch?uV", long_options, NULL)) != -1) {
+			switch (opt) {
+				case 'e':	disabledEncryption = false;															break;
+				case 's':	disabledShell = false;																break;
+				case 'c':	if (ft_strtoul(argv, optarg, &maxClients, 1024 , true))		return (2);				break;
+				case 'p':	if (ft_strtoul(argv, optarg, &portNumber, 65535, false))	return (2);				break;
+				case 'f':	logPath = std::string(optarg);														break;
+				case 'l':	if (log_level(std::string(optarg)))							return (2);				break;
+
+				case '?':	if (std::string(argv[optind - 1]) == "-?")					return (help());		return (invalid());
+				case 'h':																return (help());
+				case 'u':																return (usage());
+				case 'V':																return (version());
+			}
+		}
+
+		// if (optind >= argc) {
+		// 	std::cerr << NAME << ": missing argument\n";
+		// 	invalid(); return (2);
+		// }
+
+		return (0);
+	}
+
+#pragma endregion

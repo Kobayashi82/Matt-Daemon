@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/11 19:13:18 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/12 01:25:56 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/12 19:10:31 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,6 +45,7 @@ NAME		= MattDaemon
 
 CC			= clang++
 CFLAGS		= -Wall -Wextra -Werror -std=c++17
+CEFLAGS		= -lm -lcrypt 
 
 # ───────────────── #
 # ── DIRECTORIES ── #
@@ -59,9 +60,11 @@ SRC_DIR		= src/
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= Main/Main.cpp				\
-			  Daemon/Daemon.cpp			\
-			  Network/Network.cpp		\
+SRCS		= Main/Main.cpp Main/Options.cpp					\
+			  Crypto/Crypto.cpp									\
+			  Daemon/Daemon.cpp									\
+			  Network/Network.cpp								\
+			  Shell/Shell.cpp									\
 			  Log/Tintin_reporter.cpp
 
 # ───────────────────────────────────────────────────────────── #
@@ -83,7 +86,7 @@ _compile: $(OBJS)
 
 #	Compile
 	@printf "\r%50s\r\t$(CYAN)Compiling... $(YELLOW)$(NAME)$(NC)"
-	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -lm 
+	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(CEFLAGS)
 	@printf "\r%50s\r\t$(CYAN)Compiled    $(GREEN)✓ $(YELLOW)$(NAME)$(NC)\n"
 
 	@$(MAKE) -s _progress; printf "\n"

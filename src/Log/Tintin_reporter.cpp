@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:53 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 01:22:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/12 21:44:04 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,10 +237,10 @@
 			_logFile << "[" << getTimestamp() << "]   [ ERROR ] - " << msg << std::endl;
 		}
 
-		void Tintin_reporter::fatal(const std::string& msg) {
+		void Tintin_reporter::critical(const std::string& msg) {
 			std::lock_guard<std::mutex> lock(_mutex);
-			if (_logLevel > FATAL) return;
-			_logFile << "[" << getTimestamp() << "]   [ FATAL ] - " << msg << std::endl;
+			if (_logLevel > CRITICAL) return;
+			_logFile << "[" << getTimestamp() << "]   [ CRITICAL ] - " << msg << std::endl;
 		}
 
 	#pragma endregion
@@ -265,7 +265,8 @@
 
 			void Tintin_reporter::createDirectory(const std::string& filePath) {
 				std::filesystem::path p(filePath);
-				std::filesystem::create_directories(p.parent_path());
+				auto parent = p.parent_path();
+				if (!parent.empty()) std::filesystem::create_directories(parent);
 			}
 
 		#pragma endregion

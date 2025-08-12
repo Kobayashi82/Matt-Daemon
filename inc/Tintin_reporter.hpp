@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:17 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 01:22:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/12 21:43:44 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #pragma region "Includes"
 
+	#include <iostream>
 	#include <fstream>
 	#include <cstdint>
 	#include <mutex>
@@ -27,7 +28,7 @@
 		public:
 
 			//	Enumarators
-			enum e_level { DEBUG, INFO, LOG, WARNING, ERROR, FATAL };
+			enum e_level { DEBUG, INFO, LOG, WARNING, ERROR, CRITICAL };
 
 			//	Constructors
 			Tintin_reporter();
@@ -56,7 +57,7 @@
 			void			log(const std::string& msg);
 			void			warning(const std::string& msg);
 			void			error(const std::string& msg);
-			void			fatal(const std::string& msg);
+			void			critical(const std::string& msg);
 
 		private:
 
