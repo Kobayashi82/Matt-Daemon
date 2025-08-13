@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:17 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 14:57:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:42:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,6 @@
 
 #pragma region "Variables"
 
-	extern Tintin_reporter	*Log;
+	extern Tintin_reporter	*Log;												// 
 
 #pragma endregion

@@ -6,23 +6,23 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:53 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 15:16:08 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:42:05 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "Logging.hpp"
+	#include "Main/Logging.hpp"
 
-	#include <cstring>
-	#include <filesystem>
-	#include <ctime>
+	#include <ctime>															// 
+	#include <cstring>															// 
+	#include <filesystem>														// 
 
 #pragma endregion
 
 #pragma region "Variables"
 
-	Tintin_reporter	*Log;
+	Tintin_reporter	*Log;														// 
 
 #pragma endregion
 

@@ -6,11 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 19:09:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 14:57:41 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:41:20 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
+
+	#include "Main/Shell.hpp"
 
 	#include <unistd.h>
 	#include <pwd.h>

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:15 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 23:33:23 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:22:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 
 	#include <string>
 	#include <cstdint>
-	#include <unistd.h>
 
 #pragma endregion
 
@@ -32,23 +31,23 @@
 
 		public:
 
-			static bool			disabledEncryption;
-			static bool			disabledShell;
-			static uint16_t		maxClients;
-			static uint16_t		portNumber;
-			static uint8_t		logLevel;
-			static std::string	logPath;
+			static bool			disabledEncryption;								// Disable encrypted communication 
+			static bool			disabledShell;									// Disable remote shell
+			static uint16_t		maxClients;										// Maximum number of clients connected simultaneously
+			static uint16_t		portNumber;										// Port to listen for incoming connections
+			static uint8_t		logLevel;										// Level of logging
+			static std::string	logPath;										// Path to use for logging
 
-			static int	parse(int argc, char **argv);
+			static int	parse(int argc, char **argv);							// Parse options passed as arguments to the program
 
 		private:
 
 			enum e_level { DEBUG, INFO, LOG, WARNING, ERROR, CRITICAL };
 
-			static std::string	_fullName;
+			static std::string	_fullName;										// Name and path used to execute the program (same as argv[0])
 
-			Options() {}
-			~Options() {}
+			Options() {}														// Default constructor (no instantiable)
+			~Options() {}														// Destructor (no instantiable)
 		
 			template<typename T>
 			static int	ft_strtoul(char **argv, const char *optarg, T *value, unsigned long max_value, bool allow_zero);

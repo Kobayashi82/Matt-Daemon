@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 14:48:01 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:08:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,24 +18,24 @@
 
 		public:
 
-			//	Variables
-			int				sockfd;																		//	File descriptor associated with the client
-			uint16_t		port;																		//	Port number of the client
+			// Variables
+			int		sockfd;														// File descriptor associated with the client
+			int		port;														// Port number of the client
 
-			//	Constructors
-			Socket();
-			Socket(uint16_t _port);										//	Parameterized constructor
-			Socket(const Socket & src);									//	Copy constructor
-			~Socket();
+			// Constructors
+			Socket();															// Default constructor
+			Socket(int _port);													// Parameterized constructor
+			Socket(const Socket & src);											// Copy constructor
+			~Socket();															// Destructor
 
-			//	Overloads
-			Socket &	operator=(const Socket & rhs);													//	Overload for assignation
-			bool		operator==(const Socket & rhs) const;											//	Overload for comparison
+			// Overloads
+			Socket &	operator=(const Socket & rhs);							// Overload for assignation
+			bool		operator==(const Socket & rhs) const;					// Overload for equality
 
-			//	Methods
-			int		create();											//	Creates socket
-			int		accept();											//	Accept a new connection (client)
-			void	close();											//	Accept a new connection (client)
+			// Methods
+			int		create();													// Creates socket
+			int		accept();													// Accepts a new connection (client)
+			void	close();													// Closes socket
 	};
 
 #pragma endregion

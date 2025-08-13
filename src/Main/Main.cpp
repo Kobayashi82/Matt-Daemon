@@ -6,26 +6,26 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 15:17:04 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:45:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "Options.hpp"
-	#include "Crypto.hpp"
-	#include "Shell.hpp"
-	#include "Logging.hpp"
+	#include "Main/Options.hpp"
+	#include "Main/Logging.hpp"
+	#include "Main/Shell.hpp"
 	#include "Network/Socket.hpp"
+	#include "Network/Epoll.hpp"
 
-	#include <csignal>		// std::signal()
-	#include <cstdlib>		// std::exit()
+	#include <csignal>															// For std::signal()
+	#include <cstdlib>															// For std::exit()
 
-	#include <stdio.h>		// dprintf()
-	#include <fcntl.h>		// open()
-	#include <unistd.h>		// fork(), setsid(), chdir(), close()
-	#include <sys/stat.h>	// umask()
-	#include <sys/file.h>	// flock()
+	#include <stdio.h>															// For dprintf()
+	#include <fcntl.h>															// For open()
+	#include <unistd.h>															// For fork(), setsid(), chdir() and close()
+	#include <sys/stat.h>														// For umask()
+	#include <sys/file.h>														// For flock()
 
 #pragma endregion
 
@@ -87,10 +87,10 @@
 #pragma region "Main"
 
 	int main(int argc, char **argv) {
+		int result = 0;
+
 		try {
 			if (getuid()) { std::cerr << "This program must be run as root" << std::endl; return (1); }
-		
-			int result = 0;
 			if ((result = Options::parse(argc, argv))) return (result - 1);
 
 			Tintin_reporter	Tintin_logger(Options::logPath, Options::logLevel);
@@ -99,21 +99,29 @@
 			if (daemonize()) return (1);
 			Log->info("Daemon started");
 
-			Log->debug("Initializing network");
-			Socket Socket(Options::portNumber);
-			if (Socket.create()) return (1);
-			Log->info("Daemon listening on port " + std::to_string(Options::portNumber));
+			if (Epoll::create()) result = 1;
+			else {
+				Log->debug("Epoll initialized");
+				Socket socket(Options::portNumber);
+				if (socket.create()) result = 1;
+				else {
+					Log->info("Daemon listening on port " + std::to_string(Options::portNumber));
 
-			// epoll
+					Epoll::Running = true;
+					while (Epoll::Running) {
+						if (Epoll::events(&socket))	break;
+						sleep(10); break ;
+					}
+				}
+			}
 
-			sleep(10);
 			Log->info("Daemon closed");
 		} catch(const std::exception& e) {
 			std::cerr << e.what() << '\n';
 			return (1);
 		}
 
-		return (0);
+		return (result);
 	}
 
 #pragma endregion

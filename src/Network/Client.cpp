@@ -6,23 +6,25 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:01 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 14:55:43 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:18:53 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma region "Variables"
+#pragma region "Includes"
 
 	#include "Network/Client.hpp"
 	#include "Network/Epoll.hpp"
 
-	#include <ctime>
-	#include <csignal>
+	#include <unistd.h>															// For close()
+	#include <ctime>															// For time() and difftime()
+	#include <csignal>															// For kill()
 
 #pragma endregion
 
 #pragma region "Variables"
 
-	std::map <int, Client> clients;
+	std::map <int, Client> clients;												// 
+	std::map <int, Client> shells;												// 
 
 #pragma endregion
 

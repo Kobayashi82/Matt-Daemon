@@ -6,30 +6,31 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:32 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 23:29:15 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:41:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "Options.hpp"
+	#include "Main/Options.hpp"
 
-	#include <algorithm>
-	#include <iostream>
-	#include <cstring>
-	#include <getopt.h>
+	#include <algorithm>																// For std::transform()
+	#include <iostream>																	// For std::cerr()
+	#include <cstring>																	// For std::strlen()
+	#include <getopt.h>																	// For getopt_long()
 
 #pragma endregion
 
 #pragma region "Variables"
 
-	bool		Options::disabledEncryption	= false;
-	bool		Options::disabledShell		= false;
-	uint16_t	Options::maxClients			= 3;
-	uint16_t	Options::portNumber			= 4242;
-	uint8_t		Options::logLevel			= INFO;
-	std::string	Options::logPath			= "/var/log/matt_daemon/matt_daemon.log";
-	std::string	Options::_fullName			= "MattDaemon";
+	bool		Options::disabledEncryption	= false;									// Disable encrypted communication 
+	bool		Options::disabledShell		= false;									// Disable remote shell
+	uint16_t	Options::maxClients			= 3;										// Maximum number of clients connected simultaneously
+	uint16_t	Options::portNumber			= 4242;										// Port to listen for incoming connections
+	uint8_t		Options::logLevel			= INFO;										// Level of logging
+	std::string	Options::logPath			= "/var/log/matt_daemon/matt_daemon.log";	// Path to use for logging
+
+	std::string	Options::_fullName			= "MattDaemon";								// Name and path used to execute the program (same as argv[0])
 
 #pragma endregion
 
