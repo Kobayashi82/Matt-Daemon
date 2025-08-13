@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:53 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 00:26:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 15:16:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,12 @@
 
 #pragma endregion
 
+#pragma region "Variables"
+
+	Tintin_reporter	*Log;
+
+#pragma endregion
+
 #pragma region "Tintin Reporter"
 
 	#pragma region "Constructors"
@@ -27,6 +33,7 @@
 		#pragma region "Default"
 
 			Tintin_reporter::Tintin_reporter(const std::string& logPath, uint8_t logLevel) : _logPath(logPath), _logLevel(logLevel) {
+				if (!std::filesystem::path(_logPath).is_absolute()) _logPath = std::filesystem::absolute(_logPath).string();
 				createDirectory(_logPath);
 
 				_logFile.open(_logPath, std::ios::app);
@@ -36,6 +43,7 @@
 				}
 
 				_logFile << std::unitbuf;
+				Log = this;
 			}
 
 		#pragma endregion
@@ -43,6 +51,7 @@
 		#pragma region "Copy"
 
 			Tintin_reporter::Tintin_reporter(const Tintin_reporter& src) : _logPath(src._logPath), _logLevel(src._logLevel) {
+				if (!std::filesystem::path(_logPath).is_absolute()) _logPath = std::filesystem::absolute(_logPath).string();
 				createDirectory(_logPath);
 
 				_logFile.open(_logPath, std::ios::app);
@@ -150,7 +159,11 @@
 	#pragma region "Setter & Getters"
 	
 		void Tintin_reporter::set_logLevel(uint8_t logLevel) { _logLevel = logLevel; }
-		void Tintin_reporter::set_logPath(const std::string& logPath) { _logPath = logPath; open(); }
+		void Tintin_reporter::set_logPath(const std::string& logPath) {
+			_logPath = logPath;
+			if (!std::filesystem::path(_logPath).is_absolute()) _logPath = std::filesystem::absolute(_logPath).string();
+			open();
+		}
 
 		uint8_t Tintin_reporter::get_logLevel() const { return (_logLevel); }
 		std::string Tintin_reporter::get_logPath() const { return (_logPath); }
@@ -162,36 +175,42 @@
 		void Tintin_reporter::debug(const std::string& msg) {
 			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > DEBUG) return;
+			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
 			_logFile << "[" << getTimestamp() << "]      [ DEBUG ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::info(const std::string& msg) {
 			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > INFO) return;
+			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
 			_logFile << "[" << getTimestamp() << "]       [ INFO ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::log(const std::string& msg) {
 			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > LOG) return;
+			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
 			_logFile << "[" << getTimestamp() << "]        [ LOG ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::warning(const std::string& msg) {
 			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > WARNING) return;
+			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
 			_logFile << "[" << getTimestamp() << "]    [ WARNING ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::error(const std::string& msg) {
 			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > ERROR) return;
+			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
 			_logFile << "[" << getTimestamp() << "]      [ ERROR ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::critical(const std::string& msg) {
 			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > CRITICAL) return;
+			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
 			_logFile << "[" << getTimestamp() << "]   [ CRITICAL ] - " << msg << std::endl;
 		}
 

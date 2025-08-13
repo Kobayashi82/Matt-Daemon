@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/11 19:13:18 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/12 23:38:38 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/13 14:07:41 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -62,7 +62,8 @@ SRC_DIR		= src/
 
 SRCS		= Main/Main.cpp Main/Options.cpp					\
 			  Crypto/Crypto.cpp									\
-			  Network/Network.cpp								\
+			  Network/Socket.cpp								\
+			  Network/Client.cpp								\
 			  Shell/Shell.cpp									\
 			  Log/Logging.cpp
 

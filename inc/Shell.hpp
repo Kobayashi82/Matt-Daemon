@@ -6,17 +6,11 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 18:02:22 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 19:15:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 14:57:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-
-#pragma region "Includes"
-
-
-
-#pragma endregion
 
 #pragma region "Methods"
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 00:36:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 15:17:04 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 	#include "Crypto.hpp"
 	#include "Shell.hpp"
 	#include "Logging.hpp"
+	#include "Network/Socket.hpp"
 
 	#include <csignal>		// std::signal()
 	#include <cstdlib>		// std::exit()
@@ -25,12 +26,6 @@
 	#include <unistd.h>		// fork(), setsid(), chdir(), close()
 	#include <sys/stat.h>	// umask()
 	#include <sys/file.h>	// flock()
-
-#pragma endregion
-
-#pragma region "Variables"
-
-	Tintin_reporter	*Log;
 
 #pragma endregion
 
@@ -99,16 +94,19 @@
 			if ((result = Options::parse(argc, argv))) return (result - 1);
 
 			Tintin_reporter	Tintin_logger(Options::logPath, Options::logLevel);
-			Log = &Tintin_logger;
-
+	
 			Log->debug("Initiating daemon");
 			if (daemonize()) return (1);
 			Log->info("Daemon started");
 
 			Log->debug("Initializing network");
-			// connection
+			Socket Socket(Options::portNumber);
+			if (Socket.create()) return (1);
+			Log->info("Daemon listening on port " + std::to_string(Options::portNumber));
 
 			// epoll
+
+			sleep(10);
 			Log->info("Daemon closed");
 		} catch(const std::exception& e) {
 			std::cerr << e.what() << '\n';

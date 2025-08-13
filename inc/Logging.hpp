@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Tintin_reporter.hpp                                :+:      :+:    :+:   */
+/*   Logging.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:17 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/12 23:30:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/13 14:57:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,5 +71,11 @@
 			static void createDirectory(const std::string& filePath);
 			static std::string getTimestamp();
 	};
+
+#pragma endregion
+
+#pragma region "Variables"
+
+	extern Tintin_reporter	*Log;
 
 #pragma endregion
