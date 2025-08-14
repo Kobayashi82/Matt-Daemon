@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:17 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 22:55:48 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 00:06:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,7 @@
 			bool				operator==(const Tintin_reporter& rhs) const;	// Equality operator
 
 			// Methods
-			void			open();												// Opens or creates the log file in append mode
-			void			close();											// Closes the log file
-			void			clear();											// Clears all content from the log file
-
 			void			set_logLevel(uint8_t logLevel);						// Sets the logging level
-			void			set_logPath(const std::string& logPath);			// Sets the log file path
 			uint8_t			get_logLevel() const;								// Gets the current logging level
 			std::string		get_logPath() const;								// Gets the log file path
 
@@ -65,9 +60,14 @@
 			uint8_t			_logLevel;											// Current logging level
 			std::mutex		_mutex;												// Mutex for thread-safe logging
 
+			const size_t	MAX_LOG_SIZE = 10 * 1024 * 1024;					// Size for log rotation (Default = 10 MB)
+			const uint8_t	MAX_LOG_ROTATIONS = 5;								// Maximum number of rotated log files to keep
+
 			// Methods
-			static void createDirectory(const std::string& filePath);			// Creates the full directory path to the log file
-			static std::string getTimestamp();									// Returns the current timestamp in log-friendly format
+			void			open();												// Opens or creates the log file in append mode
+			void			rotateLog();										// Rotates log files
+			void			createDirectory(const std::string& filePath);		// Creates the full directory path to the log file
+			std::string		getTimestamp();										// Returns the current timestamp in log-friendly format
 	};
 
 #pragma endregion

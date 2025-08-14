@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 19:09:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 22:37:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 00:15:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 	#include <sys/wait.h>														// close(), fork(), setsid(), setgid(), setuid(), dup2(), chdir(), execvp()
 	#include <sys/ioctl.h>														// ioctl()
 	#include <fcntl.h>															// open()
+	#include <unistd.h>															// access()
 
 #pragma endregion
 
@@ -102,7 +103,17 @@
 				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] chdir() failed");
 				exit(1);
 			}
-			char *args[] = { (char*)"/bin/bash", nullptr };
+
+			const char* shell_path = nullptr;
+			if		(!access("/bin/bash", X_OK))	shell_path = "/bin/bash";
+			else if (!access("/bin/zsh", X_OK))		shell_path = "/bin/zsh";
+			else if (!access("/bin/sh", X_OK))		shell_path = "/bin/sh";
+			else {
+				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] no shell found");
+				exit(1);
+			}
+
+			char *args[] = { (char *)shell_path, nullptr };
 			execvp(args[0], args);
 			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] execve() failed");
 			exit(1);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:53 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 22:27:10 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 00:07:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,111 +109,107 @@
 
 	#pragma endregion
 
-	#pragma region "File Operations"
-
-		#pragma region "Open"
-
-			void Tintin_reporter::open() {
-				if (_logFile.is_open()) _logFile.close();
-
-				createDirectory(_logPath);
-				_logFile.open(_logPath, std::ios::app);
-				if (!_logFile.is_open()) {
-					std::string errorMsg = "Cannot open log file: " + _logPath + " - " + strerror(errno);
-					throw std::runtime_error(errorMsg);
-				}
-
-				_logFile << std::unitbuf;
-			}
-
-		#pragma endregion
-
-		#pragma region "Close"
-
-			void Tintin_reporter::close() {
-				if (_logFile.is_open()) _logFile.close();
-			}
-
-		#pragma endregion
-
-		#pragma region "Clear"
-
-			void Tintin_reporter::clear() {
-				bool is_open = _logFile.is_open();
-				if (_logFile.is_open()) _logFile.close();
-
-				if (is_open) {
-					createDirectory(_logPath);
-					_logFile.open(_logPath, std::ios::trunc);
-					if (!_logFile.is_open()) {
-						std::string errorMsg = "Cannot open log file: " + _logPath + " - " + strerror(errno);
-						throw std::runtime_error(errorMsg);
-					}
-					
-					_logFile << std::unitbuf;
-				}
-			}
-
-		#pragma endregion
-
-	#pragma endregion
-
 	#pragma region "Setter & Getters"
 	
 		void Tintin_reporter::set_logLevel(uint8_t logLevel) { _logLevel = logLevel; }
-		void Tintin_reporter::set_logPath(const std::string& logPath) {
-			_logPath = logPath;
-			if (!std::filesystem::path(_logPath).is_absolute()) _logPath = std::filesystem::absolute(_logPath).string();
-			open();
-		}
-
 		uint8_t Tintin_reporter::get_logLevel() const { return (_logLevel); }
 		std::string Tintin_reporter::get_logPath() const { return (_logPath); }
+
+	#pragma endregion
+
+	#pragma region "Open"
+
+		void Tintin_reporter::open() {
+			if (_logFile.is_open()) _logFile.close();
+
+			createDirectory(_logPath);
+			_logFile.open(_logPath, std::ios::app);
+			if (!_logFile.is_open()) {
+				std::string errorMsg = "Cannot open log file: " + _logPath + " - " + strerror(errno);
+				throw std::runtime_error(errorMsg);
+			}
+
+			_logFile << std::unitbuf;
+		}
 
 	#pragma endregion
 
 	#pragma region "Logging"
 
 		void Tintin_reporter::debug(const std::string& msg) {
-			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > DEBUG) return;
+			std::lock_guard<std::mutex> lock(_mutex);
 			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			rotateLog();
 			_logFile << "[" << getTimestamp() << "]      [ DEBUG ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::info(const std::string& msg) {
-			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > INFO) return;
+			std::lock_guard<std::mutex> lock(_mutex);
 			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			rotateLog();
 			_logFile << "[" << getTimestamp() << "]       [ INFO ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::log(const std::string& msg) {
-			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > LOG) return;
+			std::lock_guard<std::mutex> lock(_mutex);
 			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			rotateLog();
 			_logFile << "[" << getTimestamp() << "]        [ LOG ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::warning(const std::string& msg) {
-			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > WARNING) return;
+			std::lock_guard<std::mutex> lock(_mutex);
 			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			rotateLog();
 			_logFile << "[" << getTimestamp() << "]    [ WARNING ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::error(const std::string& msg) {
-			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > ERROR) return;
+			std::lock_guard<std::mutex> lock(_mutex);
 			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			rotateLog();
 			_logFile << "[" << getTimestamp() << "]      [ ERROR ] - " << msg << std::endl;
 		}
 
 		void Tintin_reporter::critical(const std::string& msg) {
-			std::lock_guard<std::mutex> lock(_mutex);
 			if (_logLevel > CRITICAL) return;
+			std::lock_guard<std::mutex> lock(_mutex);
 			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			rotateLog();
 			_logFile << "[" << getTimestamp() << "]   [ CRITICAL ] - " << msg << std::endl;
+		}
+
+	#pragma endregion
+
+	#pragma region "Rotate Log"
+
+		void Tintin_reporter::rotateLog() {
+			if (!_logFile.is_open()) return;
+			
+			std::streampos currentPos = _logFile.tellp();
+			
+			if ((size_t)currentPos > MAX_LOG_SIZE) {
+				_logFile.close();
+				std::string oldestFile = _logPath + "." + std::to_string(MAX_LOG_ROTATIONS);
+				std::remove(oldestFile.c_str());
+
+				for (int i = MAX_LOG_ROTATIONS - 1; i >= 1; i--) {
+					std::string currentFile = _logPath + "." + std::to_string(i);
+					std::string nextFile = _logPath + "." + std::to_string(i + 1);
+
+					std::rename(currentFile.c_str(), nextFile.c_str());
+				}
+
+				std::string firstBackup = _logPath + ".1";
+				std::rename(_logPath.c_str(), firstBackup.c_str());
+
+				open();
+			}
 		}
 
 	#pragma endregion
