@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 14:33:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 19:50:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 	#include "Main/Options.hpp"
 	#include "Main/Logging.hpp"
+	#include "Main/Shell.hpp"
 	#include "Network/Socket.hpp"
 	#include "Network/Client.hpp"
 	#include "Network/Epoll.hpp"
@@ -21,8 +22,8 @@
 
 	#include <cstring>															// For std::memset() and std::strcmp()
 	#include <unistd.h>															// For read() and write()
-	#include <sys/socket.h>														// For recv() and send()
-	
+	#include <sys/socket.h>														// For recv(), send() and shutdown()
+	#include <errno.h>															// For errno and strerror()
 	#include <iomanip>															// 
 	#include <shadow.h>															// 
 	#include <crypt.h>															// 
@@ -41,19 +42,6 @@
 
 	#pragma region "CLIENT"
 
-	void get_userpass(const std::string msg, std::string & user, std::string & pass) {	
-		size_t userPos = msg.find("user=");
-		size_t passPos = msg.find("pass=");
-
-		if (userPos != std::string::npos && passPos != std::string::npos) {
-			size_t userStart = userPos + 5;
-			size_t userEnd   = passPos - 1;
-			user = msg.substr(userStart, userEnd - userStart);		
-			size_t passStart = passPos + 5;
-			pass = msg.substr(passStart);
-		}
-	}
-
 		#pragma region "Read"
 
 			int Communication::read_client(Client *client) {
@@ -70,11 +58,14 @@
 						std::string msg = std::string(buffer, buffer + bytes_read);
 						if (!msg.empty() && msg.back() == '\n') msg.pop_back();
 						if (msg == "quit") {
+							Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] wants to close the daemon");
 							Epoll::Running = false;
 						} if (msg == "/CLIENT_SHELL_AUTH") {
+							Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] wants to open a shell");
 							std::string response;
 							if (Options::disabledShell) {
 								response = "/SHELL_DISABLED";
+								Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell is disabled, so reject connection");
 								client->diying = true;
 							} else {
 								response = "/AUTHORIZE ENCRYPTION=" + std::string(!Options::disabledEncryption ? "true" : "false");
@@ -90,30 +81,45 @@
 						try {
 							if (!Options::disabledEncryption) msg = decrypt(msg);
 						} catch (const std::exception& e) {
-							Log->critical("Message not encrypted");
+							Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] message not encrypted, so reject connection");
 							client->remove(); return (1);
 						}
-						if (msg.substr(0, 14) == "/AUTHORIZATION") {
-							Log->log("AUTHORIZATION received");
+						if (!client->shell_running && msg.substr(0, 14) == "/AUTHORIZATION") {
 							std::string user, pass, response;
-							get_userpass(msg.substr(15), user, pass);
-							Log->info(user + " - " + pass);
+
+							if (get_userpass(msg.substr(15), user, pass)) {
+								Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] authorization failed - invalid format");
+								response = "/AUTHORIZATION_FAIL";
+								if (!Options::disabledEncryption) response = encrypt(response);
+								client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
+								return (0);
+							}
+							Log->info("Authentication attempt - User: " + user);
 							if (authenticate(user, pass)) {
-								response = "/AUTHORIZATION OK";
+								response = "/AUTHORIZATION_OK";
+								Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] authorization successful");
+								client->authenticated = true;
+								client->user = user;
+								client->pass = pass;
 							} else {
-								response = "/AUTHORIZATION FAIL";
+								response = "/AUTHORIZATION_FAIL";
+								Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] authorization failed - invalid credentials");
 							}
 							if (!Options::disabledEncryption) response = encrypt(response);
 							client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
 						} else {
 							client->write_sh_buffer.insert(client->write_sh_buffer.end(), msg.begin(), msg.end());
+							if (client->shell_running && client->master_fd >= 0) Epoll::set(client->master_fd, true, true);
 						}
 					}
 				}
 				// No data (usually means a client disconected)
-				else if (bytes_read == 0)	{ client->remove();	return (1); }
+				else if (bytes_read == 0) { client->remove(); return (1); }
 				// Error reading
-				else if (bytes_read == -1)	{ client->remove();	return (1); }
+				else if (bytes_read == -1) {
+					Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] error reading data");
+					client->remove(); return (1);
+				}
 
 				return (0);
 			}
@@ -138,11 +144,33 @@
 						client->write_buffer.erase(client->write_buffer.begin(), client->write_buffer.begin() + bytes_written);
 					}
 
-					if (client->diying && client->write_buffer.empty()) { client->remove();	return; }
+					if (client->diying && client->write_buffer.empty()) { 
+						Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] removing after sending farewell message");
+						client->remove();	
+						return; 
+					}
+
+					// If client is authenticated but shell is not running and client is not dying, 
+					// try to start shell or mark for disconnection
+					if (client->type == CLIENT && client->authenticated && !client->shell_running && !client->diying) {
+						if (shell_start(client)) {
+							Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell failed");
+							std::string response = "/SHELL_FAIL";
+							if (!Options::disabledEncryption) response = encrypt(response);
+							client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
+							client->diying = true;
+						} else {
+							Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell started");
+						}
+					}
+
 					// No writing if 'write_buffer' is empty, so this must be an error
-					else if (bytes_written == 0)	{ client->remove();	return; }
+					else if (bytes_written == 0) { client->remove(); return; }
 					// Error writing
-					else if (bytes_written == -1)	{ client->remove();	return; }
+					else if (bytes_written == -1) {
+						Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] error writing data");
+						client->remove(); return;
+					}
 				}
 			}
 
@@ -164,17 +192,25 @@
 				// Read some data
 				if (bytes_read > 0) {
 					client->update_last_activity();
-					client->write_buffer.insert(client->write_buffer.end(), buffer, buffer + bytes_read);
+					std::string output(buffer, bytes_read);
+					if (!Options::disabledEncryption) output = encrypt(output);				
+					client->write_buffer.insert(client->write_buffer.end(), output.begin(), output.end());
 				}
 				// No data (shell ended or stdout closed)
 				else if (bytes_read == 0) {
-					// close shell and client
-					return (1);
+					Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell stdout closed (EOF)");
+					// Don't remove client here - let SIGCHLD handler handle it when process actually terminates
+					return (0);
 				}
-				// Error reading
+				// Error reading (would block or actual error)
 				else if (bytes_read == -1) {
-					// close shell and client
-					return (1);
+					if (errno == EAGAIN || errno == EWOULDBLOCK) {
+						// No data available right now, not an error
+						return (0);
+					}
+					Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] error reading from shell: " + std::string(strerror(errno)));
+					// Don't remove client here either - let SIGCHLD handler handle it
+					return (0);
 				}
 
 				return (0);
@@ -193,20 +229,33 @@
 
 					size_t buffer_size = client->write_sh_buffer.size();
 					size_t chunk = std::min(buffer_size, static_cast<size_t>(CHUNK_SIZE));
-					ssize_t bytes_written = write(client->master_fd, client->write_sh_buffer.data(), chunk);
+
+					std::string command_data(client->write_sh_buffer.begin(), client->write_sh_buffer.begin() + chunk);
+					if (!command_data.empty() && command_data.back() != '\n') {
+						command_data += '\n';
+					}
+
+					ssize_t bytes_written = write(client->master_fd, command_data.c_str(), command_data.length());
 
 					// Sent some data
 					if (bytes_written > 0) {
-						client->write_sh_buffer.erase(client->write_sh_buffer.begin(), client->write_sh_buffer.begin() + bytes_written);
+						size_t to_remove = std::min(static_cast<size_t>(bytes_written), chunk);
+						client->write_sh_buffer.erase(client->write_sh_buffer.begin(), client->write_sh_buffer.begin() + to_remove);
 					}
 					// No writing if 'write_sh_buffer' is empty, so this must be an error
 					else if (bytes_written == 0) {
-						// close shell and client
+						Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell not ready for writing");
+						// Shell not ready, try again later
 						return;
 					}
 					// Error writing
 					else if (bytes_written == -1) {
-						// close shell and client
+						if (errno == EAGAIN || errno == EWOULDBLOCK) {
+							// Shell not ready to receive data, try again later
+							return;
+						}
+						Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] error writing to shell: " + std::string(strerror(errno)));
+						client->shell_running = false;
 						return;
 					}
 				}
@@ -218,7 +267,7 @@
 
 #pragma endregion
 
-#pragma region "Encryption"
+#pragma region "Authentication"
 
 	#pragma region "Authenticate"
 
@@ -235,74 +284,95 @@
 
 	#pragma endregion
 
-	#pragma region "Encryptation"
+	#pragma region "Get User/Pass"
 
-		#pragma region "Internal"
+		int Communication::get_userpass(const std::string msg, std::string & user, std::string & pass) {	
+			size_t userPos = msg.find("user=");
+			size_t passPos = msg.find("pass=");
 
-			#pragma region "Process"
+			if (userPos != std::string::npos && passPos != std::string::npos) {
+				size_t userStart = userPos + 5;
+				size_t userEnd   = passPos - 1;
+				user = msg.substr(userStart, userEnd - userStart);		
+				size_t passStart = passPos + 5;
+				pass = msg.substr(passStart);
 
-				std::string Communication::process(const std::string& data) {
-					std::string result;
-					result.reserve(data.length());
+				return (0);
+			}
 
-					for (size_t i = 0; i < data.length(); ++i) {
-						char encrypted_char = data[i] ^ KEY[i % KEY.length()];
-						result.push_back(encrypted_char);
-					}
+			return (1);
+		}
 
-					return (result);
+	#pragma endregion
+
+#pragma endregion
+
+#pragma region "Encryptation"
+
+	#pragma region "Internal"
+
+		#pragma region "Process"
+
+			std::string Communication::process(const std::string& data) {
+				std::string result;
+				result.reserve(data.length());
+
+				for (size_t i = 0; i < data.length(); ++i) {
+					char encrypted_char = data[i] ^ KEY[i % KEY.length()];
+					result.push_back(encrypted_char);
 				}
 
-			#pragma endregion
-
-			#pragma region "To Hex"
-
-				std::string Communication::toHex(const std::string& data) {
-					std::stringstream ss;
-					ss << std::hex << std::setfill('0');
-					for (unsigned char c : data) ss << std::setw(2) << static_cast<int>(c);
-
-					return (ss.str());
-				}
-
-			#pragma endregion
-
-			#pragma region "From Hex"
-
-				std::string Communication::fromHex(const std::string& hexData) {
-					if (hexData.length() % 2 != 0) throw std::invalid_argument("Invalid hex string length");
-
-					std::string result;
-					result.reserve(hexData.length() / 2);
-
-					for (size_t i = 0; i < hexData.length(); i += 2) {
-						std::string byte = hexData.substr(i, 2);
-						char c = static_cast<char>(std::strtol(byte.c_str(), nullptr, 16));
-						result.push_back(c);
-					}
-
-					return (result);
-				}
-
-			#pragma endregion
-
-		#pragma endregion
-
-		#pragma region "Encrypt"
-
-			std::string Communication::encrypt(const std::string& plaintext)  {
-				return (toHex(process(plaintext)));
+				return (result);
 			}
 
 		#pragma endregion
 
-		#pragma region "Decrypt"
+		#pragma region "To Hex"
 
-			std::string Communication::decrypt(const std::string& ciphertext) {
-				return (process(fromHex(ciphertext)));
+			std::string Communication::toHex(const std::string& data) {
+				std::stringstream ss;
+				ss << std::hex << std::setfill('0');
+				for (unsigned char c : data) ss << std::setw(2) << static_cast<int>(c);
+
+				return (ss.str());
 			}
 
 		#pragma endregion
+
+		#pragma region "From Hex"
+
+			std::string Communication::fromHex(const std::string& hexData) {
+				if (hexData.length() % 2 != 0) throw std::invalid_argument("Invalid hex string length");
+
+				std::string result;
+				result.reserve(hexData.length() / 2);
+
+				for (size_t i = 0; i < hexData.length(); i += 2) {
+					std::string byte = hexData.substr(i, 2);
+					char c = static_cast<char>(std::strtol(byte.c_str(), nullptr, 16));
+					result.push_back(c);
+				}
+
+				return (result);
+			}
+
+		#pragma endregion
+
+	#pragma endregion
+
+	#pragma region "Encrypt"
+
+		std::string Communication::encrypt(const std::string& plaintext)  {
+			return (toHex(process(plaintext)));
+		}
+
+	#pragma endregion
+
+	#pragma region "Decrypt"
+
+		std::string Communication::decrypt(const std::string& ciphertext) {
+			return (process(fromHex(ciphertext)));
+		}
 
 	#pragma endregion
 

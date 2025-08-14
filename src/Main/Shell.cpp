@@ -6,87 +6,116 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 19:09:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:41:20 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 19:50:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
+	#include "Main/Logging.hpp"
 	#include "Main/Shell.hpp"
+	#include "Network/Client.hpp"
+	#include "Network/Epoll.hpp"
 
 	#include <unistd.h>
 	#include <pwd.h>
 	#include <sys/types.h>
 	#include <sys/wait.h>
+	#include <sys/ioctl.h>
+	#include <fcntl.h>
 	#include <iostream>
 
 #pragma endregion
 
-#pragma region "Popo"
+#pragma region "Start"
 
-	int popo(const std::string user) {
-		struct passwd *pw = getpwnam(user.c_str());
+	int shell_start(Client *client) {
+		struct passwd *pw = getpwnam(client->user.c_str());
 
 		if (!pw) {
-			std::cerr << "Usuario no encontrado\n";
-			return 1;
+			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] user not found");
+			return (1);
+		}
+
+		// Crear PTY antes del fork
+		client->master_fd = posix_openpt(O_RDWR | O_NOCTTY);
+		if (client->master_fd == -1) {
+			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] posix_openpt() failed");
+			return (1);
+		}
+		
+		if (grantpt(client->master_fd) == -1 || unlockpt(client->master_fd) == -1) {
+			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] grantpt()/unlockpt() failed");
+			close(client->master_fd);
+			return (1);
+		}
+		
+		char pty_name[256];
+		if (ptsname_r(client->master_fd, pty_name, sizeof(pty_name)) != 0) {
+			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] ptsname_r() failed");
+			close(client->master_fd);
+			return (1);
 		}
 
 		pid_t pid = fork();
+		if (pid < 0) {
+			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] fork() failed");
+			close(client->master_fd);
+			return (1);
+		}
 
 		if (pid == 0) {
-			// --- Hijo ---
+			client->slave_fd = open(pty_name, O_RDWR);
+			if (client->slave_fd == -1) {
+				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] open slave failed");
+				exit(1);
+			}
+
+			// Set controlling terminal properly
+			if (setsid() == -1) exit(1);
+			
+			// Set the slave as controlling terminal
+			ioctl(client->slave_fd, TIOCSCTTY, 0);
+
+			dup2(client->slave_fd, STDIN_FILENO);
+			dup2(client->slave_fd, STDOUT_FILENO);
+			dup2(client->slave_fd, STDERR_FILENO);
+			
+			close(client->master_fd);
+			if (client->slave_fd > 2) {
+				close(client->slave_fd);
+			}
+
 			if (setgid(pw->pw_gid) != 0) {
-				perror("setgid");
-				_exit(1);
+				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] setgid() failed");
+				exit(1);
 			}
 			if (setuid(pw->pw_uid) != 0) {
-				perror("setuid");
-				_exit(1);
+				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] setuid() failed");
+				exit(1);
 			}
 
 			setenv("HOME", pw->pw_dir, 1);
 			setenv("USER", pw->pw_name, 1);
 			setenv("LOGNAME", pw->pw_name, 1);
+
 			if (chdir(pw->pw_dir) != 0) {
-				perror("chdir");
-				_exit(1);
+				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] chdir() failed");
+				exit(1);
 			}
 			char *args[] = { (char*)"/bin/bash", nullptr };
 			execvp(args[0], args);
-			perror("execvp");
-			_exit(1);
-			return (0);
+			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] execve() failed");
+			exit(1);
 		}
-		else if (pid > 0) {
-			// --- Padre ---
-			int status;
-			waitpid(pid, &status, 0);
-			std::cout << "Proceso hijo terminó con código " << WEXITSTATUS(status) << "\n";
-		}
-		else {
-			perror("fork");
-			return 1;
-		}
+
+		client->shell_pid = pid;
+		client->shell_running = true;
+		shells[client->master_fd] = client;
+		Epoll::add(client->master_fd, true, true);
+
+		Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell started with PTY: " + std::string(pty_name));
 		return (0);
 	}
-
-	// try {
-	// 	if (authenticate(argv[1], argv[2])) {
-	// 		std::cout << "Autenticación OK\n";
-	// 	} else {
-	// 		std::cout << "Autenticación fallida\n";
-	// 	}
-	// } catch(const std::exception& e) {
-	// 	std::cerr << e.what() << '\n';
-	// }
-	
-
-	// std::string popo1 = encrypt("Hola, como estás #~@{<`}");
-	// std::cout << popo1 << "\n";
-	// std::string popo2 = decrypt(popo1);
-	// std::cout << popo2 << "\n";
-
-	// popo(std::string(argv[1]));
 
 #pragma endregion

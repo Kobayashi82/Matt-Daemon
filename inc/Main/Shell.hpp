@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 18:02:22 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:44:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 18:17:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 
 #pragma region "Includes"
 
-	#include <string>
+	#include "Network/Client.hpp"
 
 #pragma endregion
 
 #pragma region "Methods"
 
-	int popo(const std::string user);
+	int shell_start(Client *client);
 
 #pragma endregion

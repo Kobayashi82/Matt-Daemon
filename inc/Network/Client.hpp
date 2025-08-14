@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 13:12:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 18:37:05 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,9 @@
 			int					type;											// 
 			time_t				last_activity;									// Last activity time point
 			bool				diying;											// 
+			std::string			user;											// 
+			std::string			pass;											// 
+			bool				authenticated;									// 
 			bool				shell_running;									// 
 			int					shell_pid;										// 
 			int					master_fd;										// 
@@ -68,6 +71,6 @@
 #pragma region "Variables"
 
 	extern std::map <int, std::unique_ptr<Client>> clients;						// 
-	extern std::map <int, Client> shells;										// 
+	extern std::map <int, Client *> shells;										// 
 
 #pragma endregion

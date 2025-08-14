@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 14:08:27 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 19:11:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,7 @@
 				if (it != clients.end()) { client = it->second.get(); type = client->type; }
 				else {
 					auto it = shells.find(events[i].data.fd);
-					if (it != shells.end()) { client = &it->second;	type = SHELL; }
+					if (it != shells.end()) { client = it->second;	type = SHELL; }
 				}
 
 				if (events[i].events & EPOLLIN) {

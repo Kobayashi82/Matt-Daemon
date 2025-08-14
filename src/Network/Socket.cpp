@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:06 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 14:13:39 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 17:02:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@
 		clients.emplace(fd, std::make_unique<Client>(fd, ip, port));
 
 		if (clients.size() > Options::maxClients) {
-			Log->info("Client [" + ip + "] denied. Maximum clients reached");	
+			Log->info("Client [" + ip + ":" + std::to_string(port) + "] denied. Maximum clients reached");	
 			Client *client = nullptr; 
 			auto it = clients.find(fd);
 			if (it != clients.end()) client = it->second.get();
@@ -136,7 +136,7 @@
 			std::string msg = "Maximum connections reached. Disconnected\n";
 			client->write_buffer.insert(client->write_buffer.end(), msg.begin(), msg.end());
 		} else {
-			Log->info("Client [" + ip + "] connected");
+			Log->info("Client [" + ip + ":" + std::to_string(port) + "] connected");
 		}
 
 		if (Epoll::add(fd, true, true) == -1) {

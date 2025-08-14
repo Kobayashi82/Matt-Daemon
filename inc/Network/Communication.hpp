@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:34:55 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 17:55:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 			static void	write_shell(Client *client);							// 
 
 			static bool	authenticate(const std::string& user, const std::string& pass);
+			static int	get_userpass(const std::string msg, std::string & user, std::string & pass);
 
 			static std::string encrypt(const std::string& plaintext);
 			static std::string decrypt(const std::string& ciphertext);

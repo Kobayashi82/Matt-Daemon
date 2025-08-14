@@ -20,6 +20,7 @@
 
 	#include <csignal>															// For std::signal()
 	#include <cstdlib>															// For std::exit()
+	#include <sys/wait.h>														// For waitpid()
 
 	#include <stdio.h>															// For dprintf()
 	#include <fcntl.h>															// For open()
@@ -35,6 +36,26 @@
 		(void) signum;
 		Log->info("Signal SIGTERM received");
 		Epoll::Running = false;
+	}
+
+	static void sigchld_handler(int signum) {
+		(void) signum;
+		// Clean up zombie child processes
+		pid_t pid;
+		int status;
+		while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+			Log->debug("Child process " + std::to_string(pid) + " terminated");
+			
+			// Find the client associated with this shell process and disconnect it
+			for (auto& client_pair : clients) {
+				Client* client = client_pair.second.get();
+				if (client && client->shell_pid == pid) {
+					Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell process terminated, disconnecting client");
+					client->remove();
+					break;
+				}
+			}
+		}
 	}
 
 	static int daemonize() {
@@ -60,10 +81,10 @@
 
 		// 4. signal()
 		int signals = 0;
-		if (std::signal(SIGTERM, sigterm_handler) == SIG_ERR)	{ signals++; Log->warning("Signal SIGCHLD failed"); }
-		if (std::signal(SIGCHLD, SIG_IGN) == SIG_ERR)	{ signals++; Log->warning("Signal SIGCHLD failed"); }
+		if (std::signal(SIGTERM, sigterm_handler) == SIG_ERR)	{ signals++; Log->warning("Signal SIGTERM failed"); }
+		if (std::signal(SIGCHLD, sigchld_handler) == SIG_ERR)	{ signals++; Log->warning("Signal SIGCHLD failed"); }
 		if (std::signal(SIGHUP, SIG_IGN) == SIG_ERR)	{ signals++; Log->warning("Signal SIGHUP failed");  }
-		if (signals != 2) Log->debug("Signals set");
+		if (signals == 0) Log->debug("Signals set");
 
 		// 5. umask()
 		umask(022);
