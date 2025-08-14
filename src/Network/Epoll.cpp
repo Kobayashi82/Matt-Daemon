@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 21:10:42 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 23:06:44 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,10 @@
 	#include "Network/Epoll.hpp"
 	#include "Network/Communication.hpp"
 
-	#include <cstring>															// For std::memset()
-	#include <unistd.h>															// For read() and close()
-	#include <sys/epoll.h>														// For EPOLL
-	#include <sys/timerfd.h>													// For timerfd() to create a FD that triggers events in EPOLL
-
+	#include <cstring>															// std::memset()
+	#include <unistd.h>															// read(), close()
+	#include <sys/epoll.h>														// epoll_create(), epoll_ctl(), epoll_wait(), epoll_event
+	#include <sys/timerfd.h>													// timerfd_create(), timerfd_settime()
 
 #pragma endregion
 

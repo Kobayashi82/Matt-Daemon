@@ -1,6 +1,5 @@
 # TODO
 
-- Options
-- Daemon
-- Connection
-- Shell
+- Mejores logs
+- Cliente
+- Compile .hpp

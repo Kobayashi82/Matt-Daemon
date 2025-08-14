@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:06 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 17:02:56 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 23:04:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,9 @@
 	#include "Network/Client.hpp"
 	#include "Network/Epoll.hpp"
 
-	#include <arpa/inet.h>														// For socket functions
-	#include <unistd.h>															// For close()
-	#include <cstring>															// For std::memset()
+	#include <arpa/inet.h>														// socket(), setsockopt(), bind(), listen(), accept(), inet_ntop(), htons(), ntohs(), sockaddr_in
+	#include <unistd.h>															// close()
+	#include <cstring>															// std::memset()
 
 #pragma endregion
 

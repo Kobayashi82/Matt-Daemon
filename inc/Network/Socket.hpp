@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:08:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 22:56:04 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,8 @@
 			~Socket();															// Destructor
 
 			// Overloads
-			Socket &	operator=(const Socket & rhs);							// Overload for assignation
-			bool		operator==(const Socket & rhs) const;					// Overload for equality
+			Socket &	operator=(const Socket & rhs);							// Assignment operator
+			bool		operator==(const Socket & rhs) const;					// Equality operator
 
 			// Methods
 			int		create();													// Creates socket

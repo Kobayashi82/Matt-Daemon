@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 21:18:08 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 23:01:20 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,11 @@
 	#include "Network/Epoll.hpp"
 	#include "Network/Communication.hpp"
 
-	#include <cstring>															// For std::memset() and std::strcmp()
-	#include <unistd.h>															// For read() and write()
-	#include <sys/socket.h>														// For recv(), send() and shutdown()
-	#include <errno.h>															// For errno and strerror()
-	#include <iomanip>															// 
-	#include <shadow.h>															// 
-	#include <crypt.h>															// 
+	#include <cstring>															// std::memset(), std::strcmp()
+	#include <unistd.h>															// read() and write(), crypt()
+	#include <sys/socket.h>														// recv(), send()
+	#include <iomanip>															// std::stringstream, std::setfill(), std::setw()
+	#include <shadow.h>															// getspnam()
 
 #pragma endregion
 
@@ -34,7 +32,7 @@
 
 	const size_t Communication::CHUNK_SIZE	= 4096;								// Size of the buffer for read/recv and write/send operations
 
-	const std::string Communication::KEY	= "Th1s_1s_n0t_4_s3cr3t_k3y_1t's_0nly_4_l0v3_m3ss4g3:_I_L0v3_U_λµяΔ!";
+	const std::string Communication::KEY	= "Th1s_1s_n0t_4_s3cr3t_k3y_1t's_0nly_4_l0v3_m3ss4g3:_I_L0v3_U_λµяΔ!";	// Encryption key
 
 #pragma endregion
 
@@ -69,6 +67,7 @@
 								client->diying = true;
 							} else {
 								response = "/AUTHORIZE ENCRYPTION=" + std::string(!Options::disabledEncryption ? "true" : "false");
+								client->authenticated = false;
 								client->type = CLIENT;
 							}
 							client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
@@ -115,17 +114,9 @@
 					}
 				}
 				// No data (usually means a client disconected)
-				else if (bytes_read == 0) { 
-					Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] disconnected (EOF)");
-					client->schedule_removal(); 
-					return (1); 
-				}
+				else if (bytes_read == 0) { client->schedule_removal(); return (1); }
 				// Error reading
-				else if (bytes_read == -1) {
-					Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] error reading data");
-					client->schedule_removal(); 
-					return (1);
-				}
+				else if (bytes_read == -1) { client->schedule_removal(); return (1); }
 
 				return (0);
 			}
@@ -156,8 +147,7 @@
 						return; 
 					}
 
-					// If client is authenticated but shell is not running and client is not dying, 
-					// try to start shell or mark for disconnection
+					// If authenticated, shell not running and client not dying, start shell
 					if (client->type == CLIENT && client->authenticated && !client->shell_running && !client->diying) {
 						if (shell_start(client)) {
 							Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell failed");
@@ -170,26 +160,10 @@
 						}
 					}
 
-					// No writing if 'write_buffer' is empty, so this must be an error
-					else if (bytes_written == 0) { 
-						Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] cannot write to client (connection closed)");
-						client->schedule_removal(); 
-						return; 
-					}
+					// No writing
+					else if (bytes_written == 0) { client->schedule_removal(); return; }
 					// Error writing
-					else if (bytes_written == -1) {
-						if (errno == EPIPE || errno == ECONNRESET) {
-							Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] disconnected during write (EPIPE/ECONNRESET)");
-						} else if (errno == EAGAIN || errno == EWOULDBLOCK) {
-							// Socket buffer full, try again later
-							Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] write would block, trying later");
-							return;
-						} else {
-							Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] error writing data: " + std::string(strerror(errno)));
-						}
-						client->schedule_removal(); 
-						return;
-					}
+					else if (bytes_written == -1) { client->schedule_removal(); return; }
 				}
 			}
 
@@ -202,7 +176,7 @@
 		#pragma region "Read"
 
 			int Communication::read_shell(Client *client) {
-				if (!client || client->master_fd < 0) return (0);
+				if (!client || client->master_fd < 0  || !client->shell_running) return (0);
 
 				char buffer[CHUNK_SIZE];	std::memset(buffer, 0, sizeof(buffer));
 				ssize_t bytes_read = read(client->master_fd, buffer, CHUNK_SIZE);
@@ -228,7 +202,7 @@
 		#pragma region "Write"
 
 			void Communication::write_shell(Client *client) {
-				if (!client || client->master_fd < 0) return;
+				if (!client || client->master_fd < 0  || !client->shell_running) return;
 
 				// There are data, send it
 				if (!client->write_sh_buffer.empty()) {

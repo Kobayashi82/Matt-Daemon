@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:01 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 21:11:40 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 22:46:34 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@
 
 #pragma region "Variables"
 
-	std::map <int, std::unique_ptr<Client>>	clients;							// 
-	std::map <int, Client *>				shells;								// 
-	std::vector<int> 						pending_removals = {};				// FDs scheduled for removal after event processing
+	std::map <int, std::unique_ptr<Client>>	clients;							// FDs linked to their client
+	std::map <int, Client *>				shells;								// FDs of shells linked to their client
+	std::vector<int> 						pending_removals = {};				// List of FDs scheduled for removal
 
 #pragma endregion
 

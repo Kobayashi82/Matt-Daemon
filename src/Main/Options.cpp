@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:32 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 14:27:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 22:30:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,23 @@
 
 	#include "Main/Options.hpp"
 
-	#include <algorithm>																// For std::transform()
-	#include <iostream>																	// For std::cerr()
-	#include <cstring>																	// For std::strlen()
-	#include <getopt.h>																	// For getopt_long()
+	#include <algorithm>														// std::transform()
+	#include <iostream>															// std::cerr()
+	#include <cstring>															// std::strlen()
+	#include <getopt.h>															// getopt_long()
 
 #pragma endregion
 
 #pragma region "Variables"
 
-	bool		Options::disabledEncryption	= false;									// Disable encrypted communication 
-	bool		Options::disabledShell		= false;									// Disable remote shell
-	uint16_t	Options::maxClients			= 3;										// Maximum number of clients connected simultaneously
-	uint16_t	Options::portNumber			= 4242;										// Port to listen for incoming connections
-	uint8_t		Options::logLevel			= INFO;										// Level of logging
-	std::string	Options::logPath			= "/var/log/matt_daemon/matt_daemon.log";	// Path to use for logging
+	bool		Options::disabledEncryption	= false;							// Disable encrypted communication 
+	bool		Options::disabledShell		= false;							// Disable remote shell
+	uint16_t	Options::maxClients			= 3;								// Maximum number of clients connected simultaneously
+	uint16_t	Options::portNumber			= 4242;								// Port to listen for incoming connections
+	uint8_t		Options::logLevel			= INFO;								// Level of logging
+	std::string	Options::logPath	= "/var/log/matt_daemon/matt_daemon.log";	// Path to use for logging
 
-	std::string	Options::_fullName			= "MattDaemon";								// Name and path used to execute the program (same as argv[0])
+	std::string	Options::_fullName	= "MattDaemon";								// Name and path used to execute the program (same as argv[0])
 
 #pragma endregion
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:53 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:42:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 22:27:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,14 @@
 
 	#include "Main/Logging.hpp"
 
-	#include <ctime>															// 
-	#include <cstring>															// 
-	#include <filesystem>														// 
+	#include <cstring>															// strerror()
+	#include <filesystem>														// path(), absolute(), exists(), create_directories()
 
 #pragma endregion
 
 #pragma region "Variables"
 
-	Tintin_reporter	*Log;														// 
+	Tintin_reporter	*Log;														// Global pointer to Tintin_reporter
 
 #pragma endregion
 
@@ -140,16 +139,19 @@
 		#pragma region "Clear"
 
 			void Tintin_reporter::clear() {
+				bool is_open = _logFile.is_open();
 				if (_logFile.is_open()) _logFile.close();
 
-				createDirectory(_logPath);
-				_logFile.open(_logPath, std::ios::trunc);
-				if (!_logFile.is_open()) {
-					std::string errorMsg = "Cannot open log file: " + _logPath + " - " + strerror(errno);
-					throw std::runtime_error(errorMsg);
+				if (is_open) {
+					createDirectory(_logPath);
+					_logFile.open(_logPath, std::ios::trunc);
+					if (!_logFile.is_open()) {
+						std::string errorMsg = "Cannot open log file: " + _logPath + " - " + strerror(errno);
+						throw std::runtime_error(errorMsg);
+					}
+					
+					_logFile << std::unitbuf;
 				}
-
-				_logFile << std::unitbuf;
 			}
 
 		#pragma endregion

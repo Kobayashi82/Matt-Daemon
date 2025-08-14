@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 21:11:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 22:56:46 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,18 +37,18 @@
 			int					fd;												// File descriptor associated with the client
 			std::string			ip;												// IP address of the client
 			int					port;											// Port number of the client
-			int					type;											// 
-			time_t				last_activity;									// Last activity time point
-			bool				diying;											// 
-			std::string			user;											// 
-			std::string			pass;											// 
-			bool				authenticated;									// 
-			bool				shell_running;									// 
-			int					shell_pid;										// 
-			int					master_fd;										// 
-			int					slave_fd;										// 
-			std::vector <char>	write_buffer;									// 
-			std::vector <char>	write_sh_buffer;								// 
+			int					type;											// Type of client (MSG, CLIENT, SHELL)
+			time_t				last_activity;									// Timestamp of the last activity
+			bool				diying;											// Flag indicating client is being removed
+			std::string			user;											// Username for authentication
+			std::string			pass;											// Password for authentication
+			bool				authenticated;									// Flag indicating if client is authenticated
+			bool				shell_running;									// Flag indicating if shell is running
+			int					shell_pid;										// PID of the shell process
+			int					master_fd;										// Master FD of the shell terminal
+			int					slave_fd;										// Slave FD of the shell terminal
+			std::vector <char>	write_buffer;									// Buffer for data to write to client
+			std::vector <char>	write_sh_buffer;								// Buffer for data to write to shell
 
 			// Constructors
 			Client();															// Default constructor
@@ -57,8 +57,8 @@
 			~Client();															// Destructor
 
 			// Overloads
-			Client &	operator=(const Client & rhs);							// Overload for assignation
-			bool		operator==(const Client & rhs) const;					// Overload for equiality
+			Client &	operator=(const Client & rhs);							// Assignment operator
+			bool		operator==(const Client & rhs) const;					// Equality operator
 
 			// Methods
 			void	check_timeout(int interval);								// Checks if the client has timed out
@@ -71,9 +71,9 @@
 
 #pragma region "Variables"
 
-	extern std::map <int, std::unique_ptr<Client>>	clients;					// 
-	extern std::map <int, Client *>					shells;						// 
-	extern std::vector<int>							pending_removals;			// FDs scheduled for removal after event processing
+	extern std::map <int, std::unique_ptr<Client>>	clients;					// FDs linked to their client
+	extern std::map <int, Client *>					shells;						// FDs of shells linked to their client
+	extern std::vector<int>							pending_removals;			// List of FDs scheduled for removal
 
 #pragma endregion
 

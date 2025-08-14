@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:17 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:42:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 22:55:48 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,8 @@
 
 #pragma region "Includes"
 
-	#include <iostream>
-	#include <fstream>
-	#include <cstdint>
-	#include <mutex>
+	#include <fstream>															// std::ofstream
+	#include <mutex>															// std::mutex
 
 #pragma endregion
 
@@ -34,48 +32,48 @@
 		public:
 
 			//	Constructors
-			Tintin_reporter(const std::string& logPath, uint8_t logLevel);
-			Tintin_reporter(const Tintin_reporter& src);
-			~Tintin_reporter();
+			Tintin_reporter(const std::string& logPath, uint8_t logLevel);		// Parameterized constructor
+			Tintin_reporter(const Tintin_reporter& src);						// Copy constructor
+			~Tintin_reporter();													// Destructor
 
 			//	Overloads
-			Tintin_reporter&	operator=(const Tintin_reporter& rhs);
-			bool				operator==(const Tintin_reporter& rhs) const;
+			Tintin_reporter&	operator=(const Tintin_reporter& rhs);			// Assignment operator
+			bool				operator==(const Tintin_reporter& rhs) const;	// Equality operator
 
 			// Methods
-			void			open();
-			void			close();
-			void			clear();
+			void			open();												// Opens or creates the log file in append mode
+			void			close();											// Closes the log file
+			void			clear();											// Clears all content from the log file
 
-			void			set_logLevel(uint8_t logLevel);
-			void			set_logPath(const std::string& logPath);
-			uint8_t			get_logLevel() const;
-			std::string		get_logPath() const;
+			void			set_logLevel(uint8_t logLevel);						// Sets the logging level
+			void			set_logPath(const std::string& logPath);			// Sets the log file path
+			uint8_t			get_logLevel() const;								// Gets the current logging level
+			std::string		get_logPath() const;								// Gets the log file path
 
-			void			debug(const std::string& msg);
-    		void			info(const std::string& msg);
-			void			log(const std::string& msg);
-			void			warning(const std::string& msg);
-			void			error(const std::string& msg);
-			void			critical(const std::string& msg);
+			void			debug(const std::string& msg);						// Writes a DEBUG level log
+    		void			info(const std::string& msg);						// Writes an INFO level log
+			void			log(const std::string& msg);						// Writes a LOG level entry
+			void			warning(const std::string& msg);					// Writes a WARNING level log
+			void			error(const std::string& msg);						// Writes an ERROR level log
+			void			critical(const std::string& msg);					// Writes a CRITICAL level log
 
 		private:
 
 			//	Variables
-			std::string		_logPath;
-    		std::ofstream	_logFile;
-			uint8_t			_logLevel;
-			std::mutex		_mutex;
+			std::string		_logPath;											// Path to the log file
+    		std::ofstream	_logFile;											// Output file stream for logging
+			uint8_t			_logLevel;											// Current logging level
+			std::mutex		_mutex;												// Mutex for thread-safe logging
 
 			// Methods
-			static void createDirectory(const std::string& filePath);
-			static std::string getTimestamp();
+			static void createDirectory(const std::string& filePath);			// Creates the full directory path to the log file
+			static std::string getTimestamp();									// Returns the current timestamp in log-friendly format
 	};
 
 #pragma endregion
 
 #pragma region "Variables"
 
-	extern Tintin_reporter	*Log;												// 
+	extern Tintin_reporter	*Log;												// Global pointer to Tintin_reporter
 
 #pragma endregion

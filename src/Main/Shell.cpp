@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 19:09:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 20:47:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 22:37:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,10 @@
 	#include "Network/Client.hpp"
 	#include "Network/Epoll.hpp"
 
-	#include <unistd.h>
-	#include <pwd.h>
-	#include <sys/types.h>
-	#include <sys/wait.h>
-	#include <sys/ioctl.h>
-	#include <fcntl.h>
-	#include <iostream>
+	#include <pwd.h>															// getpwnam()
+	#include <sys/wait.h>														// close(), fork(), setsid(), setgid(), setuid(), dup2(), chdir(), execvp()
+	#include <sys/ioctl.h>														// ioctl()
+	#include <fcntl.h>															// open()
 
 #pragma endregion
 
@@ -122,27 +119,31 @@
 
 #pragma endregion
 
-int shell_close(Client *client) {
-	if (!client) return (1);
+#pragma region "Close"
 
-	if (client->shell_running && client->shell_pid > 0) {
-		Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] terminating shell process " + std::to_string(client->shell_pid));
-		kill(client->shell_pid, SIGTERM);
-		client->shell_running = false;
-		client->shell_pid = 0;
+	int shell_close(Client *client) {
+		if (!client) return (1);
+
+		if (client->shell_running && client->shell_pid > 0) {
+			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] terminating shell process " + std::to_string(client->shell_pid));
+			kill(client->shell_pid, SIGTERM);
+			client->shell_running = false;
+			client->shell_pid = 0;
+		}
+
+		if (client->master_fd >= 0) {
+			shells.erase(client->master_fd);
+			Epoll::remove(client->master_fd);
+			close(client->master_fd);
+			client->master_fd = -1;
+		}
+
+		if (client->slave_fd >= 0) {
+			close(client->slave_fd);
+			client->slave_fd = -1;
+		}
+
+		return (0);
 	}
 
-	if (client->master_fd >= 0) {
-		shells.erase(client->master_fd);
-		Epoll::remove(client->master_fd);
-		close(client->master_fd);
-		client->master_fd = -1;
-	}
-
-	if (client->slave_fd >= 0) {
-		close(client->slave_fd);
-		client->slave_fd = -1;
-	}
-
-	return (0);
-}
+#pragma endregion

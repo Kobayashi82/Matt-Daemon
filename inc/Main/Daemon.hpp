@@ -1,26 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Shell.hpp                                          :+:      :+:    :+:   */
+/*   Daemon.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/12 18:02:22 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 22:49:21 by vzurera-         ###   ########.fr       */
+/*   Created: 2025/08/14 23:10:46 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/08/14 23:12:46 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#pragma region "Includes"
-
-	#include "Network/Client.hpp"
-
-#pragma endregion
-
 #pragma region "Methods"
 
-	int	shell_start(Client *client);											// Start a new shell session
-	int	shell_close(Client *client);											// Close a shell session
+	int daemonize();															// Detach the process from the terminal and run it in the background as a daemon
 
 #pragma endregion

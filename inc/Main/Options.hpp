@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:15 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:22:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 22:30:49 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,14 @@
 
 #pragma region "Include"
 
-	#include <string>
-	#include <cstdint>
+	#include <string>															// std::string
+	#include <cstdint>															// uint8_t, uint16_t
 
 #pragma endregion
 
 #pragma region "Defines"
 
-	#define NAME	"MattDaemon"
+	#define NAME	"MattDaemon"												// Name of the program
 
 #pragma endregion
 
