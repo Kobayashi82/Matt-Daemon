@@ -6,12 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:06 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:40:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 14:13:39 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
+	#include "Main/Options.hpp"
 	#include "Main/Logging.hpp"
 	#include "Network/Socket.hpp"
 	#include "Network/Client.hpp"
@@ -91,7 +92,7 @@
 
 		// Add the socket FD to EPOLL
 		if (Epoll::add(sockfd, true, false) == -1) {
-			Log->critical("Epoll FD add failed");
+			Log->critical("Epoll Socket FD add failed");
 			::close(sockfd); return (1);
 		}
 		Log->debug("Socket added to Epoll");
@@ -124,12 +125,23 @@
 		std::string ip	= ip_str;
 		int	port		= ntohs(Addr.sin_port);	
 
-		clients[fd] = Client(fd, ip, port);
-		Log->debug("Client connected [" + ip + "]");
+		clients.emplace(fd, std::make_unique<Client>(fd, ip, port));
 
-		if (Epoll::add(fd, true, false) == -1) {
+		if (clients.size() > Options::maxClients) {
+			Log->info("Client [" + ip + "] denied. Maximum clients reached");	
+			Client *client = nullptr; 
+			auto it = clients.find(fd);
+			if (it != clients.end()) client = it->second.get();
+			client->diying = true;
+			std::string msg = "Maximum connections reached. Disconnected\n";
+			client->write_buffer.insert(client->write_buffer.end(), msg.begin(), msg.end());
+		} else {
+			Log->info("Client [" + ip + "] connected");
+		}
+
+		if (Epoll::add(fd, true, true) == -1) {
 			Log->debug("Epoll FD add failed");
-			clients[fd].remove(); return (1);
+			clients[fd]->remove(); return (1);
 		}
 		Log->debug("Client added to Epoll");
 

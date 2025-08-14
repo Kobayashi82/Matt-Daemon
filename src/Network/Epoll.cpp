@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:40:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 14:08:27 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@
 	#include <unistd.h>															// For read() and close()
 	#include <sys/epoll.h>														// For EPOLL
 	#include <sys/timerfd.h>													// For timerfd() to create a FD that triggers events in EPOLL
+
+	#include <string>
 
 #pragma endregion
 
@@ -68,7 +70,7 @@
 				uint64_t expirations;
 				read(timeout_fd, &expirations, sizeof(expirations));
 
-				for (auto& pair : clients) pair.second.check_timeout(3600);
+				for (auto& pair : clients) pair.second->check_timeout(3600);
 			}
 
 		#pragma endregion
@@ -114,7 +116,9 @@
 			else if (epollout) 			epoll_event.events = EPOLLOUT;
 			else { 						return (1); }
 
-			return (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &epoll_event));
+			int result = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &epoll_event);
+
+			return (result);
 		}
 
 	#pragma endregion
@@ -149,11 +153,11 @@
 	#pragma region "Events"
 
 		int Epoll::events(Socket *socket) {
-			if (epoll_fd < 0) return (2);
+			if (epoll_fd < 0) return (1);
 			struct epoll_event events[MAX_EVENTS];
 
 			int eventCount = epoll_wait(epoll_fd, events, MAX_EVENTS, 100);
-			if (eventCount == -1) { Log->critical("Epoll failed"); return (1); }
+			if (eventCount == -1 && Running) { Log->critical("Epoll failed"); return (1); }
 
 			for (int i = 0; i < eventCount; ++i) {
 				if (events[i].data.fd == timeout_fd)									{ check_timeout();	continue; }
@@ -161,7 +165,7 @@
 
 				Client *client = nullptr; int type = 0;
 				auto it = clients.find(events[i].data.fd);
-				if (it != clients.end()) { client = &it->second; type = client->type; }
+				if (it != clients.end()) { client = it->second.get(); type = client->type; }
 				else {
 					auto it = shells.find(events[i].data.fd);
 					if (it != shells.end()) { client = &it->second;	type = SHELL; }
@@ -177,6 +181,7 @@
 
 				if (events[i].events & EPOLLOUT) {
 					switch (type) {
+						case MSG: 		{ Communication::write_client(client);	break; }
 						case CLIENT: 	{ Communication::write_client(client);	break; }
 						case SHELL:	 	{ Communication::write_shell(client);	break; }
 					}

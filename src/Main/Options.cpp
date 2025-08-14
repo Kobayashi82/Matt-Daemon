@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:32 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:41:01 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 14:27:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,8 +174,8 @@
 		int opt;
 		while ((opt = getopt_long(argc, argv, "esc:p:f:l:h?uV", long_options, NULL)) != -1) {
 			switch (opt) {
-				case 'e':	disabledEncryption = false;															break;
-				case 's':	disabledShell = false;																break;
+				case 'e':	disabledEncryption = true;															break;
+				case 's':	disabledShell = true;																break;
 				case 'c':	if (ft_strtoul(argv, optarg, &maxClients, 1024 , true))		return (2);				break;
 				case 'p':	if (ft_strtoul(argv, optarg, &portNumber, 65535, false))	return (2);				break;
 				case 'f':	logPath = std::string(optarg);														break;

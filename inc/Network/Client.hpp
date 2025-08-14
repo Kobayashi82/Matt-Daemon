@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 22:57:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 13:12:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 	#include <string>
 	#include <vector>
 	#include <map>
+	#include <memory>
 
 #pragma endregion
 
@@ -36,12 +37,13 @@
 			int					fd;												// File descriptor associated with the client
 			std::string			ip;												// IP address of the client
 			int					port;											// Port number of the client
+			int					type;											// 
 			time_t				last_activity;									// Last activity time point
+			bool				diying;											// 
 			bool				shell_running;									// 
 			int					shell_pid;										// 
 			int					master_fd;										// 
 			int					slave_fd;										// 
-			int					type;											// 
 			std::vector <char>	write_buffer;									// 
 			std::vector <char>	write_sh_buffer;								// 
 
@@ -65,7 +67,7 @@
 
 #pragma region "Variables"
 
-	extern std::map <int, Client> clients;										// 
+	extern std::map <int, std::unique_ptr<Client>> clients;						// 
 	extern std::map <int, Client> shells;										// 
 
 #pragma endregion

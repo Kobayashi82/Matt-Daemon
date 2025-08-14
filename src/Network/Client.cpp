@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:01 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:18:53 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 12:37:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,22 +23,18 @@
 
 #pragma region "Variables"
 
-	std::map <int, Client> clients;												// 
+	std::map <int, std::unique_ptr<Client>> clients;							// 
 	std::map <int, Client> shells;												// 
 
 #pragma endregion
 
 #pragma region "Constructors"
 
-    Client::Client() : fd(-1), ip(""), port(0) {
-		last_activity = std::time(NULL);
-	}
+    Client::Client() : fd(-1), ip(""), port(0), type(MSG), last_activity(std::time(NULL)) {}
 
-    Client::Client(int _fd, std::string _ip, int _port) : fd(_fd), ip(_ip), port(_port) {
-		last_activity = std::time(NULL);
-	}
+    Client::Client(int _fd, std::string _ip, int _port) : fd(_fd), ip(_ip), port(_port), type(MSG),  last_activity(std::time(NULL)) {}
 
-    Client::Client(const Client & src) : fd(src.fd), ip(src.ip), port(src.port), last_activity(src.last_activity) {}
+    Client::Client(const Client & src) : fd(src.fd), ip(src.ip), port(src.port), type(MSG), last_activity(src.last_activity) {}
 
 	Client::~Client() {
 		if (fd != -1) {

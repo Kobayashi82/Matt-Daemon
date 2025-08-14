@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:45:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 14:34:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,12 @@
 
 #pragma region "Daemonize"
 
+	static void sigterm_handler(int signum) {
+		(void) signum;
+		Log->info("Signal SIGTERM received");
+		Epoll::Running = false;
+	}
+
 	static int daemonize() {
 		// 1. fork()
 		int pid = fork();
@@ -54,6 +60,7 @@
 
 		// 4. signal()
 		int signals = 0;
+		if (std::signal(SIGTERM, sigterm_handler) == SIG_ERR)	{ signals++; Log->warning("Signal SIGCHLD failed"); }
 		if (std::signal(SIGCHLD, SIG_IGN) == SIG_ERR)	{ signals++; Log->warning("Signal SIGCHLD failed"); }
 		if (std::signal(SIGHUP, SIG_IGN) == SIG_ERR)	{ signals++; Log->warning("Signal SIGHUP failed");  }
 		if (signals != 2) Log->debug("Signals set");
@@ -110,7 +117,6 @@
 					Epoll::Running = true;
 					while (Epoll::Running) {
 						if (Epoll::events(&socket))	break;
-						sleep(10); break ;
 					}
 				}
 			}

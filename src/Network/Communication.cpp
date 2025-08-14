@@ -6,12 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:40:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 14:33:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
+	#include "Main/Options.hpp"
 	#include "Main/Logging.hpp"
 	#include "Network/Socket.hpp"
 	#include "Network/Client.hpp"
@@ -40,10 +41,23 @@
 
 	#pragma region "CLIENT"
 
+	void get_userpass(const std::string msg, std::string & user, std::string & pass) {	
+		size_t userPos = msg.find("user=");
+		size_t passPos = msg.find("pass=");
+
+		if (userPos != std::string::npos && passPos != std::string::npos) {
+			size_t userStart = userPos + 5;
+			size_t userEnd   = passPos - 1;
+			user = msg.substr(userStart, userEnd - userStart);		
+			size_t passStart = passPos + 5;
+			pass = msg.substr(passStart);
+		}
+	}
+
 		#pragma region "Read"
 
 			int Communication::read_client(Client *client) {
-				if (!client || client->fd < 0) return (0);
+				if (!client || client->fd < 0 || client->diying) return (0);
 
 				char buffer[CHUNK_SIZE];	std::memset(buffer, 0, sizeof(buffer));
 				ssize_t bytes_read = recv(client->fd, buffer, CHUNK_SIZE, 0);
@@ -51,8 +65,50 @@
 				// Read some data
 				if (bytes_read > 0) {
 					client->update_last_activity();
-					if (client->type == MSG)	Log->log(std::string(buffer, buffer + bytes_read));
-					else						client->write_sh_buffer.insert(client->write_sh_buffer.end(), buffer, buffer + bytes_read);
+
+					if (client->type == MSG) {
+						std::string msg = std::string(buffer, buffer + bytes_read);
+						if (!msg.empty() && msg.back() == '\n') msg.pop_back();
+						if (msg == "quit") {
+							Epoll::Running = false;
+						} if (msg == "/CLIENT_SHELL_AUTH") {
+							std::string response;
+							if (Options::disabledShell) {
+								response = "/SHELL_DISABLED";
+								client->diying = true;
+							} else {
+								response = "/AUTHORIZE ENCRYPTION=" + std::string(!Options::disabledEncryption ? "true" : "false");
+								client->type = CLIENT;
+							}
+							client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
+						} else {
+							Log->log(msg);
+						}
+					} else if (client->type == CLIENT) {
+						std::string msg = std::string(buffer, buffer + bytes_read);
+						if (!msg.empty() && msg.back() == '\n') msg.pop_back(); // temp
+						try {
+							if (!Options::disabledEncryption) msg = decrypt(msg);
+						} catch (const std::exception& e) {
+							Log->critical("Message not encrypted");
+							client->remove(); return (1);
+						}
+						if (msg.substr(0, 14) == "/AUTHORIZATION") {
+							Log->log("AUTHORIZATION received");
+							std::string user, pass, response;
+							get_userpass(msg.substr(15), user, pass);
+							Log->info(user + " - " + pass);
+							if (authenticate(user, pass)) {
+								response = "/AUTHORIZATION OK";
+							} else {
+								response = "/AUTHORIZATION FAIL";
+							}
+							if (!Options::disabledEncryption) response = encrypt(response);
+							client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
+						} else {
+							client->write_sh_buffer.insert(client->write_sh_buffer.end(), msg.begin(), msg.end());
+						}
+					}
 				}
 				// No data (usually means a client disconected)
 				else if (bytes_read == 0)	{ client->remove();	return (1); }
@@ -81,6 +137,8 @@
 					if (bytes_written > 0) {
 						client->write_buffer.erase(client->write_buffer.begin(), client->write_buffer.begin() + bytes_written);
 					}
+
+					if (client->diying && client->write_buffer.empty()) { client->remove();	return; }
 					// No writing if 'write_buffer' is empty, so this must be an error
 					else if (bytes_written == 0)	{ client->remove();	return; }
 					// Error writing
