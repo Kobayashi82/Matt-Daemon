@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 14:34:08 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 20:38:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,16 +44,24 @@
 		pid_t pid;
 		int status;
 		while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
-			Log->debug("Child process " + std::to_string(pid) + " terminated");
+			Log->debug("Child process " + std::to_string(pid) + " terminated with status " + std::to_string(status));
 			
 			// Find the client associated with this shell process and disconnect it
+			bool client_found = false;
 			for (auto& client_pair : clients) {
 				Client* client = client_pair.second.get();
-				if (client && client->shell_pid == pid) {
-					Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell process terminated, disconnecting client");
+				if (client && client->shell_pid == pid && client->shell_running) {
+					Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell process " + std::to_string(pid) + " terminated, disconnecting client");
+					client->shell_running = false; // Mark shell as not running
+					client->shell_pid = 0; // Clear PID to avoid double cleanup
 					client->remove();
+					client_found = true;
 					break;
 				}
+			}
+			
+			if (!client_found) {
+				Log->debug("No client found for terminated process " + std::to_string(pid));
 			}
 		}
 	}
@@ -84,6 +92,7 @@
 		if (std::signal(SIGTERM, sigterm_handler) == SIG_ERR)	{ signals++; Log->warning("Signal SIGTERM failed"); }
 		if (std::signal(SIGCHLD, sigchld_handler) == SIG_ERR)	{ signals++; Log->warning("Signal SIGCHLD failed"); }
 		if (std::signal(SIGHUP, SIG_IGN) == SIG_ERR)	{ signals++; Log->warning("Signal SIGHUP failed");  }
+		if (std::signal(SIGPIPE, SIG_IGN) == SIG_ERR)	{ signals++; Log->warning("Signal SIGPIPE failed");  }
 		if (signals == 0) Log->debug("Signals set");
 
 		// 5. umask()

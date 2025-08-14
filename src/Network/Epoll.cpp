@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 19:11:43 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 21:10:42 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,19 +23,18 @@
 	#include <sys/epoll.h>														// For EPOLL
 	#include <sys/timerfd.h>													// For timerfd() to create a FD that triggers events in EPOLL
 
-	#include <string>
 
 #pragma endregion
 
 #pragma region "Variables"
 
-	bool		Epoll::Running			= false;								// Indicates whether the main loop is running
+	bool				Epoll::Running			= false;						// Indicates whether the main loop is running
 
-	int			Epoll::epoll_fd			= -1;									// File descriptor for epoll
-	int			Epoll::timeout_fd		= -1;									// File descriptor used to generating events in EPOLL and checking clients timeout
+	int					Epoll::epoll_fd			= -1;							// File descriptor for epoll
+	int					Epoll::timeout_fd		= -1;							// File descriptor used to generating events in EPOLL and checking clients timeout
 
-	const int	Epoll::MAX_EVENTS		= 10;									// Maximum number of events that can be handled per iteration by epoll
-	const int	Epoll::TIMEOUT_INTERVAL	= 1;									// Interval in seconds between timeout checks for inactive clients
+	const int			Epoll::MAX_EVENTS		= 10;							// Maximum number of events that can be handled per iteration by epoll
+	const int			Epoll::TIMEOUT_INTERVAL	= 1;							// Interval in seconds between timeout checks for inactive clients
 
 #pragma endregion
 
@@ -187,6 +186,8 @@
 					}
 				}
 			}
+
+			process_pending_removals();
 
 			return (0);
 		}

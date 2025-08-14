@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:16 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/13 23:24:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 21:12:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@
 			static const int 	MAX_EVENTS;										// Maximum number of events that can be handled per iteration by EPOLL
 			static const int 	TIMEOUT_INTERVAL;								// Interval in seconds between timeout checks for inactive clients
 
+			// Constructors
 			Epoll() {}															// Default constructor (no instantiable)
 			~Epoll() {}															// Destructor (no instantiable)
 

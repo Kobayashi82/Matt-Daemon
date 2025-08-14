@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 18:37:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 21:11:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,13 +64,21 @@
 			void	check_timeout(int interval);								// Checks if the client has timed out
 			void	update_last_activity();										// Updates the client last activity timestamp
 			void	remove();													// Closes the connection, removes the client and cleans up resources
+			void	schedule_removal();											// Schedule client for deferred removal (safe to call during epoll event processing)
 	};
 	
 #pragma endregion
 
 #pragma region "Variables"
 
-	extern std::map <int, std::unique_ptr<Client>> clients;						// 
-	extern std::map <int, Client *> shells;										// 
+	extern std::map <int, std::unique_ptr<Client>>	clients;					// 
+	extern std::map <int, Client *>					shells;						// 
+	extern std::vector<int>							pending_removals;			// FDs scheduled for removal after event processing
+
+#pragma endregion
+
+#pragma region "Methods"
+
+	void process_pending_removals();											// Process all pending client removals
 
 #pragma endregion

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 19:50:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/14 21:18:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,8 @@
 							if (!Options::disabledEncryption) msg = decrypt(msg);
 						} catch (const std::exception& e) {
 							Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] message not encrypted, so reject connection");
-							client->remove(); return (1);
+							client->schedule_removal(); 
+							return (1);
 						}
 						if (!client->shell_running && msg.substr(0, 14) == "/AUTHORIZATION") {
 							std::string user, pass, response;
@@ -114,11 +115,16 @@
 					}
 				}
 				// No data (usually means a client disconected)
-				else if (bytes_read == 0) { client->remove(); return (1); }
+				else if (bytes_read == 0) { 
+					Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] disconnected (EOF)");
+					client->schedule_removal(); 
+					return (1); 
+				}
 				// Error reading
 				else if (bytes_read == -1) {
 					Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] error reading data");
-					client->remove(); return (1);
+					client->schedule_removal(); 
+					return (1);
 				}
 
 				return (0);
@@ -165,11 +171,24 @@
 					}
 
 					// No writing if 'write_buffer' is empty, so this must be an error
-					else if (bytes_written == 0) { client->remove(); return; }
+					else if (bytes_written == 0) { 
+						Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] cannot write to client (connection closed)");
+						client->schedule_removal(); 
+						return; 
+					}
 					// Error writing
 					else if (bytes_written == -1) {
-						Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] error writing data");
-						client->remove(); return;
+						if (errno == EPIPE || errno == ECONNRESET) {
+							Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] disconnected during write (EPIPE/ECONNRESET)");
+						} else if (errno == EAGAIN || errno == EWOULDBLOCK) {
+							// Socket buffer full, try again later
+							Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] write would block, trying later");
+							return;
+						} else {
+							Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] error writing data: " + std::string(strerror(errno)));
+						}
+						client->schedule_removal(); 
+						return;
 					}
 				}
 			}
@@ -186,7 +205,6 @@
 				if (!client || client->master_fd < 0) return (0);
 
 				char buffer[CHUNK_SIZE];	std::memset(buffer, 0, sizeof(buffer));
-
 				ssize_t bytes_read = read(client->master_fd, buffer, CHUNK_SIZE);
 
 				// Read some data
@@ -196,22 +214,11 @@
 					if (!Options::disabledEncryption) output = encrypt(output);				
 					client->write_buffer.insert(client->write_buffer.end(), output.begin(), output.end());
 				}
-				// No data (shell ended or stdout closed)
-				else if (bytes_read == 0) {
-					Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell stdout closed (EOF)");
-					// Don't remove client here - let SIGCHLD handler handle it when process actually terminates
-					return (0);
-				}
-				// Error reading (would block or actual error)
-				else if (bytes_read == -1) {
-					if (errno == EAGAIN || errno == EWOULDBLOCK) {
-						// No data available right now, not an error
-						return (0);
-					}
-					Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] error reading from shell: " + std::string(strerror(errno)));
-					// Don't remove client here either - let SIGCHLD handler handle it
-					return (0);
-				}
+
+				// No data
+				else if (bytes_read == 0) return (0);
+				// Error reading
+				else if (bytes_read == -1) return (0);
 
 				return (0);
 			}
@@ -230,34 +237,19 @@
 					size_t buffer_size = client->write_sh_buffer.size();
 					size_t chunk = std::min(buffer_size, static_cast<size_t>(CHUNK_SIZE));
 
-					std::string command_data(client->write_sh_buffer.begin(), client->write_sh_buffer.begin() + chunk);
-					if (!command_data.empty() && command_data.back() != '\n') {
-						command_data += '\n';
-					}
-
-					ssize_t bytes_written = write(client->master_fd, command_data.c_str(), command_data.length());
+					std::string command(client->write_sh_buffer.begin(), client->write_sh_buffer.begin() + chunk);
+					if (!command.empty() && command.back() != '\n') command += '\n'; // No se esto si es correcto
+					ssize_t bytes_written = write(client->master_fd, command.c_str(), command.length());
 
 					// Sent some data
 					if (bytes_written > 0) {
 						size_t to_remove = std::min(static_cast<size_t>(bytes_written), chunk);
 						client->write_sh_buffer.erase(client->write_sh_buffer.begin(), client->write_sh_buffer.begin() + to_remove);
 					}
-					// No writing if 'write_sh_buffer' is empty, so this must be an error
-					else if (bytes_written == 0) {
-						Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell not ready for writing");
-						// Shell not ready, try again later
-						return;
-					}
+					// No writing
+					else if (bytes_written == 0) return;
 					// Error writing
-					else if (bytes_written == -1) {
-						if (errno == EAGAIN || errno == EWOULDBLOCK) {
-							// Shell not ready to receive data, try again later
-							return;
-						}
-						Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] error writing to shell: " + std::string(strerror(errno)));
-						client->shell_running = false;
-						return;
-					}
+					else if (bytes_written == -1) return;
 				}
 			}
 
