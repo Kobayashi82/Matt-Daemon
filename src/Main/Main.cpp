@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 15:01:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 16:17:59 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,26 +25,30 @@
 
 #pragma endregion
 
-int validate_input(int argc, char **argv) {
-	int result = 0;
+#pragma region "Validate Input"
 
-	if (getuid()) { std::cerr << "This program must be run as root" << std::endl;															return (1); }
+	static int validate_input(int argc, char **argv) {
+		int result = 0;
 
-	if ((result = Options::parse(argc, argv))) return (result - 1);
-	
-	int lockfd = open("/var/lock/matt_daemon.lock", O_RDWR|O_CREAT|O_TRUNC, 0640);
-	if (lockfd < 0 || flock(lockfd, LOCK_EX|LOCK_NB)) { std::cerr << "Daemon already running\n";											return (1); }
-	close(lockfd);
+		if ((result = Options::parse(argc, argv))) return (result);
 
-	if (!Socket::is_port_free(Options::portNumber)) { std::cerr << "Port " << Options::portNumber << " is not available\n";					return (1); }
+		if (getuid()) { std::cerr << "This program requires admin privileges" << std::endl;														return (2); }
 
-	if (!Options::shellPath.empty()) {
-		if (access(Options::shellPath.c_str(), F_OK)) { std::cerr << "Shell not found at " << Options::shellPath << "\n";					return (1); }
-		if (access(Options::shellPath.c_str(), X_OK)) { std::cerr << "No execute permission for shell at " << Options::shellPath << "\n";	return (1); }
+		int lockfd = open("/var/lock/matt_daemon.lock", O_RDWR|O_CREAT|O_TRUNC, 0640);
+		if (lockfd < 0 || flock(lockfd, LOCK_EX|LOCK_NB)) { std::cerr << "Daemon already running\n";											return (2); }
+		close(lockfd);
+
+		if (!Socket::is_port_free(Options::portNumber)) { std::cerr << "Port " << Options::portNumber << " is not available\n";					return (2); }
+
+		if (!Options::shellPath.empty()) {
+			if (access(Options::shellPath.c_str(), F_OK)) { std::cerr << "Shell not found at " << Options::shellPath << "\n";					return (2); }
+			if (access(Options::shellPath.c_str(), X_OK)) { std::cerr << "No execute permission for shell at " << Options::shellPath << "\n";	return (2); }
+		}
+
+		return (0);
 	}
 
-	return (0);
-}
+#pragma endregion
 
 #pragma region "Main"
 
@@ -52,7 +56,7 @@ int validate_input(int argc, char **argv) {
 		int result = 0;
 
 		try {
-			if ((result = validate_input(argc, argv))) return (result);
+			if ((result = validate_input(argc, argv))) return (result - 1);
 		
 			Tintin_reporter	Tintin_logger(Options::logFile, Options::logLevel);
 
