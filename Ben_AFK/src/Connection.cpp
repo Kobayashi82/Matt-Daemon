@@ -1,0 +1,136 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Connection.cpp                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/15 21:41:05 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/08/16 00:36:39 by vzurera-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#pragma region "Includes"
+
+	#include "Options.hpp"
+	#include "Connection.hpp"
+
+	#include <arpa/inet.h>														// socket(), setsockopt(), bind(), listen(), accept(), inet_ntop(), htons(), ntohs(), sockaddr_in
+	#include <iostream>															// std::cerr()
+	#include <unistd.h>															// close()
+
+#pragma endregion
+
+int socket_create() {
+	Options::sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (Options::sockfd < 0) {
+		std::cerr << "Error: Socket creation failed\n";
+		return (1);
+	}
+
+	Options::sockaddr.sin_family = AF_INET;
+	Options::sockaddr.sin_port = htons(Options::port);
+	if (inet_pton(AF_INET, Options::host, &Options::sockaddr.sin_addr) <= 0) {
+		std::cerr << "Error: Invalid address or address not supported: " << Options::hostname << "\n";
+		close(Options::sockfd);
+		return (1);
+	}
+
+	if (connect(Options::sockfd, (const sockaddr *)&Options::sockaddr, sizeof(sockaddr_in)) < 0) {
+		std::cerr << "Error: Failed to connect to " << Options::hostname << ":" << Options::port << "\n";
+		close(Options::sockfd);
+		return (1);	
+	}
+
+	send_data("/CLIENT_SHELL_AUTH");
+
+	return (0);
+}
+
+int send_data(const std::string & data) {
+	if (send(Options::sockfd, data.c_str(), data.size(), 0) < 0) {
+		std::cerr << "Error: Failed to send data\n";
+		return (1);
+	}
+
+	return (0);
+}
+
+int receive_data() {
+	char buffer[4096];
+
+	ssize_t bytes = recv(Options::sockfd, buffer, sizeof(buffer), 0);
+
+	if (bytes > 0) {
+		std::string msg = std::string(buffer, bytes);
+		try {
+			if (Options::encryption) msg = decrypt(msg);
+		} catch (const std::exception& e) {
+			std::cerr << "Error: Message not encrypted\n"; return (1);
+		}
+
+		if (!msg.find("/AUTHORIZE ENCRYPTION=")) {
+			std::string value = msg.substr(22);
+
+			value.erase(value.find_last_not_of(" \t\n\r") + 1);
+			if		(value == "true")	Options::encryption = true;
+			else if	(value == "false")	Options::encryption = false;
+			else {
+				std::cerr << "Error: Invalid response from server\n"; return (1);
+			}
+
+			if (!Options::insecure && !Options::encryption) {
+				std::cerr << "Error: Unsecure connection\n"; return (1);
+			}
+
+			std::string password = getPassword();
+			if (!Options::retries) return (1);
+			std::string response = "/AUTHORIZATION user=" + Options::user + " pass=" + password;
+			if (Options::encryption) response = encrypt(response);
+			send_data(response);
+			return (0);
+		}
+
+		if (!Options::authenticated && !msg.find("/AUTHORIZATION_OK")) {
+			Options::authenticated = true;
+			return (0);
+		}
+		if (!Options::authenticated && !msg.find("/AUTHORIZATION_FAIL")) {
+			Options::retries--;
+			if (!Options::retries)	{ std::cerr << "Authentication failure, giving up\n"; return (1); }
+			else					  std::cerr << "Authentication failure, please try again\n";
+			std::string password = getPassword();
+			if (!Options::retries) return (1);
+			std::string response = "/AUTHORIZATION user=" + Options::user + " pass=" + password;
+			if (Options::encryption) response = encrypt(response);
+			send_data(response);
+			return (0);
+		}
+
+		write(STDOUT_FILENO, msg.c_str(), msg.length());
+	}
+
+	if (bytes <= 0) return (1);
+
+	return (0);
+}
+
+int main_loop() {
+	fd_set readfds;
+
+	while (true) {
+		FD_ZERO(&readfds);
+		FD_SET(Options::sockfd, &readfds);
+
+		if (select(Options::sockfd + 1, &readfds, nullptr, nullptr, nullptr) < 0) {
+			std::cerr << "Error: Multiplexing failed\n";
+			return (1);
+		}
+
+		if (FD_ISSET(Options::sockfd, &readfds)) {
+			if (receive_data()) return (1);
+		}
+	}
+
+	return (0);
+}

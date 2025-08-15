@@ -10,6 +10,11 @@ doc/ft_matt-daemon\ 4.1.pdf
 !inc/**
 !src
 !src/**
+!Ben_AFK
+!Ben_AFK/**
+Ben_AFK/build
+Ben_AFK/build/**
+Ben_AFK/Ben_AFK
 !Makefile
 !.gitignore
 !README.md
