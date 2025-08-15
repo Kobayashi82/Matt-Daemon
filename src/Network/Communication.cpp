@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 15:55:57 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 00:47:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,7 +211,6 @@
 					size_t chunk = std::min(buffer_size, static_cast<size_t>(CHUNK_SIZE));
 
 					std::string command(client->write_sh_buffer.begin(), client->write_sh_buffer.begin() + chunk);
-					if (!command.empty() && command.back() != '\n') command += '\n'; // No se esto si es correcto
 					ssize_t bytes_written = write(client->master_fd, command.c_str(), command.length());
 
 					// Sent some data

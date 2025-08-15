@@ -6,38 +6,39 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:00 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 00:25:47 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 00:58:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "Options.hpp"
-	#include "Connection.hpp"
+	#include "Ben_AFK.hpp"
+
+	#include <csignal>
 
 #pragma endregion
+
+void signal_handler(int sig) {
+	disable_raw_mode();
+	exit(128 + sig);
+}
 
 #pragma region "Main"
 
 	int main(int argc, char **argv) {
+		signal(SIGINT, signal_handler);
+		signal(SIGTERM, signal_handler);
+		
 		int result = 0;
+		if ((result = Options::parse(argc, argv)))	return (result - 1);
 
-		if ((result = Options::parse(argc, argv))) return (result - 1);
+		if (socket_create())						return (1);
+		if (main_loop()) { disable_raw_mode();		return (1); }
 
-		if (socket_create()) return (1);
-		if (main_loop()) return (1);
+		disable_raw_mode();
 
-		// HACER help, usage y version
-		// Conectar y enviar /CLIENT_SHELL_AUTH
-		// Si recibe respuesta: preguntar por pass
-		// Enviar credentials
-		// Si recibe OK:
-		// Terminal en modo raw
-		// Enviar pulsaciones al servidor
-		// Imprimir datos recividos en la terminal
-		// Interceptar señales y enviarlas (no se como aun)
-
-		return (result);
+		return (0);
 	}
 
 #pragma endregion

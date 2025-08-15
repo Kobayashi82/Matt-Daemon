@@ -6,11 +6,12 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 22:29:03 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 00:05:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 00:59:04 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 	#include "Options.hpp"
+	#include "Ben_AFK.hpp"
 
 	#include <iostream>
 	#include <termios.h>
