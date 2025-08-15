@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 12:52:33 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 15:55:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,8 +142,7 @@
 					}
 
 					if (client->diying && client->write_buffer.empty()) { 
-						Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] removing after sending farewell message");
-						client->remove();	
+						client->schedule_removal();
 						return; 
 					}
 

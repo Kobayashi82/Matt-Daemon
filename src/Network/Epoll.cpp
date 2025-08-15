@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 14:59:04 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 16:04:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,7 @@
 			if (eventCount == -1 && Running) { Log->critical("Epoll failed"); return (1); }
 
 			for (int i = 0; i < eventCount; ++i) {
-				if (events[i].data.fd == timeout_fd)									{ check_timeout();	continue; }
+				if (events[i].data.fd == timeout_fd && Options::timeout)				{ check_timeout();	continue; }
 				if (events[i].data.fd == socket->sockfd && events[i].events & EPOLLIN)	{ socket->accept();	continue; }
 
 				Client *client = nullptr; int type = 0;

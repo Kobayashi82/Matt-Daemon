@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:01 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 22:46:34 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 16:02:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 	#include "Main/Logging.hpp"
 	#include "Network/Client.hpp"
 	#include "Network/Epoll.hpp"
+	#include "Network/Communication.hpp"
 
 	#include <unistd.h>															// For close()
 	#include <ctime>															// For time() and difftime()
@@ -35,9 +36,16 @@
 
     Client::Client() : fd(-1), ip(""), port(0), type(MSG), last_activity(std::time(NULL)) {}
 
-    Client::Client(int _fd, std::string _ip, int _port) : fd(_fd), ip(_ip), port(_port), type(MSG),  last_activity(std::time(NULL)) {}
+    Client::Client(int _fd, std::string _ip, int _port) : fd(_fd), ip(_ip), port(_port), type(MSG) {
+		last_activity = std::time(NULL); diying = false; user = ""; pass = ""; authenticated = false;
+		shell_running = false; shell_pid = 0; master_fd = -1; slave_fd = -1;
+	}
 
-    Client::Client(const Client & src) : fd(src.fd), ip(src.ip), port(src.port), type(MSG), last_activity(src.last_activity) {}
+    Client::Client(const Client & src) : fd(src.fd), ip(src.ip), port(src.port), type(MSG) {
+		last_activity = src.last_activity; diying = src.diying; user = src.user; pass = src.pass; authenticated = src.authenticated;
+		shell_running = src.shell_running; shell_pid = src.shell_pid; master_fd = src.master_fd; slave_fd = src.slave_fd;
+		write_buffer = src.write_buffer; write_sh_buffer = src.write_sh_buffer;
+	}
 
 	Client::~Client() {
 		if (fd >= 0) {
@@ -52,7 +60,12 @@
 #pragma region "Overloads"
 
 	Client & Client::operator=(const Client & rhs) {
-        if (this != &rhs) { fd = rhs.fd; ip = rhs.ip; port = rhs.port; last_activity = rhs.last_activity; }
+        if (this != &rhs) {
+			fd = rhs.fd; ip = rhs.ip; port = rhs.port;
+			last_activity = rhs.last_activity; diying = rhs.diying; user = rhs.user; pass = rhs.pass; authenticated = rhs.authenticated;
+			shell_running = rhs.shell_running; shell_pid = rhs.shell_pid; master_fd = rhs.master_fd; slave_fd = rhs.slave_fd;
+			write_buffer = rhs.write_buffer; write_sh_buffer = rhs.write_sh_buffer;
+		}
 		return (*this);
     }
 
@@ -68,7 +81,11 @@
 		time_t current_time = std::time(NULL);
 		if (difftime(current_time, last_activity) > interval) {
 			Log->info("Client [" + ip + ":" + std::to_string(port) + "] connection time-out");
-			remove();
+
+			std::string response = "Connection time-out\n";
+			write_buffer.insert(write_buffer.end(), response.begin(), response.end());
+			Communication::write_client(this);
+			schedule_removal();
 		}
 	}
 
