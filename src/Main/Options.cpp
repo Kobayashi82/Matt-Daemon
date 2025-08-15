@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:32 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 14:57:34 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 16:56:23 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 	#include <algorithm>														// std::transform()
 	#include <iostream>															// std::cerr()
 	#include <cstring>															// std::strlen()
-	#include <unistd.h>															// access()
 	#include <getopt.h>															// getopt_long()
 
 #pragma endregion
