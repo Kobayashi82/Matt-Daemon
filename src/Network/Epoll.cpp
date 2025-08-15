@@ -6,12 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 23:06:44 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 14:59:04 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
+	#include "Main/Options.hpp"
 	#include "Main/Logging.hpp"
 	#include "Network/Socket.hpp"
 	#include "Network/Client.hpp"
@@ -68,7 +69,7 @@
 				uint64_t expirations;
 				read(timeout_fd, &expirations, sizeof(expirations));
 
-				for (auto& pair : clients) pair.second->check_timeout(3600);
+				for (auto& pair : clients) pair.second->check_timeout(Options::timeout);
 			}
 
 		#pragma endregion

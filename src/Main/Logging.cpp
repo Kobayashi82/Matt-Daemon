@@ -6,12 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:53 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 00:07:57 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 14:55:59 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
+	#include "Main/Options.hpp"
 	#include "Main/Logging.hpp"
 
 	#include <cstring>															// strerror()
@@ -35,7 +36,9 @@
 				if (!std::filesystem::path(_logPath).is_absolute()) _logPath = std::filesystem::absolute(_logPath).string();
 				createDirectory(_logPath);
 
-				_logFile.open(_logPath, std::ios::app);
+				if (Options::logNew)	_logFile.open(_logPath, std::ios::trunc);
+				else					_logFile.open(_logPath, std::ios::app);
+
 				if (!_logFile.is_open()) {
 					std::string errorMsg = "Cannot open log file: " + _logPath + " - " + strerror(errno);
 					throw std::runtime_error(errorMsg);
@@ -53,7 +56,9 @@
 				if (!std::filesystem::path(_logPath).is_absolute()) _logPath = std::filesystem::absolute(_logPath).string();
 				createDirectory(_logPath);
 
-				_logFile.open(_logPath, std::ios::app);
+				if (Options::logNew)	_logFile.open(_logPath, std::ios::trunc);
+				else					_logFile.open(_logPath, std::ios::app);
+
 				if (!_logFile.is_open()) {
 					std::string errorMsg = "Cannot open log file: " + _logPath + " - " + strerror(errno);
 					throw std::runtime_error(errorMsg);
@@ -134,6 +139,23 @@
 
 	#pragma endregion
 
+	#pragma region "Clear"
+
+		void Tintin_reporter::clear() {
+			if (_logFile.is_open()) _logFile.close();
+
+			createDirectory(_logPath);
+			_logFile.open(_logPath, std::ios::trunc);
+			if (!_logFile.is_open()) {
+				std::string errorMsg = "Cannot open log file: " + _logPath + " - " + strerror(errno);
+				throw std::runtime_error(errorMsg);
+			}
+
+			_logFile << std::unitbuf;
+		}
+
+	#pragma endregion
+
 	#pragma region "Logging"
 
 		void Tintin_reporter::debug(const std::string& msg) {
@@ -189,26 +211,29 @@
 	#pragma region "Rotate Log"
 
 		void Tintin_reporter::rotateLog() {
-			if (!_logFile.is_open()) return;
-			
+			if (!Options::logSize || !_logFile.is_open()) return;
+
 			std::streampos currentPos = _logFile.tellp();
-			
-			if ((size_t)currentPos > MAX_LOG_SIZE) {
+
+			if ((size_t)currentPos > Options::logSize) {
 				_logFile.close();
-				std::string oldestFile = _logPath + "." + std::to_string(MAX_LOG_ROTATIONS);
-				std::remove(oldestFile.c_str());
+				if (!Options::logMax) clear();
+				else {
+					std::string oldestFile = _logPath + "." + std::to_string(Options::logMax);
+					std::remove(oldestFile.c_str());
 
-				for (int i = MAX_LOG_ROTATIONS - 1; i >= 1; i--) {
-					std::string currentFile = _logPath + "." + std::to_string(i);
-					std::string nextFile = _logPath + "." + std::to_string(i + 1);
+					for (int i = Options::logMax - 1; i >= 1; i--) {
+						std::string currentFile = _logPath + "." + std::to_string(i);
+						std::string nextFile = _logPath + "." + std::to_string(i + 1);
 
-					std::rename(currentFile.c_str(), nextFile.c_str());
+						std::rename(currentFile.c_str(), nextFile.c_str());
+					}
+
+					std::string firstBackup = _logPath + ".1";
+					std::rename(_logPath.c_str(), firstBackup.c_str());
+
+					open();
 				}
-
-				std::string firstBackup = _logPath + ".1";
-				std::rename(_logPath.c_str(), firstBackup.c_str());
-
-				open();
 			}
 		}
 

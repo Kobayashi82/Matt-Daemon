@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:32 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 22:30:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 14:57:34 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 	#include <algorithm>														// std::transform()
 	#include <iostream>															// std::cerr()
 	#include <cstring>															// std::strlen()
+	#include <unistd.h>															// access()
 	#include <getopt.h>															// getopt_long()
 
 #pragma endregion
@@ -27,10 +28,15 @@
 	bool		Options::disabledShell		= false;							// Disable remote shell
 	uint16_t	Options::maxClients			= 3;								// Maximum number of clients connected simultaneously
 	uint16_t	Options::portNumber			= 4242;								// Port to listen for incoming connections
+	uint16_t	Options::timeout			= 3600;								// Timeout in seconds for inactive connections
+	std::string	Options::logFile	= "/var/log/matt_daemon/matt_daemon.log";	// Path to use for logging
 	uint8_t		Options::logLevel			= INFO;								// Level of logging
-	std::string	Options::logPath	= "/var/log/matt_daemon/matt_daemon.log";	// Path to use for logging
+	bool		Options::logNew				= false;							// Create a new log file on start
+	uint8_t		Options::logMax				= 5;								// Maximum number of log files to keep when rotating
+	size_t		Options::logSize			= 10 *1024 * 1024;					// Minimum log size before rotation
+	std::string	Options::shellPath			= "";								// Path of the shell to execute
 
-	std::string	Options::_fullName	= "MattDaemon";								// Name and path used to execute the program (same as argv[0])
+	std::string	Options::_fullName			= "MattDaemon";						// Name and path used to execute the program (same as argv[0])
 
 #pragma endregion
 
@@ -143,7 +149,10 @@
 			else if	(l == "warning")	logLevel = WARNING;
 			else if	(l == "error")		logLevel = ERROR;
 			else if	(l == "critical")	logLevel = CRITICAL;
-			else return (1);
+			else {
+				std::cerr << "Invalid log level. Valid values are: DEBUG, INFO, LOG, WARNING, CRITICAL\n";
+				return (1);
+			}
 
 			return (0);
 		}
@@ -162,8 +171,13 @@
 			{"disable-shell",		no_argument,		0, 's'},	// [-s, --disable-shell]
 			{"max-clients",			required_argument,	0, 'c'},	// [-c, --max-clients=NUM]
 			{"port",				required_argument,	0, 'p'},	// [-p, --port=NUM]
+			{"timeout",				required_argument,	0, 't'},	// [-t, --timeout=SEC]
 			{"log-file",			required_argument,	0, 'f'},	// [-c, --log-file=PATH]
 			{"log-level",			required_argument,	0, 'l'},	// [-c, --log-level=LEVEL]
+			{"log-new",				no_argument,		0, 'n'},	// [-n, --log-new]
+			{"log-rotate-max",		required_argument,	0, 'm'},	// [-m, --log-rotate-max=NUM]
+			{"log-rotate-size",		required_argument,	0, 'r'},	// [-r, --log-rotate-size=NUM]
+			{"shell-path",			required_argument,	0, 'x'},	// [-x, --shell-path=PATH]
 
 			{"help",				no_argument,		0, 'h'},	// [-h?, --help]
 			{"usage",				no_argument,		0, 'u'},	// [	--usage]
@@ -172,19 +186,24 @@
 		};
 
 		int opt;
-		while ((opt = getopt_long(argc, argv, "esc:p:f:l:h?uV", long_options, NULL)) != -1) {
+		while ((opt = getopt_long(argc, argv, "esc:p:t:f:l:nm:r:x:h?uV", long_options, NULL)) != -1) {
 			switch (opt) {
-				case 'e':	disabledEncryption = true;															break;
-				case 's':	disabledShell = true;																break;
-				case 'c':	if (ft_strtoul(argv, optarg, &maxClients, 1024 , true))		return (2);				break;
-				case 'p':	if (ft_strtoul(argv, optarg, &portNumber, 65535, false))	return (2);				break;
-				case 'f':	logPath = std::string(optarg);														break;
-				case 'l':	if (log_level(std::string(optarg)))							return (2);				break;
+				case 'e':	disabledEncryption = true;																	break;
+				case 's':	disabledShell = true;																		break;
+				case 'c':	if (ft_strtoul(argv, optarg, &maxClients, 1024 , true))				return (2);				break;
+				case 'p':	if (ft_strtoul(argv, optarg, &portNumber, 65535, false))			return (2);				break;
+				case 't':	if (ft_strtoul(argv, optarg, &timeout, 65535, true))				return (2);				break;
+				case 'f':	logFile = std::string(optarg);																break;
+				case 'l':	if (log_level(std::string(optarg)))									return (2);				break;
+				case 'n':	logNew = true;																				break;
+				case 'm':	if (ft_strtoul(argv, optarg, &logMax, 256, true))					return (2);				break;
+				case 'r':	if (ft_strtoul(argv, optarg, &logSize, 1024 * 1024 * 1024, true))	return (2);				break;
+				case 'x':	shellPath = std::string(optarg);															break;
 
-				case '?':	if (std::string(argv[optind - 1]) == "-?")					return (help());		return (invalid());
-				case 'h':																return (help());
-				case 'u':																return (usage());
-				case 'V':																return (version());
+				case '?':	if (std::string(argv[optind - 1]) == "-?")							return (help());		return (invalid());
+				case 'h':																		return (help());
+				case 'u':																		return (usage());
+				case 'V':																		return (version());
 			}
 		}
 

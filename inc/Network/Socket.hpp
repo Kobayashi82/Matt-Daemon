@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 22:56:04 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 13:23:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,11 @@
 			bool		operator==(const Socket & rhs) const;					// Equality operator
 
 			// Methods
-			int		create();													// Creates socket
-			int		accept();													// Accepts a new connection (client)
-			void	close();													// Closes socket
+			int			create();												// Creates socket
+			void		close();												// Closes socket
+			int			accept();												// Accepts a new connection (client)
+
+			static bool	is_port_free(int port);									// Checks if a port is available
 	};
 
 #pragma endregion

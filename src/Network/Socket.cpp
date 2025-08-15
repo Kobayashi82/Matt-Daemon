@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:06 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 23:04:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 14:23:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,25 @@
 		Log->debug("Client added to Epoll");
 
 		return (0);
+	}
+
+#pragma endregion
+
+#pragma region "Is Port Free"
+
+	bool Socket::is_port_free(int port) {
+		int sock = socket(AF_INET, SOCK_STREAM, 0);
+		if (sock < 0) return (false);
+
+		sockaddr_in addr{};
+		addr.sin_family = AF_INET;
+		addr.sin_addr.s_addr = htonl(INADDR_ANY);
+		addr.sin_port = htons(port);
+
+		bool isFree = (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) == 0);
+		::close(sock);
+
+		return (isFree);
 	}
 
 #pragma endregion

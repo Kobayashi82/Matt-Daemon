@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:17 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 00:06:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 14:54:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,9 @@
 			uint8_t			_logLevel;											// Current logging level
 			std::mutex		_mutex;												// Mutex for thread-safe logging
 
-			const size_t	MAX_LOG_SIZE = 10 * 1024 * 1024;					// Size for log rotation (Default = 10 MB)
-			const uint8_t	MAX_LOG_ROTATIONS = 5;								// Maximum number of rotated log files to keep
-
 			// Methods
 			void			open();												// Opens or creates the log file in append mode
+			void			clear();											// Clears all entries from the log
 			void			rotateLog();										// Rotates log files
 			void			createDirectory(const std::string& filePath);		// Creates the full directory path to the log file
 			std::string		getTimestamp();										// Returns the current timestamp in log-friendly format

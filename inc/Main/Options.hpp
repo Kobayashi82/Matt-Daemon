@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:15 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 22:30:49 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 12:14:55 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,13 @@
 			static bool			disabledShell;									// Disable remote shell
 			static uint16_t		maxClients;										// Maximum number of clients connected simultaneously
 			static uint16_t		portNumber;										// Port to listen for incoming connections
-			static uint8_t		logLevel;										// Level of logging
-			static std::string	logPath;										// Path to use for logging
+			static uint16_t		timeout;										// Timeout in seconds for inactive connections
+			static std::string	logFile;										// Path for the log file
+			static uint8_t		logLevel;										// Logging level
+			static bool			logNew;											// Create a new log file on start
+			static uint8_t		logMax;											// Maximum number of log files to keep when rotating
+			static size_t		logSize;										// Minimum log size before rotation
+			static std::string	shellPath;										// Path of the shell to execute
 
 			static int	parse(int argc, char **argv);							// Parse options passed as arguments to the program
 
