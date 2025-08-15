@@ -4,6 +4,8 @@
 - Cliente
 - Compile .hpp
 
+- Compile Daemon and Client from main Makefile
+
 ## Client
 
 - client user@host -> usa "user", "host" y puerto por defecto (4242)

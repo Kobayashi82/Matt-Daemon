@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/11 19:13:18 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/14 23:14:21 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/15 16:20:04 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,7 +45,7 @@ NAME		= MattDaemon
 
 CC			= clang++
 CFLAGS		= -Wall -Wextra -Werror -std=c++17
-CEFLAGS		= -lm -lcrypt 
+CEFLAGS		= -lm -lcrypt
 
 # ───────────────── #
 # ── DIRECTORIES ── #
