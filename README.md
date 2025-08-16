@@ -17,21 +17,15 @@
 
 ## ✨ Características
 
-### 🔧 Funcionalidades Básicas
 - **Daemon Real**: Proceso que se ejecuta en segundo plano sin intervención del usuario
-- **Comunicación de Red**: Comunicación segura en red
-- **Sistema de Logging**: Gestión completa de logs
+- **Comunicación de Red**: Comunicación segura en red con encriptación opcional
+- **Sistema de Logging**: Gestión completa de logs con rotación automática
 - **Control de Instancias**: Solo permite una instancia ejecutándose simultáneamente
 - **Gestión de Señales**: Intercepta y maneja señales del sistema correctamente
-- **Multi-cliente**: Permite hasta multiples conexiones simultáneas
-
-### 🚀 Características Avanzadas
-
-#### **Shell Remoto Seguro (Cliente)**
-- **Conexión Remota**: Cliente de terminal que se conecta al daemon
-- **Autenticación**: Sistema de autenticación seguro para verificar usuarios
-- **Encriptación**: Comunicación encriptada entre cliente y daemon
-- **Comandos Remotos**: Ejecución de comandos del sistema de forma remota
+- **Control de Timeout**: Gestión de conexiones inactivas
+- **Multi-cliente**: Permite conexiones simultáneas configurables (por defecto 3)
+- **Comunicación Segura**: Soporte para comunicación encriptada/no encriptada
+- **Shell Interactivo**: Acceso completo a shell remoto (Ben_AFK)
 
 ## 🔧 Instalación
 
@@ -48,19 +42,72 @@ make
 ## 🖥️ Uso
 
 ### Ejecución del Daemon
+
+#### Opciones disponibles:
+
+- `-e, --disable-encryption`: Deshabilitar encriptación para clientes Ben_AFK
+- `-s, --disable-shell`: Deshabilitar acceso a shell remoto
+- `-c, --max-clients=NUM`: Número máximo de clientes (por defecto: 3, ilimitado = 0)
+- `-p, --port=PORT`: Puerto de escucha (por defecto: 4242)
+- `-t, --timeout=SEC`: Timeout para conexiones inactivas en segundos (por defecto: 3600)
+- `-f, --log-file=PATH`: Ruta del archivo de log
+- `-l, --log-level=LEVEL`: Nivel de logging (DEBUG, INFO, LOG, WARNING, ERROR, CRITICAL)
+- `-n, --log-new`: Crear nuevo archivo de log al iniciar
+- `-m, --log-rotate-max=NUM`: Máximo número de archivos de log en rotación (por defecto: 5)
+- `-r, --log-rotate-size=BYTES`: Tamaño mínimo para rotación de logs (por defecto: 10MB)
+- `-x, --shell-path=PATH`: Ruta del shell a ejecutar
+- `-h, --help`: Mostrar ayuda
+- `-u, --usage`: Mostrar uso breve
+- `-V, --version`: Mostrar versión
+
+#### Uso básico:
+
 ```bash
-# Ejecutar como root
+# Ejecutar con configuración por defecto
 sudo ./MattDaemon
 
+# Ejecutar en puerto personalizado
+sudo ./MattDaemon --port 8080
+
+# Ejecutar con máximo 5 clientes
+sudo ./MattDaemon --max-clients 5
+
+# Deshabilitar encriptación
+sudo ./MattDaemon --disable-encryption
+
+# Deshabilitar shell remoto (solo logging)
+sudo ./MattDaemon --disable-shell
+```
+
+#### Opciones avanzadas:
+
+```bash
+# Configurar logging personalizado
+sudo ./MattDaemon --log-file /var/log/my_daemon.log --log-level DEBUG
+
+# Configurar rotación de logs
+sudo ./MattDaemon --log-rotate-max 10 --log-rotate-size 52428800
+
+# Usar shell personalizado
+sudo ./MattDaemon --shell-path /bin/zsh
+
+# Configurar timeout de conexión (en segundos)
+sudo ./MattDaemon --timeout 1800
+```
+
+#### Verificar estado:
+
+```bash
 # Verificar que está ejecutándose
-ps aux | grep Matt
+ps aux | grep MattDaemon
 sudo ls -la /var/lock/ | grep matt
 
 # Ver logs en tiempo real
 sudo tail -f /var/log/matt_daemon/matt_daemon.log
 ```
 
-### Conexión Básica
+#### Conexión Básica
+
 ```bash
 # Conexión simple con netcat
 nc localhost 4242
@@ -73,34 +120,62 @@ Test message
 quit
 ```
 
-### Cliente Shell Remoto (Ben_AFK)
-```bash
-# Conectar con el cliente seguro
-./Ben_AFK -u admin -p password localhost -P port
+### Ejecución de Ben_AFK (Shell Remoto)
 
-# Una vez autenticado, usar como terminal normal
-ls -la
-pwd
-ps aux
-exit
+#### Opciones disponibles:
+
+- `-k, --insecure`: Permitir comunicación no encriptada
+- `-l, --login=USERNAME`: Especificar nombre de usuario
+- `-p, --port=PORT`: Puerto de conexión (por defecto: 4242)
+- `-h, --help`: Mostrar ayuda
+- `-u, --usage`: Mostrar uso breve
+- `-V, --version`: Mostrar versión
+
+#### Uso básico:
+
+```bash
+# Conexión básica (usuario actual, puerto por defecto)
+./Ben_AFK localhost
+
+# Especificar usuario
+./Ben_AFK --login admin localhost
+
+# Usuario en formato user@host
+./Ben_AFK admin@localhost
+
+# Puerto personalizado
+./Ben_AFK --port 8080 localhost
+
+# Permitir comunicación no encriptada
+./Ben_AFK --insecure localhost
+
+# Combinando opciones
+./Ben_AFK --login admin --port 8080 --insecure 192.168.1.100
 ```
 
 ## 🧪 Testing
 
 ### Pruebas Básicas
+
 ```bash
 # Test de instancia única
 sudo ./MattDaemon
 sudo ./MattDaemon  # Debería mostrar error de archivo bloqueado
 
-# Test de múltiples clientes (3 max)
+# Test de límite de clientes (por defecto 3)
 nc localhost 4242 &
 nc localhost 4242 &
 nc localhost 4242 &
 nc localhost 4242   # El cuarto debería rechazarse
+
+# Test con límite personalizado
+sudo ./MattDaemon --max-clients 1
+nc localhost 4242 &
+nc localhost 4242   # El segundo debería rechazarse
 ```
 
 ### Pruebas de Señales
+
 ```bash
 # Ejecutar daemon
 sudo ./MattDaemon
@@ -115,126 +190,78 @@ sudo kill -1 $PID   # SIGHUP
 sudo tail /var/log/matt_daemon/matt_daemon.log
 ```
 
-### Pruebas de Shell Remoto
-```bash
-# Test de autenticación
-./Ben_AFK -u admin -p password localhost -P port
-# Probar credenciales incorrectas
-# Probar credenciales correctas
+### Pruebas de Logging
 
-# Test de encriptación
-# Las comunicaciones deben ser encriptadas automáticamente
-tcpdump -i lo port 4242  # No debería mostrar texto plano
+```bash
+# Test de rotación de logs
+sudo ./MattDaemon --log-rotate-size 1024 --log-rotate-max 3
+
+# Test de niveles de log
+sudo ./MattDaemon --log-level DEBUG
+sudo ./MattDaemon --log-level ERROR
+
+# Test de archivo de log personalizado
+sudo ./MattDaemon --log-file /tmp/test_daemon.log
 ```
 
-## 🔒 Configuración de Seguridad
+### Pruebas de Ben_AFK (Shell Remoto)
 
-### Autenticación
 ```bash
-# Configurar usuarios autorizados (ejemplo)
-echo "admin:hashed_password" >> /etc/matt_daemon/users.conf
-echo "user1:hashed_password" >> /etc/matt_daemon/users.conf
+# Test de conexión básica
+./Ben_AFK localhost
+
+# Test con usuario específico
+./Ben_AFK --login testuser localhost
+
+# Test con puerto personalizado
+sudo ./MattDaemon --port 8080
+./Ben_AFK --port 8080 localhost
+
+# Test de comunicación no encriptada
+sudo ./MattDaemon --disable-encryption
+./Ben_AFK --insecure localhost
 ```
 
 ## 📝 Ejemplos de Log
 
-### Log de Inicio Normal
 ```
-[11/01/2025-14:34:58] [ INFO ] - Matt_daemon:  Started
-[11/01/2025-14:34:58] [ INFO ] - Matt_daemon:  Entering Daemon mode
-[11/01/2025-14:34:58] [ INFO ] - Matt_daemon:  Started. PID: 6498
-[11/01/2025-14:34:58] [ INFO ] - Matt_daemon:  Creating server
-[11/01/2025-14:34:58] [ INFO ] - Matt_daemon:  Server created
-```
-
-### Log de Conexión de Cliente
-```
-[11/01/2025-14:36:43] [ INFO ] - Matt_daemon:  Client connected from 127.0.0.1:54321
-[11/01/2025-14:36:44] [ LOG ]  - User input:   Hello World
-[11/01/2025-14:36:47] [ INFO ] - User request: Request quit
-[11/01/2025-14:36:47] [ INFO ] - Matt_daemon:  Client disconnected
-[11/01/2025-14:36:47] [ INFO ] - Matt_daemon:  Quitting
+[11/01/2025-14:34:58] [ INFO ] - Matt_daemon: Started
+[11/01/2025-14:34:58] [ INFO ] - Matt_daemon: Entering Daemon mode
+[11/01/2025-14:34:58] [ INFO ] - Matt_daemon: Started. PID: 6498
+[11/01/2025-14:34:58] [ INFO ] - Matt_daemon: Creating server on port 4242
+[11/01/2025-14:34:58] [ INFO ] - Matt_daemon: Server created, max clients: 3
+[11/01/2025-14:34:58] [ INFO ] - Matt_daemon: Encryption enabled, Shell enabled
 ```
 
-### Log de Shell Remoto
-```
-[11/01/2025-15:00:12] [ INFO ] - Matt_daemon:  Ben_AFK client connected.
-[11/01/2025-15:00:15] [ INFO ] - Matt_daemon:  Authentication successful for user: admin
-[11/01/2025-15:00:20] [ LOG ]  - User admin:   Remote command executed: ls -la
-[11/01/2025-15:00:25] [ LOG ]  - User admin:   Remote command executed: ps aux
-[11/01/2025-15:00:30] [ INFO ] - Matt_daemon:  Ben_AFK client disconnected.
-```
-
-## 🔧 Arquitectura Técnica
+## 🏗️ Arquitectura Técnica
 
 ### Estructura del Daemon
-- **Fork**: Creación del proceso hijo para funcionar en segundo plano
+- **Fork**: Creación doble del proceso hijo para funcionar en segundo plano
 - **Chdir**: Cambio al directorio raíz del sistema
 - **Flock**: Bloqueo de archivo para control de instancias únicas
-- **Signal**: Manejo de señales del sistema (SIGTERM, SIGINT, SIGHUP)
+- **Signal**: Manejo de señales del sistema (SIGINT, SIGTERM, SIGHUP, SIGQUIT, SIGPIPE, SIGSEV, SIGCHLD)
 
 ### Comunicación de Red
 - **Puerto**: 4242 (configurable)
 - **Protocolo**: TCP/IP
-- **Conexiones**: Máximo 3 simultáneas (configurable)
-- **Timeout**: Control de conexiones inactivas
+- **Conexiones**: Máximo de conexiones simultáneas (configurable)
+- **Timeout**: Control de conexiones inactivas (configurable)
 
 ### Sistema de Encriptación
-- **Algoritmo**: Encriptación simétrica de sesión
-- **Intercambio**: Negociación automática de claves
-- **Integridad**: Verificación de integridad de mensajes
+- **Encriptación**: Habilitada por defecto (configurable)
+- **Cliente Seguro**: Ben_AFK soporta comunicación encriptada/no encriptada
+- **Negociación**: Automática entre cliente y servidor
 
-## 📚 Clases Principales
-
-### Tintin_reporter
-```cpp
-// Sistema de logging con diferentes niveles
-class Tintin_reporter {
-public:
-    void log(LogLevel level, const std::string& message);
-    void info(const std::string& message);
-    void error(const std::string& message);
-    void setLogFile(const std::string& filename);
-};
-```
-
-### MattDaemon
-```cpp
-// Clase principal del daemon
-class MattDaemon {
-public:
-    void daemonize();
-    void createServer();
-    void handleConnections();
-    void cleanup();
-};
-```
-
-### Ben_AFK (Cliente)
-```cpp
-// Cliente de shell remoto
-class Ben_AFK {
-public:
-    bool connect(const std::string& host, int port);
-    bool authenticate();
-    void startShell();
-    void encryptMessage(std::string& message);
-};
-```
-
-## 🚨 Gestión de Errores
+### Sistema de Logging
+- **Niveles**: DEBUG, INFO, LOG, WARNING, ERROR, CRITICAL
+- **Rotación**: Automática basada en tamaño y cantidad de archivos
+- **Ubicación**: Configurable (por defecto: /var/log/matt_daemon/)
 
 ### Errores Comunes
 - **Permisos insuficientes**: El daemon requiere permisos de root
-- **Puerto ocupado**: Verificar que el puerto 4242 esté libre
+- **Puerto ocupado**: Verificar que el puerto especificado esté libre
 - **Archivo bloqueado**: Solo una instancia puede ejecutarse
-
-### Códigos de Salida
-- **0**: Salida normal
-- **1**: Error de permisos
-- **2**: Error de configuración
-- **3**: Error de red
-- **4**: Instancia ya ejecutándose
+- **Host desconocido**: Verificar que el hostname/IP sea válido (Ben_AFK)
 
 ## 📄 Licencia
 
@@ -244,7 +271,7 @@ Este proyecto está licenciado bajo la WTFPL – [Do What the Fuck You Want to P
 
 <div align="center">
 
-**🌐 Desarrollado como parte del curriculum de 42 School 🌐**
+**🌍 Desarrollado como parte del curriculum de 42 School 🌍**
 
 *"Because background processes need style too"*
 
