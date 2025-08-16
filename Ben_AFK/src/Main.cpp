@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:00 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 16:44:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 17:49:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@
 				// Shell Output
 				if (FD_ISSET(Options::sockfd, &readfds)) {
 					ssize_t bytes = recv(Options::sockfd, buffer, sizeof(buffer), 0);
-					if (bytes <= 0) return (1);
+					if (bytes <= 0) return (3);
 
 					std::string msg = std::string(buffer, bytes);
 					if (Options::encryption) {
@@ -103,6 +103,7 @@
 					int result = receive_data();
 					if (result == 1) return (1);	// Error
 					if (result == 2) break;			// Authenticated
+					if (result == 3) return (3);	// Disconnected
 				}
 			}
 
@@ -122,10 +123,13 @@
 		if ((result = Options::parse(argc, argv))) return (result - 1);
 
 		if (socket_create()) return (1);
-		if (main_loop()) result = 1;
+		result = main_loop();
 
 		raw_mode_disable(false);
 		if (Options::sockfd >= 0) close(Options::sockfd);
+
+		if (!Options::retries) std::cerr << "\nDisconnected" << std::endl;
+		else if (result == 3) std::cerr << "\nDisconnected" << std::endl;;
 
 		return (result);
 	}

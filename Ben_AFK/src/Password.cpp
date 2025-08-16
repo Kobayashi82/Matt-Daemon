@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 22:29:03 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 12:24:11 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 17:51:42 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,13 +41,8 @@
 	std::string getPassword() {
 		std::string password;
 
-		while (Options::retries > 0) {
+		if (Options::retries > 0) {
 			password = getPasswordInput();
-			if (password.empty()) {
-				Options::retries--;
-				if (!Options::retries)	std::cerr << "Authentication failure, giving up\n";
-				else					std::cerr << "Authentication failure, please try again\n";
-			} else break;
 		}
 
 		return (password);

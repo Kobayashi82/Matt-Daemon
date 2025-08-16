@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 11:24:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 16:22:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 17:48:41 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@
 		} else if (raw_enabled) {
 			tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios);
 			raw_enabled = false;
+			std::cout << std::endl;
 		}
 	}
 

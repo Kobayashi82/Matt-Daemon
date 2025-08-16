@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 11:44:57 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 16:39:36 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 17:45:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@
 		static void sigint_handler(int sig) {
 			raw_mode_disable(false);
 			if (Options::sockfd >= 0) close(Options::sockfd);
+			std::cerr << "Disconnected\n";
 			std::exit(128 + sig);
 		}
 
@@ -45,6 +46,7 @@
 		static void sigterm_handler(int sig) {
 			raw_mode_disable(false);
 			if (Options::sockfd >= 0) close(Options::sockfd);
+			std::cerr << "Disconnected\n";
 			std::exit(128 + sig);
 		}
 
@@ -55,6 +57,7 @@
 		static void sigup_handler(int sig) {
 			raw_mode_disable(false);
 			if (Options::sockfd >= 0) close(Options::sockfd);
+			std::cerr << "Disconnected\n";
 			std::exit(128 + sig);
 		}
 
@@ -65,6 +68,7 @@
 		static void sigquit_handler(int sig) {
 			raw_mode_disable(false);
 			if (Options::sockfd >= 0) close(Options::sockfd);
+			std::cerr << "Disconnected\n";
 			std::exit(128 + sig);
 		}
 
@@ -83,6 +87,7 @@
 		static void sigpipe_handler(int sig) {
 			raw_mode_disable(false);
 			if (Options::sockfd >= 0) close(Options::sockfd);
+			std::cerr << "Disconnected\n";
 			std::exit(128 + sig);
 		}
 
@@ -93,6 +98,7 @@
 		static void sigsev_handler(int sig) {
 			raw_mode_disable(false);
 			if (Options::sockfd >= 0) close(Options::sockfd);
+			std::cerr << "Disconnected\n";
 			signal(SIGSEGV, SIG_DFL);
 			raise(SIGSEGV);
 			std::exit(128 + sig);
