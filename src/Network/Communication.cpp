@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 15:01:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 15:03:22 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@
 						if (msg == "quit") {
 							Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] wants to close the daemon");
 							Epoll::Running = false;
-						} if (msg == "/CLIENT_SHELL_AUTH") {
+						} else if (msg == "/CLIENT_SHELL_AUTH") {
 							Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] wants to open a shell");
 							std::string response;
 							if (Options::disabledShell) {
