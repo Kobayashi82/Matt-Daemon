@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:06 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 14:12:58 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 14:51:15 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,7 @@
 			Log->info("Client [" + ip + ":" + std::to_string(port) + "] connected");
 		}
 
-		if (Epoll::add(fd, true, true) == -1) {
+		if (Epoll::add(fd, true, false) == -1) {
 			Log->debug("Epoll FD add failed");
 			clients[fd]->remove(); return (1);
 		}

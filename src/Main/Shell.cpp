@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 19:09:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 13:43:33 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 14:55:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@
 		client->shell_pid = pid;
 		client->shell_running = true;
 		shells[client->master_fd] = client;
-		Epoll::add(client->master_fd, true, true);
+		Epoll::add(client->master_fd, true, false);
 
 		Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell started with PTY: " + std::string(pty_name));
 		return (0);
