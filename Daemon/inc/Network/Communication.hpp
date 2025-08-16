@@ -6,11 +6,17 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 16:08:48 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 18:35:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
+
+#pragma region "Includes"
+
+	#include <string>															// std::string
+
+#pragma endregion
 
 #pragma region "Communication"
 
@@ -33,7 +39,6 @@
 			static std::string decrypt(const std::string& ciphertext);			// Decrypts a ciphertext string
 			
 			static std::string encrypt_with_index(const std::string& plaintext, size_t& index);		// Encrypts with continuous index
-			static std::string decrypt_with_index(const std::string& ciphertext, size_t& index);	// Decrypts with continuous index
 
 		private:
 	

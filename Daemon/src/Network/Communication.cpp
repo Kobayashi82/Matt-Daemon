@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 16:43:10 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 18:35:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -400,24 +400,6 @@
 			}
 
 			return (toHex(result));
-		}
-
-	#pragma endregion
-
-	#pragma region "Decrypt with continuous index"
-
-		std::string Communication::decrypt_with_index(const std::string& ciphertext, size_t& index) {
-			std::string binary_data = fromHex(ciphertext);
-			std::string result;
-			result.reserve(binary_data.length());
-
-			for (size_t i = 0; i < binary_data.length(); ++i) {
-				char decrypted_char = binary_data[i] ^ KEY[index % KEY.length()];
-				result.push_back(decrypted_char);
-				index++;
-			}
-
-			return (result);
 		}
 
 	#pragma endregion
