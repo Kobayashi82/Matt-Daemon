@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:33 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 23:48:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 10:55:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,16 +32,16 @@
 
 		public:
 
-			static bool					insecure;								// Allow non-encrypted communication
-			static uint16_t				port;									// Port to connect
-			static std::string			user;									// User used for login
-			static bool					encryption;								// 
-			static int					retries;								// 
-			static bool					authenticated;							// 
+			static bool					insecure;								// Allow unencrypted communications
+			static uint16_t				port;									// Port to listen for incoming connections
+			static std::string			user;									// Username to use for login
+			static bool					encryption;								// Server requires encryption (true = encrypted, false = plain)
+			static int					retries;								// Remaining password retry attempts
+			static bool					authenticated;							// Authentication state (true if login successful)
 
-			static int					sockfd;									// 
+			static int					sockfd;									// Socket file descriptor
 			static char					hostname[254];							// IP address or hostname
-			static char					host[INET_ADDRSTRLEN];					// IP address resolved
+			static char					host[INET_ADDRSTRLEN];					// Resolved IPv4 address in string form
 			static struct sockaddr_in	sockaddr;								// Stores IPv4 socket address information
 
 			static int	parse(int argc, char **argv);							// Parse options passed as arguments to the program

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:04 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 23:48:44 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 12:10:48 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,52 +26,19 @@
 
 #pragma region "Variables"
 
-	bool				Options::insecure		= false;						// Disable encrypted communication 
+	bool				Options::insecure		= false;						// Allow unencrypted communications
 	uint16_t			Options::port			= 4242;							// Port to listen for incoming connections
-	std::string			Options::user			= "";							// Path to use for logging
-	bool				Options::encryption		= false;						// 
-	int					Options::retries		= 3;							// 
-	bool				Options::authenticated	= false;						// 
+	std::string			Options::user			= "";							// Username to use for login
+	bool				Options::encryption		= false;						// Server requires encryption (true = encrypted, false = plain)
+	int					Options::retries		= 3;							// Remaining password retry attempts
+	bool				Options::authenticated	= false;						// Authentication state (true if login successful)
 
-	int					Options::sockfd			= -1;							// 
+	int					Options::sockfd			= -1;							// Socket file descriptor
 	char				Options::hostname[254];									// IP address or hostname
-	char				Options::host[INET_ADDRSTRLEN];							// IP address resolved
+	char				Options::host[INET_ADDRSTRLEN];							// Resolved IPv4 address in string form
 	struct sockaddr_in	Options::sockaddr;										// Stores IPv4 socket address information
 
 	std::string	Options::_fullName		= "Ben__AFK";							// Name and path used to execute the program (same as argv[0])
-
-#pragma endregion
-
-#pragma region "Strtoul"
-
-	template<typename T>
-	int Options::ft_strtoul(char **argv, const char *optarg, T *value, unsigned long max_value, bool allow_zero) {
-		try {
-			size_t			idx;
-			unsigned long	tmp = std::stoul(optarg, &idx, 0);
-
-			if (idx != std::strlen(optarg)) {
-				std::cerr << argv[0] << ": invalid value (`" << optarg << "' near `" << (optarg + idx) << "')\n";
-				return (1);
-			}
-
-			if (!tmp && !allow_zero) {
-				std::cerr << argv[0] << ": option value too small: " << optarg << "\n";
-				return (1);
-			}
-
-			if (max_value && tmp > max_value) {
-				std::cerr << argv[0] << ": option value too big: " << optarg << "\n";
-				return (1);
-			}
-
-			*value = static_cast<T>(tmp);
-			return (0);
-		} catch (const std::exception &) {
-			std::cerr << argv[0] << ": invalid number: " << optarg << "\n";
-			return (1);
-		}
-	}
 
 #pragma endregion
 
@@ -80,20 +47,19 @@
 	#pragma region "Help"
 
 		int Options::help() {
-			std::cerr << "Usage: " << NAME << " [ -esh?uV ] [ -c max_clients ]  [ -p port ] [ -f log_file ] [ -l log_level ]\n";
+			std::cerr << "Usage: " << NAME << " [ OPTION... ] HOST...\n";
 			std::cerr << "\n";
 			std::cerr << " Options:\n";
 			std::cerr << "\n";
-			std::cerr << "  -e,  --disable-encryption   disable encryption for remote shell\n";
-			std::cerr << "  -s,  --disable-shell        disable remote shell access\n";
-			std::cerr << "  -c,  --max-clients=NUM      maximum number of simultaneous clients    (default: 3, unlimited = 0)\n";
-			std::cerr << "  -p,  --port=NUM             port number to listen on                  (default: 4242)\n";
-			std::cerr << "  -f,  --log-file=PATH        path to the log file                      (default: /var/log/matt_daemon/matt_daemon.log)\n";
-			std::cerr << "  -l,  --log-level=LEVEL      logging verbosity level                   (default: INFO)\n";
+			std::cerr << "  -k,  --insecure             Allow unencrypted communication\n";
+			std::cerr << "  -l,  --login=USERNAME       Login username                   (default: current user)\n";
+			std::cerr << "  -p,  --port=PORT            Port number to connect to        (default: 4242)\n";
 			std::cerr << "\n";
-			std::cerr << "  -h?, --help                 give this help list\n";
-      		std::cerr << "  -u,  --usage                give a short usage message\n";
-  			std::cerr << "  -V,  --version              print program version\n";
+			std::cerr << "  -h?, --help                 Display this help message\n";
+      		std::cerr << "  -u,  --usage                Display short usage message\n";
+  			std::cerr << "  -V,  --version              Show program version\n";
+			std::cerr << "\n";
+			std::cerr << " HOST                         Hostname or IP address to connect to\n";
 			std::cerr << "\n";
 			std::cerr << "Report bugs to <kobayashi82@outlook.com>\n";
 
@@ -105,9 +71,9 @@
 	#pragma region "Usage"
 
 		int Options::usage() {
-			std::cerr << "Usage: " << NAME << " [-e, --disable-encryption] [-s, --disable-shell] [-c NUM, --max-clients=NUM]\n";
-			std::cerr << "                  [-p NUM, --port=NUM] [-f PATH, --log-file=PATH] [-l LEVEL, --log-level=LEVEL]\n";
-			std::cerr << "                  [-h? --help] [-u --usage] [-V --version]\n";
+			std::cerr << "Usage: " << NAME << " [-k, --insecure] [-l USERNAME, --login=USERNAME] [-p PORT, --port=PORT]\n";
+			std::cerr << "               [-h? --help] [-u --usage] [-V --version]\n";
+			std::cerr << "               HOST ...\n";
 
 			return (1);
 		}
@@ -139,6 +105,43 @@
 
 	#pragma endregion
 
+#pragma endregion
+
+#pragma region "Parsing"
+
+	#pragma region "Strtoul"
+
+		template<typename T>
+		int Options::ft_strtoul(char **argv, const char *optarg, T *value, unsigned long max_value, bool allow_zero) {
+			try {
+				size_t			idx;
+				unsigned long	tmp = std::stoul(optarg, &idx, 0);
+
+				if (idx != std::strlen(optarg)) {
+					std::cerr << argv[0] << ": invalid value (`" << optarg << "' near `" << (optarg + idx) << "')\n";
+					return (1);
+				}
+
+				if (!tmp && !allow_zero) {
+					std::cerr << argv[0] << ": option value too small: " << optarg << "\n";
+					return (1);
+				}
+
+				if (max_value && tmp > max_value) {
+					std::cerr << argv[0] << ": option value too big: " << optarg << "\n";
+					return (1);
+				}
+
+				*value = static_cast<T>(tmp);
+				return (0);
+			} catch (const std::exception &) {
+				std::cerr << argv[0] << ": invalid number: " << optarg << "\n";
+				return (1);
+			}
+		}
+
+	#pragma endregion
+
 	#pragma region "Validate Host"
 
 		int Options::validate_host(const char *_hostname) {
@@ -149,7 +152,7 @@
 			hints.ai_socktype = SOCK_RAW;
 			hints.ai_flags = AI_CANONNAME;
 
-			if (getaddrinfo(_hostname, NULL, &hints, &res)) return (1);
+			if (getaddrinfo(_hostname, NULL, &hints, &res)) return (2);
 
 			std::memcpy(&sockaddr, res->ai_addr, res->ai_addrlen);
 			snprintf(hostname, sizeof(hostname), "%s", res->ai_canonname ? res->ai_canonname : _hostname);
@@ -162,28 +165,32 @@
 
 	#pragma endregion
 
-#pragma endregion
+	#pragma region "User@Host"
 
-	int Options::parseUserHost(const std::string & _host) {
-		size_t atPos = _host.find('@');
+		int Options::parseUserHost(const std::string & _host) {
+			size_t atPos = _host.find('@');
 
-		if (atPos == std::string::npos) {
-			std::strncpy(host, _host.c_str(), sizeof(host));
-		} else {
-			std::string newUser = _host.substr(0, atPos);
-			std::string newHost = _host.substr(atPos + 1);
+			if (atPos == std::string::npos) {
+				std::strncpy(host, _host.c_str(), sizeof(host));
+			} else {
+				std::string newUser = _host.substr(0, atPos);
+				std::string newHost = _host.substr(atPos + 1);
 
-			if (!user.empty() && user != newUser) {
-				std::cerr << "Error: user conflict: '" + user + "' vs '" + newUser + "'\n";
-				return (1);
+				if (!user.empty() && user != newUser) {
+					std::cerr << "Error: user conflict: '" + user + "' vs '" + newUser + "'\n";
+					return (1);
+				}
+
+				if (user.empty()) user = newUser;
+				std::strncpy(host, newHost.c_str(), sizeof(host));
 			}
-
-			if (user.empty()) user = newUser;
-			std::strncpy(host, newHost.c_str(), sizeof(host));
+			
+			return (0);
 		}
-		
-		return (0);
-	}
+
+	#pragma endregion
+
+#pragma endregion
 
 #pragma region "Parse"
 
@@ -192,8 +199,8 @@
 
 		struct option long_options[] = {
 			{"insecure",			no_argument,		0, 'k'},	// [-k, --insecure]
-			{"port",				required_argument,	0, 'p'},	// [-p, --port=NUM]
 			{"login",				required_argument,	0, 'l'},	// [-l, --login=USER]
+			{"port",				required_argument,	0, 'p'},	// [-p, --port=NUM]
 
 			{"help",				no_argument,		0, 'h'},	// [-h?, --help]
 			{"usage",				no_argument,		0, 'u'},	// [	--usage]
@@ -202,11 +209,11 @@
 		};
 
 		int opt;
-		while ((opt = getopt_long(argc, argv, "kp:l:h?uV", long_options, NULL)) != -1) {
+		while ((opt = getopt_long(argc, argv, "kl:p:h?uV", long_options, NULL)) != -1) {
 			switch (opt) {
-				case 'k':	insecure = true;																break;
-				case 'p':	if (ft_strtoul(argv, optarg, &port, 65535, false))		return (2);				break;
-				case 'l':	user = std::string(optarg);														break;
+				case 'k':	insecure = true;										break;
+				case 'l':	user = std::string(optarg);								break;
+				case 'p':	if (!ft_strtoul(argv, optarg, &port, 65535, false))		break;					return (2);
 
 				case '?':	if (std::string(argv[optind - 1]) == "-?")				return (help());		return (invalid());
 				case 'h':															return (help());
@@ -215,21 +222,17 @@
 			}
 		}
 
-		if (optind >= argc) {
-			std::cerr << NAME << ": Missing host\n";
-			invalid(); return (2);
-		}
+		if (optind >= argc) { std::cerr << NAME << ": Missing host\n";										return (invalid()); }
 
-		if (parseUserHost(std::string(argv[optind]))) return (2);
+		if (parseUserHost(std::string(argv[optind])))														return (2);
 
 		if (user.empty()) {
 			struct passwd* pw = getpwuid(getuid());
 			user = pw ? std::string(pw->pw_name) : "";
+			if (user.empty()) { std::cerr << "Error: unable to determine current user\n";					return (2); }
 		}
 
-		if (user.empty()) { std::cerr << "Error: unable to determine current user\n"; return (2); }
-
-		if (validate_host(host)) { std::cerr << "Error: unknown host\n"; return (2); }
+		if (validate_host(host)) { std::cerr << "Error: unknown host\n";									return (2); }
 
 		return (0);
 	}

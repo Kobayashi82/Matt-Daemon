@@ -6,43 +6,43 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 22:29:03 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 00:59:04 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 12:24:11 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma region "Includes"
+
 	#include "Options.hpp"
-	#include "Ben_AFK.hpp"
+	#include "RawMode.hpp"
+	#include "Password.hpp"
 
-	#include <iostream>
-	#include <termios.h>
-	#include <unistd.h>
+	#include <iostream>															// std::getline(), std::cerr()
 
-	std::string getUserPassword() {
-		struct termios	oldTermios, newTermios;
-		std::string		password;
+#pragma endregion
 
-		std::cout << "Password for " + Options::user + ": "; std::cout.flush();
+#pragma region "Get Password Input"
 
-		tcgetattr(STDIN_FILENO, &oldTermios);
-		newTermios = oldTermios;
+	static std::string getPasswordInput() {
+		std::string password;
 
-		newTermios.c_lflag &= ~ECHO;
-		tcsetattr(STDIN_FILENO, TCSANOW, &newTermios);
+		raw_mode_enable(true);
 
 		std::getline(std::cin, password);
 
-		tcsetattr(STDIN_FILENO, TCSANOW, &oldTermios);
-
-		std::cout << std::endl;
+		raw_mode_disable(true);
 
 		return (password);
 	}
+
+#pragma endregion
+
+#pragma region "Get Password"
 
 	std::string getPassword() {
 		std::string password;
 
 		while (Options::retries > 0) {
-			password = getUserPassword();
+			password = getPasswordInput();
 			if (password.empty()) {
 				Options::retries--;
 				if (!Options::retries)	std::cerr << "Authentication failure, giving up\n";
@@ -52,3 +52,5 @@
 
 		return (password);
 	}
+
+#pragma endregion

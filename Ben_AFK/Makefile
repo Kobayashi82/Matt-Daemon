@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/15 16:49:47 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/15 23:39:15 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/16 11:52:30 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -60,7 +60,8 @@ SRC_DIR		= src/
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= Main.cpp Options.cpp Password.cpp Connection.cpp Encryption.cpp
+SRCS		= Main.cpp Options.cpp Password.cpp Connection.cpp Encryption.cpp	\
+			  RawMode.cpp Signals.cpp
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #
@@ -120,7 +121,7 @@ _show_title:
 		$(MAKE) -s _progress; printf "\n" \
 		$(MAKE) -s _show_cursor; \
 	elif [ -f "$(NAME)" ] && \
-		[ -z "$$(find $(SRC_PATHS) -newer "$(NAME)" 2>/dev/null; find inc -name '*.h' -newer "$(NAME)" 2>/dev/null)" ] && \
+		[ -z "$$(find $(SRC_PATHS) -newer "$(NAME)" 2>/dev/null; find inc -name '*.hpp' -newer "$(NAME)" 2>/dev/null)" ] && \
 		[ $$(find $(OBJS) 2>/dev/null | wc -l) -eq $$(echo "$(OBJS)" | wc -w) ]; then \
         printf "\t$(GREEN)✓ $(YELLOW)$(NAME)$(CYAN) is up to date$(NC)"; \
 		printf "\n\t$(WHITE)──────────────────────────$(NC)"; \

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:32 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 16:56:23 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 11:15:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,20 +77,20 @@
 	#pragma region "Help"
 
 		int Options::help() {
-			std::cerr << "Usage: " << NAME << " [ -esh?uV ] [ -c max_clients ]  [ -p port ] [ -f log_file ] [ -l log_level ]\n";
+			std::cerr << "Usage: " << NAME << " [ OPTION... ] \n";
 			std::cerr << "\n";
 			std::cerr << " Options:\n";
 			std::cerr << "\n";
-			std::cerr << "  -e,  --disable-encryption   disable encryption for remote shell\n";
-			std::cerr << "  -s,  --disable-shell        disable remote shell access\n";
-			std::cerr << "  -c,  --max-clients=NUM      maximum number of simultaneous clients    (default: 3, unlimited = 0)\n";
-			std::cerr << "  -p,  --port=NUM             port number to listen on                  (default: 4242)\n";
-			std::cerr << "  -f,  --log-file=PATH        path to the log file                      (default: /var/log/matt_daemon/matt_daemon.log)\n";
-			std::cerr << "  -l,  --log-level=LEVEL      logging verbosity level                   (default: INFO)\n";
+			std::cerr << "  -e,  --disable-encryption   Disable encryption communication for Ben_AFK clients\n";
+			std::cerr << "  -s,  --disable-shell        Disable remote shell access\n";
+			std::cerr << "  -c,  --max-clients=NUM      Maximum number of clients   (default: 3, unlimited = 0)\n";
+			std::cerr << "  -p,  --port=PORT            Port number to listen on    (default: 4242)\n";
+			std::cerr << "  -f,  --log-file=PATH        Path to the log file        (default: /var/log/matt_daemon/matt_daemon.log)\n";
+			std::cerr << "  -l,  --log-level=LEVEL      Logging verbosity level     (default: INFO)\n";
 			std::cerr << "\n";
-			std::cerr << "  -h?, --help                 give this help list\n";
-      		std::cerr << "  -u,  --usage                give a short usage message\n";
-  			std::cerr << "  -V,  --version              print program version\n";
+			std::cerr << "  -h?, --help                 Display this help message\n";
+      		std::cerr << "  -u,  --usage                Display short usage message\n";
+  			std::cerr << "  -V,  --version              Show program version\n";
 			std::cerr << "\n";
 			std::cerr << "Report bugs to <kobayashi82@outlook.com>\n";
 
@@ -103,7 +103,7 @@
 
 		int Options::usage() {
 			std::cerr << "Usage: " << NAME << " [-e, --disable-encryption] [-s, --disable-shell] [-c NUM, --max-clients=NUM]\n";
-			std::cerr << "                  [-p NUM, --port=NUM] [-f PATH, --log-file=PATH] [-l LEVEL, --log-level=LEVEL]\n";
+			std::cerr << "                  [-p PORT, --port=PORT] [-f PATH, --log-file=PATH] [-l LEVEL, --log-level=LEVEL]\n";
 			std::cerr << "                  [-h? --help] [-u --usage] [-V --version]\n";
 
 			return (1);

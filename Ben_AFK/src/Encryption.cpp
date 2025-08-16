@@ -6,16 +6,16 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 23:36:28 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 00:58:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 11:54:41 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-	#include "Ben_AFK.hpp"
+	#include "Encryption.hpp"
 
 	#include <iomanip>															// std::stringstream, std::setfill(), std::setw()
 	#include <shadow.h>															// getspnam()
 
-	const std::string KEY	= "Th1s_1s_n0t_4_s3cr3t_k3y_1t's_0nly_4_l0v3_m3ss4g3:_I_L0v3_U_λµяΔ!";	// Encryption key
+	const std::string KEY	= "Th1s_1s_n0t_4_s3cr3t_k3y";						// Encryption key
 
 #pragma region "Encryptation"
 

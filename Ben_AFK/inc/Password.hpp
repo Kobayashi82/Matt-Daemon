@@ -1,29 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Ben_AFK.hpp                                        :+:      :+:    :+:   */
+/*   Password.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/15 21:41:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 00:58:07 by vzurera-         ###   ########.fr       */
+/*   Created: 2025/08/16 11:41:36 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/08/16 11:43:32 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#pragma region "Includes"
+
 	#include <string>
 
-std::string getUserPassword();
-std::string getPassword();
+#pragma endregion
 
-std::string encrypt(const std::string& plaintext);
-std::string decrypt(const std::string& ciphertext);
+#pragma region "Methods"
 
-int		socket_create();
-int		send_data(const std::string & data);
-int		main_loop();
-int		interactive_loop();
+	std::string	getPassword();
 
-int		enable_raw_mode();
-void	disable_raw_mode();
+#pragma endregion

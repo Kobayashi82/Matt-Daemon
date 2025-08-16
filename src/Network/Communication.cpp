@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 00:47:52 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 11:54:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,7 @@
 #pragma region "Variables"
 
 	const size_t Communication::CHUNK_SIZE	= 4096;								// Size of the buffer for read/recv and write/send operations
-
-	const std::string Communication::KEY	= "Th1s_1s_n0t_4_s3cr3t_k3y_1t's_0nly_4_l0v3_m3ss4g3:_I_L0v3_U_λµяΔ!";	// Encryption key
+	const std::string Communication::KEY	= "Th1s_1s_n0t_4_s3cr3t_k3y";		// Encryption key
 
 #pragma endregion
 
