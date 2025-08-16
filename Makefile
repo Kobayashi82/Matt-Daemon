@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/11 19:13:18 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/16 18:31:30 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/16 23:39:32 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,4 +28,6 @@ wipe:
 	@$(MAKE) -s -C Ben_AFK wipe
 	@rm -rf bin
 
-.PHONY: all MattDaemon daemon Ben_AFK client fclean wipe 
+re: wipe all
+
+.PHONY: all MattDaemon daemon Ben_AFK client fclean wipe re
