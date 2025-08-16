@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 21:41:05 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 12:26:40 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 13:14:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,10 @@
 			} catch (const std::exception& e) {
 				std::cerr << "Error: Message not encrypted\n"; return (1);
 			}
+
+			if (!msg.find("/SHELL_DISABLED")) { std::cerr << "Remote shell access is disabled on the server\n"; return (1); }
+
+			if (!msg.find("/SHELL_FAIL")) { std::cerr << "Failed to open remote shell\n"; return (1); }
 
 			if (!msg.find("/AUTHORIZE ENCRYPTION=")) {
 				std::string value = msg.substr(22);

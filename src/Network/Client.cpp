@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:01 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 16:02:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 13:46:55 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 	#include "Network/Client.hpp"
 	#include "Network/Epoll.hpp"
 	#include "Network/Communication.hpp"
+	#include "Main/Shell.hpp"
 
 	#include <unistd.h>															// For close()
 	#include <ctime>															// For time() and difftime()
@@ -49,6 +50,7 @@
 
 	Client::~Client() {
 		if (fd >= 0) {
+			if (shell_running && shell_pid) shell_close(this);
 			Epoll::remove(fd);
 			close(fd); fd = -1;
 			Log->info("Client [" + ip + ":" + std::to_string(port) + "] disconnected");

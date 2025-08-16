@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/11 19:13:18 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/16 10:45:48 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/16 12:31:52 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -61,7 +61,7 @@ SRC_DIR		= src/
 # ─────────── #
 
 SRCS		= Main/Main.cpp Main/Options.cpp Main/Logging.cpp	\
-			  Main/Daemon.cpp Main/Shell.cpp					\
+			  Main/Signals.cpp Main/Daemon.cpp Main/Shell.cpp	\
 			  Network/Socket.cpp Network/Client.cpp				\
 			  Network/Epoll.cpp Network/Communication.cpp
 

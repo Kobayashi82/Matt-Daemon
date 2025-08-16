@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 16:17:59 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 14:10:20 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,9 +88,11 @@
 			Log->info("Daemon closed");
 		} catch(const std::exception& e) {
 			std::cerr << e.what() << '\n';
-			return (1);
+			result = 1;
 		}
 
+		unlink("/var/lock/matt_daemon.lock");
+		if (!result && Options::signum) result = 128 + Options::signum;
 		return (result);
 	}
 

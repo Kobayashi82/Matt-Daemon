@@ -6,18 +6,19 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 11:44:57 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 12:23:20 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 12:58:30 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
+	#include "Signals.hpp"
 	#include "Options.hpp"
 	#include "RawMode.hpp"
 
-	#include <iostream>															// std::getline(), std::cerr()
+	#include <iostream>															// std::getline(), std::cerr(), std::exit()
 	#include <unistd.h>															// close()
-	#include <csignal>															// signal(s)
+	#include <csignal>															// std::signal()
 
 #pragma endregion
 
@@ -28,7 +29,7 @@
 		static void sigint_handler(int sig) {
 			raw_mode_disable(false);
 			if (Options::sockfd >= 0) close(Options::sockfd);
-			exit(128 + sig);
+			std::exit(128 + sig);
 		}
 
 	#pragma endregion
@@ -38,7 +39,7 @@
 		static void sigterm_handler(int sig) {
 			raw_mode_disable(false);
 			if (Options::sockfd >= 0) close(Options::sockfd);
-			exit(128 + sig);
+			std::exit(128 + sig);
 		}
 
 	#pragma endregion
@@ -48,7 +49,7 @@
 		static void sigup_handler(int sig) {
 			raw_mode_disable(false);
 			if (Options::sockfd >= 0) close(Options::sockfd);
-			exit(128 + sig);
+			std::exit(128 + sig);
 		}
 
 	#pragma endregion
@@ -58,7 +59,7 @@
 		static void sigquit_handler(int sig) {
 			raw_mode_disable(false);
 			if (Options::sockfd >= 0) close(Options::sockfd);
-			exit(128 + sig);
+			std::exit(128 + sig);
 		}
 
 	#pragma endregion
@@ -68,7 +69,7 @@
 		static void sigpipe_handler(int sig) {
 			raw_mode_disable(false);
 			if (Options::sockfd >= 0) close(Options::sockfd);
-			exit(128 + sig);
+			std::exit(128 + sig);
 		}
 
 	#pragma endregion
@@ -80,7 +81,7 @@
 			if (Options::sockfd >= 0) close(Options::sockfd);
 			signal(SIGSEGV, SIG_DFL);
 			raise(SIGSEGV);
-			exit(128 + sig);
+			std::exit(128 + sig);
 		}
 
 	#pragma endregion
@@ -92,12 +93,12 @@
 	int signal_set() {
 		int result = 0;
 
-		if (signal(SIGINT,  sigint_handler)		== SIG_ERR) result++;	// Interrupt from keyboard (Ctrl+C)
-		if (signal(SIGTERM, sigterm_handler)	== SIG_ERR) result++;	// Request to terminate the program gracefully (sent by 'kill' or system shutdown)
-		if (signal(SIGHUP,  sigup_handler)		== SIG_ERR) result++;	// Terminal hangup or controlling process terminated (often used to reload config)
-		if (signal(SIGQUIT, sigquit_handler)	== SIG_ERR) result++;	// Quit from keyboard (Ctrl+\)
-		if (signal(SIGPIPE, sigpipe_handler)	== SIG_ERR) result++;	// Broken pipe (write to pipe with no readers)
-		if (signal(SIGSEGV, sigsev_handler)		== SIG_ERR) result++;	// Invalid memory reference (segmentation fault)
+		if (std::signal(SIGINT,  sigint_handler)	== SIG_ERR) result++;	// Interrupt from keyboard (Ctrl+C)
+		if (std::signal(SIGTERM, sigterm_handler)	== SIG_ERR) result++;	// Request to terminate the program gracefully (sent by 'kill' or system shutdown)
+		if (std::signal(SIGHUP,  sigup_handler)		== SIG_ERR) result++;	// Terminal hangup or controlling process terminated (often used to reload config)
+		if (std::signal(SIGQUIT, sigquit_handler)	== SIG_ERR) result++;	// Quit from keyboard (Ctrl+\)
+		if (std::signal(SIGPIPE, sigpipe_handler)	== SIG_ERR) result++;	// Broken pipe (write to pipe with no readers)
+		if (std::signal(SIGSEGV, sigsev_handler)	== SIG_ERR) result++;	// Invalid memory reference (segmentation fault)
 
 		return (result);
 	}

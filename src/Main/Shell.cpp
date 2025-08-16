@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 19:09:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 00:15:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 13:43:33 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@
 			return (1);
 		}
 
-		// Crear PTY antes del fork
 		client->master_fd = posix_openpt(O_RDWR | O_NOCTTY);
 		if (client->master_fd == -1) {
 			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] posix_openpt() failed");
@@ -68,13 +67,11 @@
 			client->slave_fd = open(pty_name, O_RDWR);
 			if (client->slave_fd == -1) {
 				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] open slave failed");
-				exit(1);
+				std::exit(1);
 			}
 
-			// Set controlling terminal properly
-			if (setsid() == -1) exit(1);
+			if (setsid() == -1) std::exit(1);
 			
-			// Set the slave as controlling terminal
 			ioctl(client->slave_fd, TIOCSCTTY, 0);
 
 			dup2(client->slave_fd, STDIN_FILENO);
@@ -88,11 +85,11 @@
 
 			if (setgid(pw->pw_gid) != 0) {
 				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] setgid() failed");
-				exit(1);
+				std::exit(1);
 			}
 			if (setuid(pw->pw_uid) != 0) {
 				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] setuid() failed");
-				exit(1);
+				std::exit(1);
 			}
 
 			setenv("HOME", pw->pw_dir, 1);
@@ -101,7 +98,7 @@
 
 			if (chdir(pw->pw_dir) != 0) {
 				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] chdir() failed");
-				exit(1);
+				std::exit(1);
 			}
 
 			const char* shell_path = nullptr;
@@ -110,13 +107,13 @@
 			else if (!access("/bin/sh", X_OK))		shell_path = "/bin/sh";
 			else {
 				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] no shell found");
-				exit(1);
+				std::exit(1);
 			}
 
 			char *args[] = { (char *)shell_path, nullptr };
 			execvp(args[0], args);
 			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] execve() failed");
-			exit(1);
+			std::exit(1);
 		}
 
 		client->shell_pid = pid;

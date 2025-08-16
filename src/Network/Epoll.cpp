@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 16:04:52 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 13:45:24 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,10 @@
 			struct epoll_event events[MAX_EVENTS];
 
 			int eventCount = epoll_wait(epoll_fd, events, MAX_EVENTS, 100);
-			if (eventCount == -1 && Running) { Log->critical("Epoll failed"); return (1); }
+			if (eventCount == -1) {
+				if (errno == EINTR) return (0);
+				if (Running) { Log->critical("Epoll failed");  return (1); }
+			}
 
 			for (int i = 0; i < eventCount; ++i) {
 				if (events[i].data.fd == timeout_fd && Options::timeout)				{ check_timeout();	continue; }
@@ -169,6 +172,8 @@
 					auto it = shells.find(events[i].data.fd);
 					if (it != shells.end()) { client = it->second;	type = SHELL; }
 				}
+
+				if (!client) continue;
 
 				if (events[i].events & EPOLLIN) {
 					switch (type) {

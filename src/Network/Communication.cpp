@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 11:54:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 14:12:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@
 								client->pass = pass;
 							} else {
 								response = "/AUTHORIZATION_FAIL";
-								Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] authorization failed - invalid credentials");
+								Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] authorization failed");
 							}
 							if (!Options::disabledEncryption) response = encrypt(response);
 							client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
@@ -130,6 +130,17 @@
 				// There are data, send it
 				if (!client->write_buffer.empty()) {
 					client->update_last_activity();
+				
+					// If authenticated, shell not running and client not dying, start shell
+					if (client->type == CLIENT && client->authenticated && !client->shell_running && !client->diying) {
+						if (shell_start(client)) {
+							Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell failed");
+							std::string response = "/SHELL_FAIL";
+							if (!Options::disabledEncryption) response = encrypt(response);
+							client->write_buffer = std::vector<char>(response.begin(), response.end());
+							client->diying = true;
+						}
+					}
 
 					size_t buffer_size = client->write_buffer.size();
 					size_t chunk = std::min(buffer_size, static_cast<size_t>(CHUNK_SIZE));
@@ -143,19 +154,6 @@
 					if (client->diying && client->write_buffer.empty()) { 
 						client->schedule_removal();
 						return; 
-					}
-
-					// If authenticated, shell not running and client not dying, start shell
-					if (client->type == CLIENT && client->authenticated && !client->shell_running && !client->diying) {
-						if (shell_start(client)) {
-							Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell failed");
-							std::string response = "/SHELL_FAIL";
-							if (!Options::disabledEncryption) response = encrypt(response);
-							client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
-							client->diying = true;
-						} else {
-							Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell started");
-						}
 					}
 
 					// No writing

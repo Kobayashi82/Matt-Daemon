@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:00 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 12:27:37 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 14:01:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,11 @@
 				// Shell Output
 				if (FD_ISSET(Options::sockfd, &readfds)) {
 					ssize_t bytes = recv(Options::sockfd, buffer, sizeof(buffer), 0);
-					if (bytes <= 0) { return (1); }
+					if (bytes <= 0) { 
+						// Connection closed - clean up terminal before exiting
+						write(STDOUT_FILENO, "\n", 1);  // Add newline for clean prompt
+						return (1); 
+					}
 
 					std::string msg = std::string(buffer, bytes);
 					try {
@@ -101,18 +105,18 @@
 #pragma region "Main"
 
 	int main(int argc, char **argv) {
-		if (signal_set()) { std::cerr << "Error: Signal set failed\n";	return (1); }
+		if (signal_set()) { std::cerr << "Error: Signal set failed\n"; return (1); }
 
 		int result = 0;
-		if ((result = Options::parse(argc, argv)))						return (result - 1);
+		if ((result = Options::parse(argc, argv))) return (result - 1);
 
-		if (socket_create())											return (1);
-		if (main_loop()) { raw_mode_disable(false);						return (1); }
+		if (socket_create()) return (1);
+		if (main_loop()) result = 1;
 
 		raw_mode_disable(false);
 		if (Options::sockfd >= 0) close(Options::sockfd);
 
-		return (0);
+		return (result);
 	}
 
 #pragma endregion

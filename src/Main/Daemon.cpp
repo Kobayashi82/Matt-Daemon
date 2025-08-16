@@ -6,57 +6,21 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/14 23:07:15 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/14 23:11:01 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 12:59:11 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
+	#include "Main/Signals.hpp"
 	#include "Main/Logging.hpp"
 	#include "Network/Client.hpp"
-	#include "Network/Epoll.hpp"
 
-	#include <iostream>															// std::cerr()
-	#include <csignal>															// std::signal()
-	#include <sys/wait.h>														// waitpid()
+	#include <iostream>															// std::cerr(), std::exit()
 	#include <fcntl.h>															// open()
 	#include <unistd.h>															// fork(), setsid(), chdir(), close()
 	#include <sys/stat.h>														// umask()
 	#include <sys/file.h>														// flock()
-
-#pragma endregion
-
-#pragma region "Signals Handlers"
-
-	#pragma region "SIGTERM"
-
-		static void sigterm_handler(int signum) { (void) signum;
-			Log->info("Signal SIGTERM received");
-			Epoll::Running = false;
-		}
-
-	#pragma endregion
-		
-	#pragma region "SIGCHLD"
-
-		static void sigchld_handler(int signum) { (void) signum;
-			int pid, status;
-
-			while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
-				for (auto& client_pair : clients) {
-					Client *client = client_pair.second.get();
-					if (client && client->shell_pid == pid && client->shell_running) {
-						Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell process " + std::to_string(pid) + " terminated, disconnecting client");
-						client->shell_running = false;
-						client->shell_pid = 0;
-						client->schedule_removal();
-						break;
-					}
-				}
-			}
-		}
-
-	#pragma endregion
 
 #pragma endregion
 
@@ -84,12 +48,8 @@
 		Log->debug("Second fork() completed");
 
 		// 4. signal()
-		int signals = 0;
-		if (std::signal(SIGTERM, sigterm_handler) == SIG_ERR)	{ signals++; Log->warning("Signal SIGTERM failed"); }
-		if (std::signal(SIGCHLD, sigchld_handler) == SIG_ERR)	{ signals++; Log->warning("Signal SIGCHLD failed"); }
-		if (std::signal(SIGHUP, SIG_IGN) == SIG_ERR)			{ signals++; Log->warning("Signal SIGHUP failed");  }
-		if (std::signal(SIGPIPE, SIG_IGN) == SIG_ERR)			{ signals++; Log->warning("Signal SIGPIPE failed"); }
-		if (signals == 0) Log->debug("Signals set");
+		if (!signal_set())	Log->debug("All signal handlers successfully installed");
+		else				Log->debug("Failed to register one or more signal handlers");
 
 		// 5. umask()
 		umask(022);

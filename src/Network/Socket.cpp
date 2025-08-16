@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:06 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 14:23:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 14:12:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,6 +155,11 @@
 	bool Socket::is_port_free(int port) {
 		int sock = socket(AF_INET, SOCK_STREAM, 0);
 		if (sock < 0) return (false);
+
+		int options = 1;
+		if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &options, sizeof(options)) == -1) {
+			::close(sock); return (false);
+		}
 
 		sockaddr_in addr{};
 		addr.sin_family = AF_INET;
