@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 11:44:57 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 14:13:41 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 15:01:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 	#include "Main/Signals.hpp"
 	#include "Main/Options.hpp"
 	#include "Main/Logging.hpp"
+	#include "Main/Shell.hpp"
 	#include "Network/Client.hpp"
 	#include "Network/Epoll.hpp"
 
@@ -96,8 +97,7 @@
 					Client *client = client_pair.second.get();
 					if (client && client->shell_pid == pid && client->shell_running) {
 						Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell process " + std::to_string(pid) + " terminated");
-						client->shell_running = false;
-						client->shell_pid = 0;
+						shell_close(client);
 						if (!client->diying) client->schedule_removal();
 						break;
 					}

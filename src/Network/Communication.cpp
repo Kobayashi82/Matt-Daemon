@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 14:12:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 15:01:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,13 +70,13 @@
 								client->type = CLIENT;
 							}
 							client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
-							Epoll::set(client->fd, true, true); // Enable EPOLLOUT when data is added
+							Epoll::set(client->fd, true, true);
 						} else {
 							Log->log(msg);
 						}
 					} else if (client->type == CLIENT) {
 						std::string msg = std::string(buffer, buffer + bytes_read);
-						if (!msg.empty() && msg.back() == '\n') msg.pop_back(); // temp
+						// if (!msg.empty() && msg.back() == '\n') msg.pop_back(); // temp
 						try {
 							if (!Options::disabledEncryption) msg = decrypt(msg);
 						} catch (const std::exception& e) {
@@ -92,7 +92,7 @@
 								response = "/AUTHORIZATION_FAIL";
 								if (!Options::disabledEncryption) response = encrypt(response);
 								client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
-								Epoll::set(client->fd, true, true); // Enable EPOLLOUT when data is added
+								Epoll::set(client->fd, true, true);
 								return (0);
 							}
 							Log->info("Authentication attempt - User: " + user);
@@ -108,7 +108,7 @@
 							}
 							if (!Options::disabledEncryption) response = encrypt(response);
 							client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
-							Epoll::set(client->fd, true, true); // Enable EPOLLOUT when data is added
+							Epoll::set(client->fd, true, true);
 						} else {
 							client->write_sh_buffer.insert(client->write_sh_buffer.end(), msg.begin(), msg.end());
 							if (client->shell_running && client->master_fd >= 0) Epoll::set(client->master_fd, true, true);
@@ -153,10 +153,7 @@
 					if (bytes_written > 0) {
 						client->write_buffer.erase(client->write_buffer.begin(), client->write_buffer.begin() + bytes_written);
 						
-						// If buffer is now empty, disable EPOLLOUT to prevent constant triggering
-						if (client->write_buffer.empty()) {
-							Epoll::set(client->fd, true, false);
-						}
+						if (client->write_buffer.empty()) Epoll::set(client->fd, true, false);
 					}
 
 					if (client->diying && client->write_buffer.empty()) { 
@@ -191,7 +188,7 @@
 					std::string output(buffer, bytes_read);
 					if (!Options::disabledEncryption) output = encrypt(output);				
 					client->write_buffer.insert(client->write_buffer.end(), output.begin(), output.end());
-					Epoll::set(client->fd, true, true); // Enable EPOLLOUT when data is added
+					Epoll::set(client->fd, true, true);
 				}
 
 				// No data
@@ -223,11 +220,8 @@
 					if (bytes_written > 0) {
 						size_t to_remove = std::min(static_cast<size_t>(bytes_written), chunk);
 						client->write_sh_buffer.erase(client->write_sh_buffer.begin(), client->write_sh_buffer.begin() + to_remove);
-						
-						// If buffer is now empty, disable EPOLLOUT to prevent constant triggering
-						if (client->write_sh_buffer.empty()) {
-							Epoll::set(client->master_fd, true, false);
-						}
+
+						if (client->write_sh_buffer.empty()) Epoll::set(client->master_fd, true, false);
 					}
 					// No writing
 					else if (bytes_written == 0) return;

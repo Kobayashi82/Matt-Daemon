@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:00 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 14:40:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 15:00:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,7 @@
 					if (Options::encryption) {
 						try {
 							msg = decrypt(msg);
-						} catch (const std::exception& e) {
-							// If decryption fails (e.g., incomplete hex data), skip this message
-							continue;
-						}
+						} catch (const std::exception& e) { continue; }
 					}
 					write(STDOUT_FILENO, msg.c_str(), msg.length());
 				}
