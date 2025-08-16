@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:33 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 12:39:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 16:08:48 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@
 			static bool					encryption;								// Server requires encryption (true = encrypted, false = plain)
 			static int					retries;								// Remaining password retry attempts
 			static bool					authenticated;							// Authentication state (true if login successful)
+			static size_t				decryption_index;						// Index for continuous decryption key rotation
 
 			static int					sockfd;									// Socket file descriptor
 			static char					hostname[254];							// IP address or hostname

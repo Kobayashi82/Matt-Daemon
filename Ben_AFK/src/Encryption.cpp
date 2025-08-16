@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 23:36:28 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 11:54:41 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 16:10:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,24 @@
 
 		std::string decrypt(const std::string& ciphertext) {
 			return (process(fromHex(ciphertext)));
+		}
+
+	#pragma endregion
+
+	#pragma region "Decrypt with index"
+
+		std::string decrypt_with_index(const std::string& ciphertext, size_t& index) {
+			std::string binary_data = fromHex(ciphertext);
+			std::string result;
+			result.reserve(binary_data.length());
+
+			for (size_t i = 0; i < binary_data.length(); ++i) {
+				char decrypted_char = binary_data[i] ^ KEY[index % KEY.length()];
+				result.push_back(decrypted_char);
+				index++;
+			}
+
+			return (result);
 		}
 
 	#pragma endregion

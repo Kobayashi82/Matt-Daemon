@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:01 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 13:46:55 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 16:39:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,13 +39,15 @@
 
     Client::Client(int _fd, std::string _ip, int _port) : fd(_fd), ip(_ip), port(_port), type(MSG) {
 		last_activity = std::time(NULL); diying = false; user = ""; pass = ""; authenticated = false;
-		shell_running = false; shell_pid = 0; master_fd = -1; slave_fd = -1;
+		shell_running = false; shell_pid = 0; master_fd = -1; slave_fd = -1; encryption_index = 0;
+		terminal_cols = 80; terminal_rows = 24;
 	}
 
     Client::Client(const Client & src) : fd(src.fd), ip(src.ip), port(src.port), type(MSG) {
 		last_activity = src.last_activity; diying = src.diying; user = src.user; pass = src.pass; authenticated = src.authenticated;
 		shell_running = src.shell_running; shell_pid = src.shell_pid; master_fd = src.master_fd; slave_fd = src.slave_fd;
-		write_buffer = src.write_buffer; write_sh_buffer = src.write_sh_buffer;
+		write_buffer = src.write_buffer; write_sh_buffer = src.write_sh_buffer; encryption_index = src.encryption_index;
+		terminal_cols = src.terminal_cols; terminal_rows = src.terminal_rows;
 	}
 
 	Client::~Client() {
@@ -66,7 +68,8 @@
 			fd = rhs.fd; ip = rhs.ip; port = rhs.port;
 			last_activity = rhs.last_activity; diying = rhs.diying; user = rhs.user; pass = rhs.pass; authenticated = rhs.authenticated;
 			shell_running = rhs.shell_running; shell_pid = rhs.shell_pid; master_fd = rhs.master_fd; slave_fd = rhs.slave_fd;
-			write_buffer = rhs.write_buffer; write_sh_buffer = rhs.write_sh_buffer;
+			write_buffer = rhs.write_buffer; write_sh_buffer = rhs.write_sh_buffer; encryption_index = rhs.encryption_index;
+			terminal_cols = rhs.terminal_cols; terminal_rows = rhs.terminal_rows;
 		}
 		return (*this);
     }

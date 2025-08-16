@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 21:41:05 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 13:14:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 16:40:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 	#include <arpa/inet.h>														// socket(), setsockopt(), bind(), listen(), accept(), inet_ntop(), htons(), ntohs(), sockaddr_in
 	#include <iostream>															// std::cerr()
 	#include <unistd.h>															// close()
+	#include <sys/ioctl.h>														// ioctl()
+	#include <termios.h>														// struct winsize
 
 #pragma endregion
 
@@ -100,6 +102,12 @@
 
 			if (!Options::authenticated && !msg.find("/AUTHORIZATION_OK")) {
 				Options::authenticated = true;
+
+				std::string terminal_size = get_terminal_size();
+				std::string size_msg = "/TERMINAL_SIZE " + terminal_size;
+				if (Options::encryption) size_msg = encrypt(size_msg);
+				send_data(size_msg);
+
 				if (raw_mode_enable(false)) return (1); else return (2);
 			}
 
@@ -122,6 +130,21 @@
 		if (bytes <= 0) return (1);
 
 		return (0);
+	}
+
+#pragma endregion
+
+#pragma region "Get Terminal Size"
+
+	std::string get_terminal_size() {
+		struct winsize ws;
+		if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1) {
+			// Si no se puede obtener el tamaño, usar valores por defecto
+			ws.ws_row = 24;
+			ws.ws_col = 80;
+		}
+		
+		return std::to_string(ws.ws_col) + "x" + std::to_string(ws.ws_row);
 	}
 
 #pragma endregion

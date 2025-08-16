@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 15:03:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 16:43:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 	#include <cstring>															// std::memset(), std::strcmp()
 	#include <unistd.h>															// read() and write(), crypt()
 	#include <sys/socket.h>														// recv(), send()
+	#include <sys/ioctl.h>														// ioctl()
+	#include <termios.h>														// struct winsize
 	#include <iomanip>															// std::stringstream, std::setfill(), std::setw()
 	#include <shadow.h>															// getspnam()
 
@@ -76,7 +78,6 @@
 						}
 					} else if (client->type == CLIENT) {
 						std::string msg = std::string(buffer, buffer + bytes_read);
-						// if (!msg.empty() && msg.back() == '\n') msg.pop_back(); // temp
 						try {
 							if (!Options::disabledEncryption) msg = decrypt(msg);
 						} catch (const std::exception& e) {
@@ -109,6 +110,55 @@
 							if (!Options::disabledEncryption) response = encrypt(response);
 							client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
 							Epoll::set(client->fd, true, true);
+						} else if (msg.substr(0, 14) == "/TERMINAL_SIZE") {
+							std::string size_info = msg.substr(15);
+							size_t x_pos = size_info.find('x');
+							if (x_pos != std::string::npos) {
+								try {
+									client->terminal_cols = std::stoi(size_info.substr(0, x_pos));
+									client->terminal_rows = std::stoi(size_info.substr(x_pos + 1));
+									Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] terminal size: " + std::to_string(client->terminal_cols) + "x" + std::to_string(client->terminal_rows));
+									
+									// If authenticated, shell not running and client not dying, start shell
+									if (client->type == CLIENT && client->authenticated && !client->shell_running && !client->diying) {
+										if (shell_start(client)) {
+											Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell failed");
+											std::string response = "/SHELL_FAIL";
+											if (!Options::disabledEncryption) response = encrypt(response);
+											client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
+											client->diying = true;
+											Epoll::set(client->fd, true, true);
+										}
+									}
+								} catch (const std::exception& e) {
+									Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] invalid terminal size format");
+								}
+							}
+						} else if (msg.substr(0, 16) == "/TERMINAL_RESIZE") {
+							std::string	size_info = msg.substr(17);
+							size_t		x_pos = size_info.find('x');
+
+							if (x_pos != std::string::npos) {
+								try {
+									client->terminal_cols = std::stoi(size_info.substr(0, x_pos));
+									client->terminal_rows = std::stoi(size_info.substr(x_pos + 1));
+									
+									if (client->shell_running && client->master_fd >= 0) {
+										struct winsize ws;
+										ws.ws_row = client->terminal_rows;
+										ws.ws_col = client->terminal_cols;
+										ws.ws_xpixel = 0;
+										ws.ws_ypixel = 0;
+										if (ioctl(client->master_fd, TIOCSWINSZ, &ws) == 0) {
+											Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] terminal resized to: " + std::to_string(client->terminal_cols) + "x" + std::to_string(client->terminal_rows));
+										} else {
+											Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] failed to resize PTY");
+										}
+									}
+								} catch (const std::exception& e) {
+									Log->warning("Client [" + client->ip + ":" + std::to_string(client->port) + "] invalid terminal resize format");
+								}
+							}
 						} else {
 							client->write_sh_buffer.insert(client->write_sh_buffer.end(), msg.begin(), msg.end());
 							if (client->shell_running && client->master_fd >= 0) Epoll::set(client->master_fd, true, true);
@@ -134,16 +184,8 @@
 				if (!client->write_buffer.empty()) {
 					client->update_last_activity();
 				
-					// If authenticated, shell not running and client not dying, start shell
-					if (client->type == CLIENT && client->authenticated && !client->shell_running && !client->diying) {
-						if (shell_start(client)) {
-							Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell failed");
-							std::string response = "/SHELL_FAIL";
-							if (!Options::disabledEncryption) response = encrypt(response);
-							client->write_buffer = std::vector<char>(response.begin(), response.end());
-							client->diying = true;
-						}
-					}
+					// No iniciar el shell automáticamente aquí
+					// El shell se iniciará cuando se reciba /TERMINAL_SIZE
 
 					size_t buffer_size = client->write_buffer.size();
 					size_t chunk = std::min(buffer_size, static_cast<size_t>(CHUNK_SIZE));
@@ -186,7 +228,7 @@
 				if (bytes_read > 0) {
 					client->update_last_activity();
 					std::string output(buffer, bytes_read);
-					if (!Options::disabledEncryption) output = encrypt(output);				
+					if (!Options::disabledEncryption) output = encrypt_with_index(output, client->encryption_index);				
 					client->write_buffer.insert(client->write_buffer.end(), output.begin(), output.end());
 					Epoll::set(client->fd, true, true);
 				}
@@ -341,6 +383,41 @@
 
 		std::string Communication::decrypt(const std::string& ciphertext) {
 			return (process(fromHex(ciphertext)));
+		}
+
+	#pragma endregion
+
+	#pragma region "Encrypt with continuous index"
+
+		std::string Communication::encrypt_with_index(const std::string& plaintext, size_t& index) {
+			std::string result;
+			result.reserve(plaintext.length());
+
+			for (size_t i = 0; i < plaintext.length(); ++i) {
+				char encrypted_char = plaintext[i] ^ KEY[index % KEY.length()];
+				result.push_back(encrypted_char);
+				index++;
+			}
+
+			return (toHex(result));
+		}
+
+	#pragma endregion
+
+	#pragma region "Decrypt with continuous index"
+
+		std::string Communication::decrypt_with_index(const std::string& ciphertext, size_t& index) {
+			std::string binary_data = fromHex(ciphertext);
+			std::string result;
+			result.reserve(binary_data.length());
+
+			for (size_t i = 0; i < binary_data.length(); ++i) {
+				char decrypted_char = binary_data[i] ^ KEY[index % KEY.length()];
+				result.push_back(decrypted_char);
+				index++;
+			}
+
+			return (result);
 		}
 
 	#pragma endregion

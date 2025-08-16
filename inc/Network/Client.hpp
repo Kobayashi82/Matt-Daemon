@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 10:46:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 16:39:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,9 @@
 			int					slave_fd;										// Slave FD of the shell terminal
 			std::vector <char>	write_buffer;									// Buffer for data to write to client
 			std::vector <char>	write_sh_buffer;								// Buffer for data to write to shell
+			size_t				encryption_index;								// Index for continuous encryption key rotation
+			int					terminal_cols;									// Terminal columns for PTY size
+			int					terminal_rows;									// Terminal rows for PTY size
 
 			// Constructors
 			Client();															// Default constructor

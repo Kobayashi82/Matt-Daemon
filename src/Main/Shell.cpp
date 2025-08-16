@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 19:09:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 14:55:36 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 16:41:48 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 	#include <sys/ioctl.h>														// ioctl()
 	#include <fcntl.h>															// open()
 	#include <unistd.h>															// access()
+	#include <termios.h>														// struct winsize
 
 #pragma endregion
 
@@ -53,6 +54,16 @@
 		if (ptsname_r(client->master_fd, pty_name, sizeof(pty_name)) != 0) {
 			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] ptsname_r() failed");
 			close(client->master_fd);
+			return (1);
+		}
+
+		struct winsize ws;
+		ws.ws_row = client->terminal_rows;
+		ws.ws_col = client->terminal_cols;
+		ws.ws_xpixel = 0;
+		ws.ws_ypixel = 0;
+		if (ioctl(client->master_fd, TIOCSWINSZ, &ws) == -1) {
+			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] failed to set PTY window size");
 			return (1);
 		}
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:04 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 12:10:48 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 16:08:48 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 	bool				Options::encryption		= false;						// Server requires encryption (true = encrypted, false = plain)
 	int					Options::retries		= 3;							// Remaining password retry attempts
 	bool				Options::authenticated	= false;						// Authentication state (true if login successful)
+	size_t				Options::decryption_index = 0;							// Index for continuous decryption key rotation
 
 	int					Options::sockfd			= -1;							// Socket file descriptor
 	char				Options::hostname[254];									// IP address or hostname

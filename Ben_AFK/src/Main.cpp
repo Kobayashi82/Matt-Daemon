@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:00 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 15:00:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 16:44:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 	#include <iostream>															// std::cerr()
 	#include <unistd.h>															// close()
 	#include <sys/select.h>														// select(), fd_set, FD_ZERO, FD_SET, FD_ISSET
+	#include <errno.h>															// errno, EINTR
 
 #pragma endregion
 
@@ -33,13 +34,25 @@
 			char buffer[4096];
 
 			while (true) {
+				if (window_resized) {
+					window_resized = false;
+					std::string terminal_size = get_terminal_size();
+					std::string resize_msg = "/TERMINAL_RESIZE " + terminal_size;
+					if (Options::encryption) resize_msg = encrypt(resize_msg);
+					send_data(resize_msg);
+				}
+
 				FD_ZERO(&readfds);
 				FD_SET(Options::sockfd, &readfds);
 				FD_SET(STDIN_FILENO, &readfds);
 
 				int max_fd = (Options::sockfd > STDIN_FILENO) ? Options::sockfd : STDIN_FILENO;
 
-				if (select(max_fd + 1, &readfds, nullptr, nullptr, nullptr) < 0) { std::cerr << "Error: Multiplexing failed\n"; return (1); }
+				int select_result = select(max_fd + 1, &readfds, nullptr, nullptr, nullptr);
+				if (select_result < 0) { 
+					if (errno == EINTR) continue;
+					std::cerr << "Error: Multiplexing failed\n"; return (1); 
+				}
 
 				// Shell Output
 				if (FD_ISSET(Options::sockfd, &readfds)) {
@@ -48,9 +61,8 @@
 
 					std::string msg = std::string(buffer, bytes);
 					if (Options::encryption) {
-						try {
-							msg = decrypt(msg);
-						} catch (const std::exception& e) { continue; }
+						try { msg = decrypt_with_index(msg, Options::decryption_index); }
+						catch (const std::exception& e) { continue; }
 					}
 					write(STDOUT_FILENO, msg.c_str(), msg.length());
 				}
@@ -81,7 +93,11 @@
 				FD_ZERO(&readfds);
 				FD_SET(Options::sockfd, &readfds);
 
-				if (select(Options::sockfd + 1, &readfds, nullptr, nullptr, nullptr) < 0) { std::cerr << "Error: Multiplexing failed\n"; return (1); }
+				int select_result = select(Options::sockfd + 1, &readfds, nullptr, nullptr, nullptr);
+				if (select_result < 0) { 
+					if (errno == EINTR) continue;
+					std::cerr << "Error: Multiplexing failed\n"; return (1); 
+				}
 
 				if (FD_ISSET(Options::sockfd, &readfds)) {
 					int result = receive_data();
