@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:32 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 12:40:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 23:37:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,12 +83,17 @@
 			std::cerr << "\n";
 			std::cerr << " Options:\n";
 			std::cerr << "\n";
-			std::cerr << "  -e,  --disable-encryption   Disable encryption communication for Ben_AFK clients\n";
+			std::cerr << "  -k,  --disable-encryption   Disable encryption communication for Ben_AFK clients\n";
 			std::cerr << "  -s,  --disable-shell        Disable remote shell access\n";
 			std::cerr << "  -c,  --max-clients=NUM      Maximum number of clients   (default: 3, unlimited = 0)\n";
 			std::cerr << "  -p,  --port=PORT            Port number to listen on    (default: 4242)\n";
+			std::cerr << "  -t,  --timeout=SECOND       Timeout in seconds for inactive connections\n";
 			std::cerr << "  -f,  --log-file=PATH        Path to the log file        (default: /var/log/matt_daemon/matt_daemon.log)\n";
 			std::cerr << "  -l,  --log-level=LEVEL      Logging verbosity level     (default: INFO)\n";
+			std::cerr << "  -n,  --log-new              Create a new log file on start\n";
+			std::cerr << "  -m,  --log-rotate-max=NUM   Maximum number of log files to keep when rotating\n";
+			std::cerr << "  -r,  --log-rotate-size=BYTE Minimum log size before rotation\n";
+			std::cerr << "  -x,  --shell-path=PATH      Path of the shell to execute\n";
 			std::cerr << "\n";
 			std::cerr << "  -h?, --help                 Display this help message\n";
       		std::cerr << "  -u,  --usage                Display short usage message\n";
@@ -104,8 +109,9 @@
 	#pragma region "Usage"
 
 		int Options::usage() {
-			std::cerr << "Usage: " << NAME << " [-e, --disable-encryption] [-s, --disable-shell] [-c NUM, --max-clients=NUM]\n";
-			std::cerr << "                  [-p PORT, --port=PORT] [-f PATH, --log-file=PATH] [-l LEVEL, --log-level=LEVEL]\n";
+			std::cerr << "Usage: " << NAME << " [-k, --disable-encryption] [-s, --disable-shell] [-c NUM, --max-clients=NUM] [-p PORT, --port=PORT]\n";
+			std::cerr << "                  [-t SECOND, --timeout=SECOND] [-f PATH, --log-file=PATH] [-l LEVEL, --log-level=LEVEL] [-n, --log-new]\n";
+			std::cerr << "                  [-m NUM, --log-rotate-max=NUM] [-r BYTE, --log-rotate-size=BYTE] [-x, --shell-path=PATH]\n";
 			std::cerr << "                  [-h? --help] [-u --usage] [-V --version]\n";
 
 			return (1);
@@ -168,7 +174,7 @@
 		_fullName = argv[0];
 
 		struct option long_options[] = {
-			{"disable-encryption",	no_argument,		0, 'e'},	// [-e, --disable-encryption]
+			{"disable-encryption",	no_argument,		0, 'k'},	// [-k, --disable-encryption]
 			{"disable-shell",		no_argument,		0, 's'},	// [-s, --disable-shell]
 			{"max-clients",			required_argument,	0, 'c'},	// [-c, --max-clients=NUM]
 			{"port",				required_argument,	0, 'p'},	// [-p, --port=NUM]
@@ -187,9 +193,9 @@
 		};
 
 		int opt;
-		while ((opt = getopt_long(argc, argv, "esc:p:t:f:l:nm:r:x:h?uV", long_options, NULL)) != -1) {
+		while ((opt = getopt_long(argc, argv, "ksc:p:t:f:l:nm:r:x:h?uV", long_options, NULL)) != -1) {
 			switch (opt) {
-				case 'e':	disabledEncryption = true;																	break;
+				case 'k':	disabledEncryption = true;																	break;
 				case 's':	disabledShell = true;																		break;
 				case 'c':	if (ft_strtoul(argv, optarg, &maxClients, 1024 , true))				return (2);				break;
 				case 'p':	if (ft_strtoul(argv, optarg, &portNumber, 65535, false))			return (2);				break;
@@ -208,12 +214,10 @@
 			}
 		}
 
-		// This is used when an argument (not option) is required
-		// 
-		// if (optind >= argc) {
-		// 	std::cerr << NAME << ": missing argument\n";
-		// 	invalid(); return (2);
-		// }
+		if (optind < argc) {
+			std::cerr << NAME << ": invalid argument: " << argv[optind] << "\n";
+			invalid(); return (2);
+		}
 
 		return (0);
 	}

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 14:10:20 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 23:30:28 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,27 @@
 	#include <unistd.h>															// getuid()
 	#include <fcntl.h>															// open()
 	#include <sys/file.h>														// flock()
+	#include <filesystem>														// path(), absolute()
+
+#pragma endregion
+
+#pragma region "Resolve Path"
+
+	static std::string resolve_path(const std::string &cmd) {
+		if (cmd.find('/') != std::string::npos) return (cmd);
+
+		const char *path_env = std::getenv("PATH");
+		if (!path_env) return (cmd);
+
+		std::stringstream ss(path_env);
+		std::string dir;
+		while (std::getline(ss, dir, ':')) {
+			std::filesystem::path candidate = std::filesystem::path(dir) / cmd;
+			if (::access(candidate.c_str(), X_OK) == 0) return (candidate.string());
+		}
+
+		return (cmd);
+	}
 
 #pragma endregion
 
@@ -41,6 +62,8 @@
 		if (!Socket::is_port_free(Options::portNumber)) { std::cerr << "Port " << Options::portNumber << " is not available\n";					return (2); }
 
 		if (!Options::shellPath.empty()) {
+			Options::shellPath = resolve_path(Options::shellPath);
+			if (!std::filesystem::path(Options::shellPath).is_absolute()) Options::shellPath = std::filesystem::absolute(Options::shellPath).string();
 			if (access(Options::shellPath.c_str(), F_OK)) { std::cerr << "Shell not found at " << Options::shellPath << "\n";					return (2); }
 			if (access(Options::shellPath.c_str(), X_OK)) { std::cerr << "No execute permission for shell at " << Options::shellPath << "\n";	return (2); }
 		}

@@ -1,0 +1,142 @@
+[16/08/2025-23:06:59]       [ INFO ] - Daemon started
+[16/08/2025-23:06:59]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:07:17]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:07:17]       [ INFO ] - Daemon closed
+[16/08/2025-23:07:17]       [ INFO ] - Daemon started
+[16/08/2025-23:07:17]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:09:33]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:09:33]       [ INFO ] - Daemon closed
+[16/08/2025-23:09:33]       [ INFO ] - Daemon started
+[16/08/2025-23:09:33]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:09:39]       [ INFO ] - Client [127.0.0.1:35886] connected
+[16/08/2025-23:09:39]    [ WARNING ] - Client [127.0.0.1:35886] wants to open a shell
+[16/08/2025-23:09:41]       [ INFO ] - Authentication attempt - User: kobay
+[16/08/2025-23:09:41]    [ WARNING ] - Client [127.0.0.1:35886] authorization successful
+[16/08/2025-23:09:41]       [ INFO ] - Client [127.0.0.1:35886] terminal size: 120x30
+[16/08/2025-23:09:41]       [ INFO ] - Client [127.0.0.1:35886] shell started with PTY: /dev/pts/7
+[16/08/2025-23:09:41]       [ INFO ] - Client [127.0.0.1:35886] disconnected
+[16/08/2025-23:09:41]       [ INFO ] - Signal SIGCHLD received. Handling child process termination
+[16/08/2025-23:09:41]       [ INFO ] - Client [127.0.0.1:35886] shell process 9536 terminated
+[16/08/2025-23:09:41]       [ INFO ] - Client [127.0.0.1:35886] disconnected
+[16/08/2025-23:11:04]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:11:04]       [ INFO ] - Daemon closed
+[16/08/2025-23:11:04]       [ INFO ] - Daemon started
+[16/08/2025-23:11:04]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:11:06]       [ INFO ] - Client [127.0.0.1:33310] connected
+[16/08/2025-23:11:06]    [ WARNING ] - Client [127.0.0.1:33310] wants to open a shell
+[16/08/2025-23:11:08]       [ INFO ] - Authentication attempt - User: kobay
+[16/08/2025-23:11:08]    [ WARNING ] - Client [127.0.0.1:33310] authorization successful
+[16/08/2025-23:11:08]       [ INFO ] - Client [127.0.0.1:33310] terminal size: 120x30
+[16/08/2025-23:11:08]       [ INFO ] - Client [127.0.0.1:33310] shell started with PTY: /dev/pts/7
+[16/08/2025-23:11:08]       [ INFO ] - Client [127.0.0.1:33310] disconnected
+[16/08/2025-23:11:08]       [ INFO ] - Signal SIGCHLD received. Handling child process termination
+[16/08/2025-23:11:08]       [ INFO ] - Client [127.0.0.1:33310] shell process 9886 terminated
+[16/08/2025-23:11:08]       [ INFO ] - Client [127.0.0.1:33310] disconnected
+[16/08/2025-23:11:47]       [ INFO ] - Client [127.0.0.1:43632] connected
+[16/08/2025-23:11:47]    [ WARNING ] - Client [127.0.0.1:43632] wants to open a shell
+[16/08/2025-23:11:49]       [ INFO ] - Authentication attempt - User: kobay
+[16/08/2025-23:11:49]    [ WARNING ] - Client [127.0.0.1:43632] authorization successful
+[16/08/2025-23:11:49]       [ INFO ] - Client [127.0.0.1:43632] terminal size: 120x30
+[16/08/2025-23:11:49]       [ INFO ] - Client [127.0.0.1:43632] shell started with PTY: /dev/pts/7
+[16/08/2025-23:11:49]       [ INFO ] - Client [127.0.0.1:43632] disconnected
+[16/08/2025-23:11:49]       [ INFO ] - Signal SIGCHLD received. Handling child process termination
+[16/08/2025-23:11:49]       [ INFO ] - Client [127.0.0.1:43632] shell process 10012 terminated
+[16/08/2025-23:11:49]       [ INFO ] - Client [127.0.0.1:43632] disconnected
+[16/08/2025-23:12:10]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:12:10]       [ INFO ] - Daemon closed
+[16/08/2025-23:12:10]       [ INFO ] - Daemon started
+[16/08/2025-23:12:10]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:12:12]       [ INFO ] - Client [127.0.0.1:46572] connected
+[16/08/2025-23:12:12]    [ WARNING ] - Client [127.0.0.1:46572] wants to open a shell
+[16/08/2025-23:12:14]       [ INFO ] - Authentication attempt - User: kobay
+[16/08/2025-23:12:14]    [ WARNING ] - Client [127.0.0.1:46572] authorization successful
+[16/08/2025-23:12:14]       [ INFO ] - Client [127.0.0.1:46572] terminal size: 120x30
+[16/08/2025-23:12:14]       [ INFO ] - Client [127.0.0.1:46572] shell started with PTY: /dev/pts/7
+[16/08/2025-23:12:14]       [ INFO ] - Client [127.0.0.1:46572] disconnected
+[16/08/2025-23:12:14]       [ INFO ] - Signal SIGCHLD received. Handling child process termination
+[16/08/2025-23:12:14]       [ INFO ] - Client [127.0.0.1:46572] shell process 10204 terminated
+[16/08/2025-23:12:14]       [ INFO ] - Client [127.0.0.1:46572] disconnected
+[16/08/2025-23:18:01]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:18:01]       [ INFO ] - Daemon closed
+[16/08/2025-23:18:01]       [ INFO ] - Daemon started
+[16/08/2025-23:18:01]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:18:06]       [ INFO ] - Client [127.0.0.1:43772] connected
+[16/08/2025-23:18:06]    [ WARNING ] - Client [127.0.0.1:43772] wants to open a shell
+[16/08/2025-23:18:09]       [ INFO ] - Authentication attempt - User: kobay
+[16/08/2025-23:18:09]    [ WARNING ] - Client [127.0.0.1:43772] authorization successful
+[16/08/2025-23:18:09]       [ INFO ] - Client [127.0.0.1:43772] terminal size: 120x30
+[16/08/2025-23:18:09]       [ INFO ] - Client [127.0.0.1:43772] shell started with PTY: /dev/pts/7
+[16/08/2025-23:18:09]       [ INFO ] - shell_path
+[16/08/2025-23:19:53]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:19:53]       [ INFO ] - Client [127.0.0.1:43772] disconnected
+[16/08/2025-23:19:53]       [ INFO ] - Daemon closed
+[16/08/2025-23:19:53]       [ INFO ] - Daemon started
+[16/08/2025-23:19:53]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:19:57]       [ INFO ] - Client [127.0.0.1:40574] connected
+[16/08/2025-23:19:57]    [ WARNING ] - Client [127.0.0.1:40574] wants to open a shell
+[16/08/2025-23:20:00]       [ INFO ] - Authentication attempt - User: kobay
+[16/08/2025-23:20:00]    [ WARNING ] - Client [127.0.0.1:40574] authorization successful
+[16/08/2025-23:20:00]       [ INFO ] - Client [127.0.0.1:40574] terminal size: 120x30
+[16/08/2025-23:20:00]       [ INFO ] - Client [127.0.0.1:40574] shell started with PTY: /dev/pts/7
+[16/08/2025-23:20:00]       [ INFO ] - shell_path
+[16/08/2025-23:20:09]       [ INFO ] - Signal SIGCHLD received. Handling child process termination
+[16/08/2025-23:20:09]       [ INFO ] - Client [127.0.0.1:40574] shell process 11644 terminated
+[16/08/2025-23:20:09]       [ INFO ] - Client [127.0.0.1:40574] disconnected
+[16/08/2025-23:22:51]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:22:51]       [ INFO ] - Daemon closed
+[16/08/2025-23:22:51]       [ INFO ] - Daemon started
+[16/08/2025-23:22:51]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:22:53]       [ INFO ] - Client [127.0.0.1:57768] connected
+[16/08/2025-23:22:53]    [ WARNING ] - Client [127.0.0.1:57768] wants to open a shell
+[16/08/2025-23:22:55]       [ INFO ] - Authentication attempt - User: kobay
+[16/08/2025-23:22:55]    [ WARNING ] - Client [127.0.0.1:57768] authorization successful
+[16/08/2025-23:22:55]       [ INFO ] - Client [127.0.0.1:57768] terminal size: 120x30
+[16/08/2025-23:22:55]       [ INFO ] - Client [127.0.0.1:57768] shell started with PTY: /dev/pts/7
+[16/08/2025-23:22:59]       [ INFO ] - Signal SIGCHLD received. Handling child process termination
+[16/08/2025-23:22:59]       [ INFO ] - Client [127.0.0.1:57768] shell process 12380 terminated
+[16/08/2025-23:22:59]       [ INFO ] - Client [127.0.0.1:57768] disconnected
+[16/08/2025-23:24:06]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:24:06]       [ INFO ] - Daemon closed
+[16/08/2025-23:24:06]       [ INFO ] - Daemon started
+[16/08/2025-23:24:06]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:25:20]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:25:20]       [ INFO ] - Daemon closed
+[16/08/2025-23:25:20]       [ INFO ] - Daemon started
+[16/08/2025-23:25:20]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:25:31]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:25:31]       [ INFO ] - Daemon closed
+[16/08/2025-23:25:31]       [ INFO ] - Daemon started
+[16/08/2025-23:25:31]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:25:45]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:25:45]       [ INFO ] - Daemon closed
+[16/08/2025-23:26:33]       [ INFO ] - Daemon started
+[16/08/2025-23:26:33]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:26:44]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:26:44]       [ INFO ] - Daemon closed
+[16/08/2025-23:26:44]       [ INFO ] - Daemon started
+[16/08/2025-23:26:44]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:26:57]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:26:57]       [ INFO ] - Daemon closed
+[16/08/2025-23:29:19]       [ INFO ] - Daemon started
+[16/08/2025-23:29:19]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:29:24]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:29:24]       [ INFO ] - Daemon closed
+[16/08/2025-23:29:24]       [ INFO ] - Daemon started
+[16/08/2025-23:29:24]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:29:26]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:29:26]       [ INFO ] - Daemon closed
+[16/08/2025-23:29:37]       [ INFO ] - Daemon started
+[16/08/2025-23:29:37]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:30:35]       [ INFO ] - Signal SIGTERM received. Closing Daemon
+[16/08/2025-23:30:35]       [ INFO ] - Daemon closed
+[16/08/2025-23:30:35]       [ INFO ] - Daemon started
+[16/08/2025-23:30:35]       [ INFO ] - Daemon listening on port 4242
+[16/08/2025-23:30:37]       [ INFO ] - Client [127.0.0.1:60178] connected
+[16/08/2025-23:30:37]    [ WARNING ] - Client [127.0.0.1:60178] wants to open a shell
+[16/08/2025-23:30:41]       [ INFO ] - Authentication attempt - User: kobay
+[16/08/2025-23:30:41]    [ WARNING ] - Client [127.0.0.1:60178] authorization successful
+[16/08/2025-23:30:41]       [ INFO ] - Client [127.0.0.1:60178] terminal size: 120x30
+[16/08/2025-23:30:41]       [ INFO ] - Client [127.0.0.1:60178] shell started with PTY: /dev/pts/7
+[16/08/2025-23:30:46]       [ INFO ] - Signal SIGCHLD received. Handling child process termination
+[16/08/2025-23:30:46]       [ INFO ] - Client [127.0.0.1:60178] shell process 14727 terminated
+[16/08/2025-23:30:46]       [ INFO ] - Client [127.0.0.1:60178] disconnected

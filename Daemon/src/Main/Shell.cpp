@@ -6,12 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 19:09:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 16:41:48 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/16 23:20:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
+	#include "Main/Options.hpp"
 	#include "Main/Logging.hpp"
 	#include "Main/Shell.hpp"
 	#include "Network/Client.hpp"
@@ -112,18 +113,20 @@
 				std::exit(1);
 			}
 
-			const char* shell_path = nullptr;
-			if		(!access("/bin/bash", X_OK))	shell_path = "/bin/bash";
-			else if (!access("/bin/zsh", X_OK))		shell_path = "/bin/zsh";
-			else if (!access("/bin/sh", X_OK))		shell_path = "/bin/sh";
-			else {
-				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] no shell found");
-				std::exit(1);
+			const char *shell_path = nullptr;
+			if (!Options::shellPath.empty()) {
+				if		(access(Options::shellPath.c_str(), F_OK)) { Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] Shell not found at " + Options::shellPath);					std::exit(1); }
+				else if	(access(Options::shellPath.c_str(), X_OK)) { Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] No execute permission for shell at " + Options::shellPath);		std::exit(1); }
+				shell_path = Options::shellPath.c_str();
+			} else {
+				if		(!access("/bin/bash", X_OK))	shell_path = "/bin/bash";
+				else if (!access("/bin/zsh", X_OK))		shell_path = "/bin/zsh";
+				else if (!access("/bin/sh", X_OK))		shell_path = "/bin/sh";
+				else { Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] no shell found"); std::exit(1); }
 			}
-
 			char *args[] = { (char *)shell_path, nullptr };
 			execvp(args[0], args);
-			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] execve() failed");
+			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] execvp() failed");
 			std::exit(1);
 		}
 
