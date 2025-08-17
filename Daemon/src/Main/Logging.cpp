@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:53 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/15 14:55:59 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/17 22:18:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,7 +161,11 @@
 		void Tintin_reporter::debug(const std::string& msg) {
 			if (_logLevel > DEBUG) return;
 			std::lock_guard<std::mutex> lock(_mutex);
-			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			try {
+				if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			} catch (const std::filesystem::filesystem_error&) {
+				if (!_logFile.is_open()) open();
+			}
 			rotateLog();
 			_logFile << "[" << getTimestamp() << "]      [ DEBUG ] - " << msg << std::endl;
 		}
@@ -169,7 +173,11 @@
 		void Tintin_reporter::info(const std::string& msg) {
 			if (_logLevel > INFO) return;
 			std::lock_guard<std::mutex> lock(_mutex);
-			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			try {
+				if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			} catch (const std::filesystem::filesystem_error&) {
+				if (!_logFile.is_open()) open();
+			}
 			rotateLog();
 			_logFile << "[" << getTimestamp() << "]       [ INFO ] - " << msg << std::endl;
 		}
@@ -177,7 +185,11 @@
 		void Tintin_reporter::log(const std::string& msg) {
 			if (_logLevel > LOG) return;
 			std::lock_guard<std::mutex> lock(_mutex);
-			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			try {
+				if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			} catch (const std::filesystem::filesystem_error&) {
+				if (!_logFile.is_open()) open();
+			}
 			rotateLog();
 			_logFile << "[" << getTimestamp() << "]        [ LOG ] - " << msg << std::endl;
 		}
@@ -185,7 +197,11 @@
 		void Tintin_reporter::warning(const std::string& msg) {
 			if (_logLevel > WARNING) return;
 			std::lock_guard<std::mutex> lock(_mutex);
-			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			try {
+				if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			} catch (const std::filesystem::filesystem_error&) {
+				if (!_logFile.is_open()) open();
+			}
 			rotateLog();
 			_logFile << "[" << getTimestamp() << "]    [ WARNING ] - " << msg << std::endl;
 		}
@@ -193,7 +209,11 @@
 		void Tintin_reporter::error(const std::string& msg) {
 			if (_logLevel > ERROR) return;
 			std::lock_guard<std::mutex> lock(_mutex);
-			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			try {
+				if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			} catch (const std::filesystem::filesystem_error&) {
+				if (!_logFile.is_open()) open();
+			}
 			rotateLog();
 			_logFile << "[" << getTimestamp() << "]      [ ERROR ] - " << msg << std::endl;
 		}
@@ -201,7 +221,11 @@
 		void Tintin_reporter::critical(const std::string& msg) {
 			if (_logLevel > CRITICAL) return;
 			std::lock_guard<std::mutex> lock(_mutex);
-			if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			try {
+				if (!std::filesystem::exists(_logPath) || !_logFile.is_open()) open();
+			} catch (const std::filesystem::filesystem_error&) {
+				if (!_logFile.is_open()) open();
+			}
 			rotateLog();
 			_logFile << "[" << getTimestamp() << "]   [ CRITICAL ] - " << msg << std::endl;
 		}
@@ -258,9 +282,13 @@
 		#pragma region "Create Directory"
 
 			void Tintin_reporter::createDirectory(const std::string& filePath) {
-				std::filesystem::path p(filePath);
-				auto parent = p.parent_path();
-				if (!parent.empty()) std::filesystem::create_directories(parent);
+				try {
+					std::filesystem::path p(filePath);
+					auto parent = p.parent_path();
+					if (!parent.empty() && !std::filesystem::exists(parent)) {
+						std::filesystem::create_directories(parent);
+					}
+				} catch (const std::filesystem::filesystem_error& e) {}
 			}
 
 		#pragma endregion

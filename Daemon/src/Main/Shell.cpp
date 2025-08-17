@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 19:09:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 23:20:18 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/17 22:53:38 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 	#include <fcntl.h>															// open()
 	#include <unistd.h>															// access()
 	#include <termios.h>														// struct winsize
+	#include <grp.h>														// struct winsize
 
 #pragma endregion
 
@@ -70,7 +71,7 @@
 
 		pid_t pid = fork();
 		if (pid < 0) {
-			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] fork() failed");
+			// Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] fork() failed");
 			close(client->master_fd);
 			return (1);
 		}
@@ -78,7 +79,7 @@
 		if (pid == 0) {
 			client->slave_fd = open(pty_name, O_RDWR);
 			if (client->slave_fd == -1) {
-				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] open slave failed");
+				// Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] open slave failed");
 				std::exit(1);
 			}
 
@@ -95,18 +96,24 @@
 				close(client->slave_fd);
 			}
 
+			if (initgroups(pw->pw_name, pw->pw_gid)) {
+				// Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] initgroups() failed");
+				std::exit(1);
+			}
+
 			if (setgid(pw->pw_gid) != 0) {
-				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] setgid() failed");
+				// Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] setgid() failed");
 				std::exit(1);
 			}
 			if (setuid(pw->pw_uid) != 0) {
-				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] setuid() failed");
+				// Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] setuid() failed");
 				std::exit(1);
 			}
 
 			setenv("HOME", pw->pw_dir, 1);
 			setenv("USER", pw->pw_name, 1);
 			setenv("LOGNAME", pw->pw_name, 1);
+			setenv("TERM", "xterm-256color", 1);
 
 			if (chdir(pw->pw_dir) != 0) {
 				Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] chdir() failed");
@@ -115,18 +122,18 @@
 
 			const char *shell_path = nullptr;
 			if (!Options::shellPath.empty()) {
-				if		(access(Options::shellPath.c_str(), F_OK)) { Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] Shell not found at " + Options::shellPath);					std::exit(1); }
-				else if	(access(Options::shellPath.c_str(), X_OK)) { Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] No execute permission for shell at " + Options::shellPath);		std::exit(1); }
+				if		(access(Options::shellPath.c_str(), F_OK)) std::exit(1); // { Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] Shell not found at " + Options::shellPath);					std::exit(1); }
+				else if	(access(Options::shellPath.c_str(), X_OK)) std::exit(1); // { Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] No execute permission for shell at " + Options::shellPath);		std::exit(1); }
 				shell_path = Options::shellPath.c_str();
 			} else {
 				if		(!access("/bin/bash", X_OK))	shell_path = "/bin/bash";
 				else if (!access("/bin/zsh", X_OK))		shell_path = "/bin/zsh";
 				else if (!access("/bin/sh", X_OK))		shell_path = "/bin/sh";
-				else { Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] no shell found"); std::exit(1); }
+				else std::exit(1); // Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] no shell found"); std::exit(1); }
 			}
 			char *args[] = { (char *)shell_path, nullptr };
 			execvp(args[0], args);
-			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] execvp() failed");
+			// Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] execvp() failed");
 			std::exit(1);
 		}
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:00 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 17:49:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/17 22:27:34 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 
 		static int interactive_loop() {
 			fd_set readfds;
-			char buffer[4096];
+			char buffer[4096 * 5];
 
 			while (true) {
 				if (window_resized) {

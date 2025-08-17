@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 23:36:28 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 16:10:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/17 21:03:29 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@
 
 				for (size_t i = 0; i < hexData.length(); i += 2) {
 					std::string byte = hexData.substr(i, 2);
-					char c = static_cast<char>(std::strtol(byte.c_str(), nullptr, 16));
+					char c = static_cast<unsigned char>(std::strtol(byte.c_str(), nullptr, 16));
 					result.push_back(c);
 				}
 
