@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 11:44:57 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 15:01:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 00:27:39 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,18 +91,7 @@
 		static void sigchld_handler(int sig) { (void) sig;
 			int pid, status;
 
-			Log->info("Signal SIGCHLD received. Handling child process termination");
-			while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
-				for (auto& client_pair : clients) {
-					Client *client = client_pair.second.get();
-					if (client && client->shell_pid == pid && client->shell_running) {
-						Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell process " + std::to_string(pid) + " terminated");
-						shell_close(client);
-						if (!client->diying) client->schedule_removal();
-						break;
-					}
-				}
-			}
+			while ((pid = waitpid(-1, &status, WNOHANG)) > 0) terminated_pids.push_back(pid);
 		}
 
 	#pragma endregion

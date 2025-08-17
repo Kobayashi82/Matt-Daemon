@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/17 21:03:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 00:28:24 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,11 +77,13 @@
 	extern std::map <int, std::unique_ptr<Client>>	clients;					// FDs linked to their client
 	extern std::map <int, Client *>					shells;						// FDs of shells linked to their client
 	extern std::vector<int>							pending_removals;			// List of FDs scheduled for removal
+	extern std::vector<int>							terminated_pids;			// List of PIDs to scheduled for closing
 
 #pragma endregion
 
 #pragma region "Methods"
 
 	void process_pending_removals();											// Process all pending client removals
+	void process_terminated_pids();												// Process all terminated shell PIDs
 
 #pragma endregion

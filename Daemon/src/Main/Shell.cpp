@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 19:09:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/17 22:53:38 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 00:19:59 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@
 		shells[client->master_fd] = client;
 		Epoll::add(client->master_fd, true, false);
 
-		Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell started with PTY: " + std::string(pty_name));
+		Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell started with PID " + std::to_string(pid) + " and PTY: " + std::string(pty_name));
 		return (0);
 	}
 
@@ -152,6 +152,7 @@
 
 	int shell_close(Client *client) {
 		if (!client) return (1);
+		if (!client->shell_running && client->shell_pid == 0 && client->master_fd == -1) return (0);
 
 		if (client->shell_running && client->shell_pid > 0) {
 			Log->debug("Client [" + client->ip + ":" + std::to_string(client->port) + "] terminating shell process " + std::to_string(client->shell_pid));

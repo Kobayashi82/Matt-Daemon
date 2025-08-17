@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:01 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 16:39:36 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 00:18:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 	#include <ctime>															// For time() and difftime()
 	#include <csignal>															// For kill()
 	#include <algorithm>														// For std::find()
+	#include <sys/socket.h>														// For send(), MSG_DONTWAIT, shutdown()
 
 #pragma endregion
 
@@ -30,6 +31,7 @@
 	std::map <int, std::unique_ptr<Client>>	clients;							// FDs linked to their client
 	std::map <int, Client *>				shells;								// FDs of shells linked to their client
 	std::vector<int> 						pending_removals = {};				// List of FDs scheduled for removal
+	std::vector<int> 						terminated_pids = {};				// List of PIDs that have terminated (signal-safe)
 
 #pragma endregion
 
@@ -52,10 +54,12 @@
 
 	Client::~Client() {
 		if (fd >= 0) {
-			if (shell_running && shell_pid) shell_close(this);
-			Epoll::remove(fd);
-			close(fd); fd = -1;
 			Log->info("Client [" + ip + ":" + std::to_string(port) + "] disconnected");
+			if (shell_running || shell_pid > 0 || master_fd >= 0) shell_close(this);
+
+			Epoll::remove(fd);
+			close(fd); 
+			fd = -1;
 		}
 	}
 
@@ -109,9 +113,12 @@
 #pragma region "Schedule Removal"
 
 	void Client::schedule_removal() {
-		Log->debug("Client [" + ip + ":" + std::to_string(port) + "] scheduled for deferred removal");
-		if (std::find(pending_removals.begin(), pending_removals.end(), fd) == pending_removals.end())
-			pending_removals.push_back(fd);
+		if (diying) return;
+
+		Log->warning("Client [" + ip + ":" + std::to_string(port) + "] scheduled for deferred removal");
+		diying = true;
+
+		if (std::find(pending_removals.begin(), pending_removals.end(), fd) == pending_removals.end()) pending_removals.push_back(fd);
 	}
 
 #pragma endregion
@@ -123,10 +130,57 @@
 			auto it = clients.find(fd);
 			if (it != clients.end()) {
 				Log->debug("Processing deferred removal of client: " + it->second->ip + ":" + std::to_string(it->second->port));
-				it->second->remove();
+
+				Client* client = it->second.get();
+
+				// Close shell if still running (SIGCHLD might have already done this)
+				if (client->shell_running || client->shell_pid > 0 || client->master_fd >= 0) shell_close(client);
+				if (client->fd >= 0) shutdown(client->fd, SHUT_RDWR);
+
+				Epoll::remove(client->fd);
+				close(client->fd);
+				client->fd = -1;
+				clients.erase(it);
 			}
 		}
 		pending_removals.clear();
+	}
+
+#pragma endregion
+
+#pragma region "Process Terminated PIDs"
+
+	void process_terminated_pids() {
+		for (int pid : terminated_pids) {
+			Log->warning("Processing terminated PID: " + std::to_string(pid));
+
+			for (auto& client_pair : clients) {
+				Client *client = client_pair.second.get();
+				if (client && client->shell_pid == pid && client->shell_running && !client->diying) {
+					Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell process " + std::to_string(pid) + " terminated");
+
+					client->shell_running = false;
+					client->shell_pid = 0;
+
+					if (client->master_fd >= 0) {
+						shells.erase(client->master_fd);
+						Epoll::remove(client->master_fd);
+						close(client->master_fd);
+						client->master_fd = -1;
+					}
+
+					if (client->slave_fd >= 0) {
+						close(client->slave_fd);
+						client->slave_fd = -1;
+					}
+
+					Log->debug("Scheduling client removal due to shell termination");
+					client->schedule_removal();
+					break;
+				}
+			}
+		}
+		terminated_pids.clear();
 	}
 
 #pragma endregion

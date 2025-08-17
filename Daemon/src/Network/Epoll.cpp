@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 13:45:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 00:18:47 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,6 +192,7 @@
 				}
 			}
 
+			process_terminated_pids();
 			process_pending_removals();
 
 			return (0);
