@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:06 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 14:51:15 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 00:48:00 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 	#include "Network/Epoll.hpp"
 
 	#include <arpa/inet.h>														// socket(), setsockopt(), bind(), listen(), accept(), inet_ntop(), htons(), ntohs(), sockaddr_in
+	#include <sys/socket.h>														// send()
 	#include <unistd.h>															// close()
 	#include <cstring>															// std::memset()
 
@@ -119,7 +120,7 @@
 		sockaddr_in Addr; socklen_t AddrLen = sizeof(Addr);
 		int fd = ::accept(sockfd, (sockaddr *)&Addr, &AddrLen);
 		if (fd < 0) { Log->error("Socket accept connection failed"); return (1); }
-		
+
 		char ip_str[INET_ADDRSTRLEN];
 		inet_ntop(AF_INET, &(Addr.sin_addr), ip_str, INET_ADDRSTRLEN);
 		std::string ip	= ip_str;
@@ -132,18 +133,28 @@
 			Client *client = nullptr; 
 			auto it = clients.find(fd);
 			if (it != clients.end()) client = it->second.get();
-			client->diying = true;
-			std::string msg = "Maximum connections reached. Disconnected\n";
-			client->write_buffer.insert(client->write_buffer.end(), msg.begin(), msg.end());
+
+			if (client) {
+				std::string msg = "Maximum connections reached\n";
+
+				send(fd, msg.c_str(), msg.length(), 0);
+				Log->debug("Rejection message sent to client " + ip + ":" + std::to_string(port));
+
+				::close(fd);
+				clients.erase(fd);
+
+				Log->info("Client [" + ip + ":" + std::to_string(port) + "] connection closed due to max connections");
+				return (0);
+			}
 		} else {
 			Log->info("Client [" + ip + ":" + std::to_string(port) + "] connected");
+			
+			if (Epoll::add(fd, true, false) == -1) {
+				Log->debug("Epoll FD add failed");
+				clients[fd]->remove(); return (1);
+			}
+			Log->debug("Client added to Epoll");
 		}
-
-		if (Epoll::add(fd, true, false) == -1) {
-			Log->debug("Epoll FD add failed");
-			clients[fd]->remove(); return (1);
-		}
-		Log->debug("Client added to Epoll");
 
 		return (0);
 	}

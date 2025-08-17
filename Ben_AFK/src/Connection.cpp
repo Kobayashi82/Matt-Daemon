@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 21:41:05 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 17:46:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 00:46:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,9 +76,11 @@
 				std::cerr << "Error: Message not encrypted\n"; return (1);
 			}
 
-			if (!msg.find("/SHELL_DISABLED")) { std::cerr << "Remote shell access is disabled on the server\n"; return (1); }
+			if (!msg.find("Maximum connections reached")) { std::cerr << "Maximum connections reached\n"; return (3); }
 
-			if (!msg.find("/SHELL_FAIL")) { std::cerr << "Failed to open remote shell\n"; return (1); }
+			if (!msg.find("/SHELL_DISABLED")) { std::cerr << "Remote shell access is disabled on the server\n"; return (3); }
+
+			if (!msg.find("/SHELL_FAIL")) { std::cerr << "Failed to open remote shell\n"; return (3); }
 
 			if (!msg.find("/AUTHORIZE ENCRYPTION=")) {
 				std::string value = msg.substr(22);
@@ -86,9 +88,9 @@
 				value.erase(value.find_last_not_of(" \t\n\r") + 1);
 				if		(value == "true")	Options::encryption = true;
 				else if	(value == "false")	Options::encryption = false;
-				else { std::cerr << "Error: Invalid response from server\n"; return (1); }
+				else { std::cerr << "Error: Invalid response from server\n"; return (3); }
 
-				if (!Options::insecure && !Options::encryption) { std::cerr << "Error: Unsecure connection\n"; return (1); }
+				if (!Options::insecure && !Options::encryption) { std::cerr << "Error: Unsecure connection\n"; return (3); }
 
 				std::string password = getPassword();
 				if (!Options::retries) return (1);
