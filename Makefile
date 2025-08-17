@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/11 19:13:18 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/16 23:39:32 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/18 00:31:33 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,12 +15,14 @@ all: MattDaemon Ben_AFK
 MattDaemon: daemon
 daemon:
 	@mkdir -p bin
-	@$(MAKE) -s -C Daemon all && cp Daemon/MattDaemon bin/
+	@$(MAKE) -s -C Daemon all
+	@cp Daemon/MattDaemon bin/
 
 Ben_AFK: client
 client:
 	@mkdir -p bin
-	@$(MAKE) -s -C Ben_AFK all && cp Ben_AFK/Ben_AFK bin/
+	@$(MAKE) -s -C Ben_AFK all
+	@cp Ben_AFK/Ben_AFK bin/
 
 fclean: wipe
 wipe:
