@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 00:28:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 00:50:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,8 @@
 			int					shell_pid;										// PID of the shell process
 			int					master_fd;										// Master FD of the shell terminal
 			int					slave_fd;										// Slave FD of the shell terminal
-			std::vector <unsigned char>	write_buffer;									// Buffer for data to write to client
-			std::vector <unsigned char>	write_sh_buffer;								// Buffer for data to write to shell
+			std::vector <unsigned char>	write_buffer;							// Buffer for data to write to client
+			std::vector <unsigned char>	write_sh_buffer;						// Buffer for data to write to shell
 			size_t				encryption_index;								// Index for continuous encryption key rotation
 			int					terminal_cols;									// Terminal columns for PTY size
 			int					terminal_rows;									// Terminal rows for PTY size
