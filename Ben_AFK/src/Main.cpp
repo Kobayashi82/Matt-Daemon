@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:00 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 15:33:23 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 18:12:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@
 				int select_result = select(max_fd + 1, &readfds, nullptr, nullptr, nullptr);
 				if (select_result < 0) { 
 					if (errno == EINTR) continue;
-					std::cerr << "Error: Multiplexing failed\n\n"; return (3); 
+					std::cerr << "Multiplexing failed\n\n"; return (3); 
 				}
 
 				// Shell Output
@@ -75,7 +75,7 @@
 					std::string input = std::string(buffer, bytes);
 					if (Options::encryption) input = encrypt(input);
 
-					if (send(Options::sockfd, input.c_str(), input.length(), 0) < 0) { std::cerr << "Error: Failed to send data\n"; return (1); }
+					if (send(Options::sockfd, input.c_str(), input.length(), 0) < 0) { std::cerr << "Failed to send data\n"; return (1); }
 				}
 			}
 
@@ -96,7 +96,7 @@
 				int select_result = select(Options::sockfd + 1, &readfds, nullptr, nullptr, nullptr);
 				if (select_result < 0) { 
 					if (errno == EINTR) continue;
-					std::cerr << "Error: Multiplexing failed\n"; return (1); 
+					std::cerr << "Multiplexing failed\n"; return (1); 
 				}
 
 				if (FD_ISSET(Options::sockfd, &readfds)) {
@@ -117,7 +117,7 @@
 #pragma region "Main"
 
 	int main(int argc, char **argv) {
-		if (signal_set()) { std::cerr << "Error: Signal set failed\n"; return (1); }
+		if (signal_set()) { std::cerr << "Signal set failed\n"; return (1); }
 
 		int result = 0;
 		if ((result = Options::parse(argc, argv))) return (result - 1);

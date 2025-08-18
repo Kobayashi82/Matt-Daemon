@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:04 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 16:08:48 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 18:10:55 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,7 +178,7 @@
 				std::string newHost = _host.substr(atPos + 1);
 
 				if (!user.empty() && user != newUser) {
-					std::cerr << "Error: user conflict: '" + user + "' vs '" + newUser + "'\n";
+					std::cerr << "User conflict: '" + user + "' vs '" + newUser + "'\n";
 					return (1);
 				}
 
@@ -230,10 +230,10 @@
 		if (user.empty()) {
 			struct passwd* pw = getpwuid(getuid());
 			user = pw ? std::string(pw->pw_name) : "";
-			if (user.empty()) { std::cerr << "Error: unable to determine current user\n";					return (2); }
+			if (user.empty()) { std::cerr << "Unable to determine current user\n";							return (2); }
 		}
 
-		if (validate_host(host)) { std::cerr << "Error: unknown host\n";									return (2); }
+		if (validate_host(host)) { std::cerr << "Unknown host\n";											return (2); }
 
 		return (0);
 	}

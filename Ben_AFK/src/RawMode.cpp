@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 11:24:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 15:36:44 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 18:11:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@
 
 			in_passmode = true;
 		} else if (!raw_enabled) {
-			if (tcgetattr(STDIN_FILENO, &original_termios) == -1) { std::cerr << "Error: Failed to get terminal attributes\n"; return (1); }
+			if (tcgetattr(STDIN_FILENO, &original_termios) == -1) { std::cerr << "Failed to get terminal attributes\n"; return (1); }
 
 			struct termios raw = original_termios;
 			raw.c_lflag &= ~(ECHO | ICANON | ISIG | IEXTEN);
@@ -56,7 +56,7 @@
 			raw.c_cc[VMIN] = 1;
 			raw.c_cc[VTIME] = 0;
 
-			if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) { std::cerr << "Error: Failed to set raw mode\n"; return (1); }
+			if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) { std::cerr << "Failed to set raw mode\n"; return (1); }
 
 			raw_enabled = true;
 		}

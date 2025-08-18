@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 21:41:05 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 15:37:13 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 18:12:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,17 +28,17 @@
 
 	int socket_create() {
 		Options::sockfd = socket(AF_INET, SOCK_STREAM, 0);
-		if (Options::sockfd < 0) { std::cerr << "Error: Socket creation failed\n"; return (1); }
+		if (Options::sockfd < 0) { std::cerr << "Socket creation failed\n"; return (1); }
 
 		Options::sockaddr.sin_family = AF_INET;
 		Options::sockaddr.sin_port = htons(Options::port);
 		if (inet_pton(AF_INET, Options::host, &Options::sockaddr.sin_addr) <= 0) {
-			std::cerr << "Error: Invalid address or address not supported: " << Options::hostname << "\n";
+			std::cerr << "Invalid address or address not supported: " << Options::hostname << "\n";
 			close(Options::sockfd); return (1);
 		}
 
 		if (connect(Options::sockfd, (const sockaddr *)&Options::sockaddr, sizeof(sockaddr_in)) < 0) {
-			std::cerr << "Error: Failed to connect to " << Options::hostname << ":" << Options::port << "\n";
+			std::cerr << "Failed to connect to " << Options::hostname << ":" << Options::port << "\n";
 			close(Options::sockfd); return (1);	
 		}
 
@@ -52,7 +52,7 @@
 #pragma region "Send Data"
 
 	int send_data(const std::string & data) {
-		if (send(Options::sockfd, data.c_str(), data.size(), 0) < 0) { std::cerr << "Error: Failed to send data\n"; return (1); }
+		if (send(Options::sockfd, data.c_str(), data.size(), 0) < 0) { std::cerr << "Failed to send data\n"; return (1); }
 
 		return (0);
 	}
@@ -71,7 +71,7 @@
 			try {
 				if (Options::encryption) msg = decrypt(msg);
 			} catch (const std::exception& e) {
-				std::cerr << "Error: Message not encrypted\n"; return (1);
+				std::cerr << "Message not encrypted\n"; return (1);
 			}
 
 			if (!msg.find("Maximum connections reached")) { std::cerr << "Maximum connections reached\n"; return (3); }
@@ -88,9 +88,9 @@
 				value.erase(value.find_last_not_of(" \t\n\r") + 1);
 				if		(value == "true")	Options::encryption = true;
 				else if	(value == "false")	Options::encryption = false;
-				else { std::cerr << "Error: Invalid response from server\n"; return (3); }
+				else { std::cerr << "Invalid response from server\n"; return (3); }
 
-				if (!Options::insecure && !Options::encryption) { std::cerr << "Error: Unsecure connection\n"; return (3); }
+				if (!Options::insecure && !Options::encryption) { std::cerr << "Unsecure connection\n"; return (3); }
 
 				std::string password = getPassword();
 				if (!Options::retries) return (1);

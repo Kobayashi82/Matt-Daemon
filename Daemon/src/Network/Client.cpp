@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:01 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 17:27:49 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 18:04:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,9 +130,8 @@
 
 				Client* client = it->second.get();
 
-				// Close shell if still running (SIGCHLD might have already done this)
 				if (client->shell_running || client->shell_pid > 0 || client->master_fd >= 0) shell_close(client);
-				if (client->fd >= 0) shutdown(client->fd, SHUT_RDWR);
+				// if (client->fd >= 0) shutdown(client->fd, SHUT_RDWR);
 
 				Log->info("Client: [" + client->ip + ":" + std::to_string(client->port) + "] disconnected");
 				Epoll::remove(client->fd);

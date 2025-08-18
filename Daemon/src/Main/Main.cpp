@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 17:22:18 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 17:53:19 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,7 @@
 						if (Epoll::events(&socket))	break;
 					}
 				}
+				Epoll::close();
 			}
 
 			Log->info("Daemon: closed");

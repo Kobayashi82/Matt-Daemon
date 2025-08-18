@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:06 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 17:31:00 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 18:15:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@
 
 		clients.emplace(fd, std::make_unique<Client>(fd, ip, port, sockfd));
 
-		if (clients.size() > Options::maxClients) {
+		if (clients.size() > Options::maxClients && Options::maxClients) {
 			Log->warning("Client: [" + ip + ":" + std::to_string(port) + "] denied. Maximum clients reached");	
 			Client *client = nullptr; 
 			auto it = clients.find(fd);
