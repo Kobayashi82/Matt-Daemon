@@ -4,7 +4,6 @@
 			"name": "WSL",
 			"includePath": [
 				"${workspaceFolder}/**/",
-				"${workspaceFolder}/Ben_AFK/**/",
 				"/usr/include",
 				"/usr/include/x86_64-linux-gnu",
 				"/usr/lib/clang/18/include"
