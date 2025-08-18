@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:00 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 00:39:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 15:33:23 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@
 				int select_result = select(max_fd + 1, &readfds, nullptr, nullptr, nullptr);
 				if (select_result < 0) { 
 					if (errno == EINTR) continue;
-					std::cerr << "Error: Multiplexing failed\n"; return (1); 
+					std::cerr << "Error: Multiplexing failed\n\n"; return (3); 
 				}
 
 				// Shell Output
@@ -70,7 +70,7 @@
 				// User Input
 				if (FD_ISSET(STDIN_FILENO, &readfds)) {
 					ssize_t bytes = read(STDIN_FILENO, buffer, sizeof(buffer));
-					if (bytes <= 0) { return (1); }
+					if (bytes <= 0) return (3);
 
 					std::string input = std::string(buffer, bytes);
 					if (Options::encryption) input = encrypt(input);
@@ -128,8 +128,8 @@
 		raw_mode_disable(false);
 		if (Options::sockfd >= 0) close(Options::sockfd);
 
-		if (!Options::retries) std::cerr << "\nDisconnected" << std::endl;
-		else if (result == 3) std::cerr << "\nDisconnected" << std::endl;;
+		if (!Options::retries) std::cerr << "Disconnected" << std::endl;
+		else if (result == 3) std::cerr << "Disconnected" << std::endl;;
 
 		return (result);
 	}

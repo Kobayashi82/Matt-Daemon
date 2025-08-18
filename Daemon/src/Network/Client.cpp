@@ -6,13 +6,15 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:01 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 00:18:07 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 15:19:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
+	#include "Main/Options.hpp"
 	#include "Main/Logging.hpp"
+	#include "Main/Encryption.hpp"
 	#include "Network/Client.hpp"
 	#include "Network/Epoll.hpp"
 	#include "Network/Communication.hpp"
@@ -54,7 +56,7 @@
 
 	Client::~Client() {
 		if (fd >= 0) {
-			Log->info("Client [" + ip + ":" + std::to_string(port) + "] disconnected");
+			Log->info("Client: [" + ip + ":" + std::to_string(port) + "] disconnected");
 			if (shell_running || shell_pid > 0 || master_fd >= 0) shell_close(this);
 
 			Epoll::remove(fd);
@@ -89,12 +91,16 @@
 	void Client::check_timeout(int interval) {
 		time_t current_time = std::time(NULL);
 		if (difftime(current_time, last_activity) > interval) {
-			Log->info("Client [" + ip + ":" + std::to_string(port) + "] connection time-out");
+			Log->info("Client: [" + ip + ":" + std::to_string(port) + "] connection time-out");
 
-			std::string response = "Connection time-out\n";
+			std::string response;
+			if (type == CLIENT) {
+				if (!Options::disabledEncryption)	response = encrypt("\n\rConnection time-out\n");
+				else								response = "\n\rConnection time-out\n";
+			} else response = "Connection time-out\n";
 			write_buffer.insert(write_buffer.end(), response.begin(), response.end());
-			Communication::write_client(this);
-			schedule_removal();
+			diying = true;
+			Epoll::set(fd, true, true);
 		}
 	}
 
@@ -113,12 +119,10 @@
 #pragma region "Schedule Removal"
 
 	void Client::schedule_removal() {
-		if (diying) return;
-
-		Log->warning("Client [" + ip + ":" + std::to_string(port) + "] scheduled for deferred removal");
-		diying = true;
-
-		if (std::find(pending_removals.begin(), pending_removals.end(), fd) == pending_removals.end()) pending_removals.push_back(fd);
+		if (std::find(pending_removals.begin(), pending_removals.end(), fd) == pending_removals.end()) {
+			Log->debug("Client: [" + ip + ":" + std::to_string(port) + "] scheduled for deferred removal");
+			pending_removals.push_back(fd);
+		}
 	}
 
 #pragma endregion
@@ -137,6 +141,7 @@
 				if (client->shell_running || client->shell_pid > 0 || client->master_fd >= 0) shell_close(client);
 				if (client->fd >= 0) shutdown(client->fd, SHUT_RDWR);
 
+				Log->info("Client: [" + client->ip + ":" + std::to_string(client->port) + "] disconnected");
 				Epoll::remove(client->fd);
 				close(client->fd);
 				client->fd = -1;
@@ -152,12 +157,12 @@
 
 	void process_terminated_pids() {
 		for (int pid : terminated_pids) {
-			Log->warning("Processing terminated PID: " + std::to_string(pid));
+			Log->debug("Processing terminated PID: " + std::to_string(pid));
 
 			for (auto& client_pair : clients) {
 				Client *client = client_pair.second.get();
 				if (client && client->shell_pid == pid && client->shell_running && !client->diying) {
-					Log->info("Client [" + client->ip + ":" + std::to_string(client->port) + "] shell process " + std::to_string(pid) + " terminated");
+					Log->debug("Client: [" + client->ip + ":" + std::to_string(client->port) + "] shell process " + std::to_string(pid) + " terminated");
 
 					client->shell_running = false;
 					client->shell_pid = 0;

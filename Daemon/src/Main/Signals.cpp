@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 11:44:57 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 00:27:39 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 15:35:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 	#pragma region "SIGINT"
 
 		static void sigint_handler(int sig) {
-			Log->info("Signal SIGINT received. Closing Daemon");
+			Log->info("Signal: SIGINT received. Closing Daemon");
 			Options::signum = sig;
 			Epoll::Running = false;
 		}
@@ -41,7 +41,7 @@
 	#pragma region "SIGTERM"
 
 		static void sigterm_handler(int sig) {
-			Log->info("Signal SIGTERM received. Closing Daemon");
+			Log->info("Signal: SIGTERM received. Closing Daemon");
 			Options::signum = sig;
 			Epoll::Running = false;
 		}
@@ -51,7 +51,7 @@
 	#pragma region "SIGUP"
 
 		static void sigup_handler(int sig) { (void) sig;
-			Log->info("Signal SIGUP received. No reload configuration required");
+			Log->info("Signal: SIGUP received. No reload configuration required");
 		}
 
 	#pragma endregion
@@ -59,7 +59,7 @@
 	#pragma region "SIGQUIT"
 
 		static void sigquit_handler(int sig) {
-			Log->info("Signal SIGQUIT received. Closing Daemon");
+			Log->info("Signal: SIGQUIT received. Closing Daemon");
 			Options::signum = sig;
 			Epoll::Running = false;
 		}
@@ -69,7 +69,7 @@
 	#pragma region "SIGSEV"
 
 		static void sigsev_handler(int sig) {
-			Log->critical("Signal SIGSEV received. Segmentation fault");
+			Log->critical("Signal: SIGSEV received. Segmentation fault");
 			signal(SIGSEGV, SIG_DFL);
 			raise(SIGSEGV);
 			unlink("/var/lock/matt_daemon.lock");
@@ -81,7 +81,7 @@
 	#pragma region "SIGPIPE"
 
 		static void sigpipe_handler(int sig) { (void) sig;
-			Log->info("Signal SIGPIPE received. Shell or client connection closed");
+			Log->info("Signal: SIGPIPE received. Shell or client connection closed");
 		}
 
 	#pragma endregion
@@ -103,13 +103,13 @@
 	int signal_set() {
 		int result = 0;
 
-		if (std::signal(SIGINT,  sigint_handler)	== SIG_ERR) { result++; Log->warning("Signal SIGINT failed");  }	// Interrupt from keyboard (Ctrl+C)
-		if (std::signal(SIGTERM, sigterm_handler)	== SIG_ERR) { result++; Log->warning("Signal SIGTERM failed"); }	// Request to terminate the program gracefully (sent by 'kill' or system shutdown)
-		if (std::signal(SIGHUP,  sigup_handler)		== SIG_ERR) { result++; Log->warning("Signal SIGHUP failed");  }	// Terminal hangup or controlling process terminated (often used to reload config)
-		if (std::signal(SIGQUIT, sigquit_handler)	== SIG_ERR) { result++; Log->warning("Signal SIGQUIT failed"); }	// Quit from keyboard (Ctrl+\)
-		if (std::signal(SIGPIPE, sigpipe_handler)	== SIG_ERR) { result++; Log->warning("Signal SIGPIPE failed"); }	// Broken pipe (write to pipe with no readers)
-		if (std::signal(SIGSEGV, sigsev_handler)	== SIG_ERR) { result++; Log->warning("Signal SIGSEGV failed"); }	// Invalid memory reference (segmentation fault)
-		if (std::signal(SIGCHLD, sigchld_handler)	== SIG_ERR) { result++; Log->warning("Signal SIGCHLD failed"); }	// Child process stopped or terminated (used to reap zombies)
+		if (std::signal(SIGINT,  sigint_handler)	== SIG_ERR) { result++; Log->warning("Signal: SIGINT failed");  }	// Interrupt from keyboard (Ctrl+C)
+		if (std::signal(SIGTERM, sigterm_handler)	== SIG_ERR) { result++; Log->warning("Signal: SIGTERM failed"); }	// Request to terminate the program gracefully (sent by 'kill' or system shutdown)
+		if (std::signal(SIGHUP,  sigup_handler)		== SIG_ERR) { result++; Log->warning("Signal: SIGHUP failed");  }	// Terminal hangup or controlling process terminated (often used to reload config)
+		if (std::signal(SIGQUIT, sigquit_handler)	== SIG_ERR) { result++; Log->warning("Signal: SIGQUIT failed"); }	// Quit from keyboard (Ctrl+\)
+		if (std::signal(SIGPIPE, sigpipe_handler)	== SIG_ERR) { result++; Log->warning("Signal: SIGPIPE failed"); }	// Broken pipe (write to pipe with no readers)
+		if (std::signal(SIGSEGV, sigsev_handler)	== SIG_ERR) { result++; Log->warning("Signal: SIGSEGV failed"); }	// Invalid memory reference (segmentation fault)
+		if (std::signal(SIGCHLD, sigchld_handler)	== SIG_ERR) { result++; Log->warning("Signal: SIGCHLD failed"); }	// Child process stopped or terminated (used to reap zombies)
 
 		return (result);
 	}

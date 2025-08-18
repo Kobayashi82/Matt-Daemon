@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:06 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 00:48:00 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 15:46:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@
 	int Socket::accept() {
 		sockaddr_in Addr; socklen_t AddrLen = sizeof(Addr);
 		int fd = ::accept(sockfd, (sockaddr *)&Addr, &AddrLen);
-		if (fd < 0) { Log->error("Socket accept connection failed"); return (1); }
+		if (fd < 0) { Log->critical("Socket accept connection failed"); return (1); }
 
 		char ip_str[INET_ADDRSTRLEN];
 		inet_ntop(AF_INET, &(Addr.sin_addr), ip_str, INET_ADDRSTRLEN);
@@ -129,7 +129,7 @@
 		clients.emplace(fd, std::make_unique<Client>(fd, ip, port));
 
 		if (clients.size() > Options::maxClients) {
-			Log->info("Client [" + ip + ":" + std::to_string(port) + "] denied. Maximum clients reached");	
+			Log->warning("Client: [" + ip + ":" + std::to_string(port) + "] denied. Maximum clients reached");	
 			Client *client = nullptr; 
 			auto it = clients.find(fd);
 			if (it != clients.end()) client = it->second.get();
@@ -138,16 +138,14 @@
 				std::string msg = "Maximum connections reached\n";
 
 				send(fd, msg.c_str(), msg.length(), 0);
-				Log->debug("Rejection message sent to client " + ip + ":" + std::to_string(port));
 
 				::close(fd);
 				clients.erase(fd);
 
-				Log->info("Client [" + ip + ":" + std::to_string(port) + "] connection closed due to max connections");
 				return (0);
 			}
 		} else {
-			Log->info("Client [" + ip + ":" + std::to_string(port) + "] connected");
+			Log->info("Client: [" + ip + ":" + std::to_string(port) + "] connected");
 			
 			if (Epoll::add(fd, true, false) == -1) {
 				Log->debug("Epoll FD add failed");

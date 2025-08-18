@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 21:41:05 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 00:46:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 15:37:13 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,6 @@
 	#include <arpa/inet.h>														// socket(), setsockopt(), bind(), listen(), accept(), inet_ntop(), htons(), ntohs(), sockaddr_in
 	#include <iostream>															// std::cerr()
 	#include <unistd.h>															// close()
-	#include <sys/ioctl.h>														// ioctl()
-	#include <termios.h>														// struct winsize
 
 #pragma endregion
 
@@ -82,6 +80,8 @@
 
 			if (!msg.find("/SHELL_FAIL")) { std::cerr << "Failed to open remote shell\n"; return (3); }
 
+			if (!msg.find("/DISCONNECT")) { std::cerr << "Connection rejected by the server\n"; return (3); }
+
 			if (!msg.find("/AUTHORIZE ENCRYPTION=")) {
 				std::string value = msg.substr(22);
 
@@ -115,7 +115,7 @@
 
 			if (!Options::authenticated && !msg.find("/AUTHORIZATION_FAIL")) {
 				Options::retries--;
-				if (!Options::retries)	{ std::cerr << "Authentication failure, giving up\n"; return (1); }
+				if (!Options::retries)	{ std::cerr << "Authentication failure, giving up\n\n"; return (3); }
 				else					  std::cerr << "Authentication failure, please try again\n";
 
 				std::string password = getPassword();
@@ -132,21 +132,6 @@
 		if (bytes <= 0) return (3);
 
 		return (0);
-	}
-
-#pragma endregion
-
-#pragma region "Get Terminal Size"
-
-	std::string get_terminal_size() {
-		struct winsize ws;
-		if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1) {
-			// Si no se puede obtener el tamaño, usar valores por defecto
-			ws.ws_row = 24;
-			ws.ws_col = 80;
-		}
-		
-		return std::to_string(ws.ws_col) + "x" + std::to_string(ws.ws_row);
 	}
 
 #pragma endregion

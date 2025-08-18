@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 11:24:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 17:48:41 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 15:36:44 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@
 
 	#include <iostream>															// std::cerr()
 	#include <unistd.h>															// STDIN_FILENO
-	#include <termios.h>														// tcgetattr(), tcsetattr(), termios
+	#include <termios.h>														// tcgetattr(), tcsetattr(), termios, winsize
+	#include <sys/ioctl.h>														// ioctl()
 
 #pragma endregion
 
@@ -77,6 +78,17 @@
 			raw_enabled = false;
 			std::cout << std::endl;
 		}
+	}
+
+#pragma endregion
+
+#pragma region "Get Terminal Size"
+
+	std::string get_terminal_size() {
+		struct winsize ws;
+
+		if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1) { ws.ws_row = 24; ws.ws_col = 80; }
+		return (std::to_string(ws.ws_col) + "x" + std::to_string(ws.ws_row));
 	}
 
 #pragma endregion

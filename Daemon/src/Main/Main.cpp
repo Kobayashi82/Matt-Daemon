@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 23:30:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 15:21:05 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@
 
 			Log->debug("Initiating daemon");
 			if (daemonize()) return (1);
-			Log->info("Daemon started");
+			Log->info("Daemon: started");
 
 			if (Epoll::create()) result = 1;
 			else {
@@ -99,7 +99,7 @@
 				Socket socket(Options::portNumber);
 				if (socket.create()) result = 1;
 				else {
-					Log->info("Daemon listening on port " + std::to_string(Options::portNumber));
+					Log->info("Daemon: listening on port " + std::to_string(Options::portNumber));
 
 					Epoll::Running = true;
 					while (Epoll::Running) {
@@ -108,7 +108,7 @@
 				}
 			}
 
-			Log->info("Daemon closed");
+			Log->info("Daemon: closed");
 		} catch(const std::exception& e) {
 			std::cerr << e.what() << '\n';
 			result = 1;
