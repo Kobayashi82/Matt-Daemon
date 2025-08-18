@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 18:22:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 20:52:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@
 				Socket socket(Options::portNumber);
 				if (socket.create()) result = 1;
 				else {
-					Log->debug("Daemon: Listening on port " + std::to_string(Options::portNumber));
+					Log->info("Daemon: Listening on port " + std::to_string(Options::portNumber));
 
 					Epoll::Running = true;
 					while (Epoll::Running) {

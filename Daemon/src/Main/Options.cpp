@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:32 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 17:29:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 20:22:29 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,14 +87,14 @@
 			std::cerr << "\n";
 			std::cerr << "  -k,  --disable-encryption   Disable encryption communication for Ben_AFK clients\n";
 			std::cerr << "  -s,  --disable-shell        Disable remote shell access\n";
-			std::cerr << "  -c,  --max-clients=NUM      Maximum number of clients   (default: 3, unlimited = 0)\n";
-			std::cerr << "  -p,  --port=PORT            Port number to listen on    (default: 4242)\n";
-			std::cerr << "  -t,  --timeout=SECOND       Timeout in seconds for inactive connections\n";
-			std::cerr << "  -f,  --log-file=PATH        Path to the log file        (default: /var/log/matt_daemon/matt_daemon.log)\n";
-			std::cerr << "  -l,  --log-level=LEVEL      Logging verbosity level     (default: INFO)\n";
+			std::cerr << "  -c,  --max-clients=NUM      Maximum number of clients                           (default: 3, unlimited = 0)\n";
+			std::cerr << "  -p,  --port=PORT            Port number to listen on                            (default: 4242)\n";
+			std::cerr << "  -t,  --timeout=SECOND       Timeout in seconds for inactive connections         (default: 600)\n";
+			std::cerr << "  -f,  --log-file=PATH        Path to the log file                                (default: /var/log/matt_daemon/matt_daemon.log)\n";
+			std::cerr << "  -l,  --log-level=LEVEL      Logging verbosity level                             (default: INFO)\n";
 			std::cerr << "  -n,  --log-new              Create a new log file on start\n";
-			std::cerr << "  -m,  --log-rotate-max=NUM   Maximum number of log files to keep when rotating\n";
-			std::cerr << "  -r,  --log-rotate-size=BYTE Minimum log size before rotation\n";
+			std::cerr << "  -m,  --log-rotate-max=NUM   Maximum number of log files to keep when rotating   (default: 5)\n";
+			std::cerr << "  -r,  --log-rotate-size=BYTE Minimum log size before rotation                    (default: 10M\n";
 			std::cerr << "  -x,  --shell-path=PATH      Path of the shell to execute\n";
 			std::cerr << "\n";
 			std::cerr << "  -h?, --help                 Display this help message\n";
@@ -206,7 +206,15 @@
 				case 'l':	if (log_level(std::string(optarg)))									return (2);				break;
 				case 'n':	logNew = true;																				break;
 				case 'm':	if (ft_strtoul(argv, optarg, &logMax, 256, true))					return (2);				break;
-				case 'r':	if (ft_strtoul(argv, optarg, &logSize, 1024 * 1024 * 1024, true))	return (2);				break;
+				case 'r':
+				{
+					std::string value = std::string(optarg);
+					int multiplier = 1;
+					if (!value.empty() && (value.back() == 'k' || value.back() == 'K')) { multiplier = 1024;		value.pop_back(); }
+					if (!value.empty() && (value.back() == 'm' || value.back() == 'M')) { multiplier = 1024 * 1024;	value.pop_back(); }
+					if (ft_strtoul(argv, value.c_str(), &logSize, 1024 * 1024 * 1024, true))	return (2);
+					logSize *= multiplier;																				break;
+				}
 				case 'x':	shellPath = std::string(optarg);															break;
 
 				case '?':	if (std::string(argv[optind - 1]) == "-?")							return (help());		return (invalid());

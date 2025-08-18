@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 11:44:57 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 17:40:01 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 20:42:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,12 @@
 
 	#pragma endregion
 
-	#pragma region "SIGUP"
+	#pragma region "SIGHUP"
 
-		static void sigup_handler(int sig) { (void) sig;
-			Log->info("Signal: SIGUP received. No reload configuration required");
+		static void sighup_handler(int sig) {
+			Log->info("Signal: SIGHUP received. No reload configuration required");
+			Options::signum = sig;
+			Epoll::Running = false;
 		}
 
 	#pragma endregion
@@ -114,7 +116,7 @@
 
 		if (std::signal(SIGINT,  sigint_handler)	== SIG_ERR) { result++; Log->warning("Signal: SIGINT failed");  }	// Interrupt from keyboard (Ctrl+C)
 		if (std::signal(SIGTERM, sigterm_handler)	== SIG_ERR) { result++; Log->warning("Signal: SIGTERM failed"); }	// Request to terminate the program gracefully (sent by 'kill' or system shutdown)
-		if (std::signal(SIGHUP,  sigup_handler)		== SIG_ERR) { result++; Log->warning("Signal: SIGHUP failed");  }	// Terminal hangup or controlling process terminated (often used to reload config)
+		if (std::signal(SIGHUP,  sighup_handler)	== SIG_ERR) { result++; Log->warning("Signal: SIGHUP failed");  }	// Terminal hangup or controlling process terminated (often used to reload config)
 		if (std::signal(SIGQUIT, sigquit_handler)	== SIG_ERR) { result++; Log->warning("Signal: SIGQUIT failed"); }	// Quit from keyboard (Ctrl+\)
 		if (std::signal(SIGPIPE, sigpipe_handler)	== SIG_ERR) { result++; Log->warning("Signal: SIGPIPE failed"); }	// Broken pipe (write to pipe with no readers)
 		if (std::signal(SIGSEGV, sigsev_handler)	== SIG_ERR) { result++; Log->warning("Signal: SIGSEGV failed"); }	// Invalid memory reference (segmentation fault)
