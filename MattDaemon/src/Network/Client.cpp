@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:01 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 22:25:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 23:31:04 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,12 +129,11 @@
 		for (int fd : pending_removals) {
 			auto it = clients.find(fd);
 			if (it != clients.end()) {
-				Log->debug("Processing deferred removal of client: " + it->second->ip + ":" + std::to_string(it->second->port));
+				Log->debug("Client: [" + it->second->ip + ":" + std::to_string(it->second->port) + "] removing");
 
 				Client* client = it->second.get();
 
 				if (client->shell_running || client->shell_pid > 0 || client->master_fd >= 0) shell_close(client);
-				// if (client->fd >= 0) shutdown(client->fd, SHUT_RDWR);
 
 				Log->info("Client: [" + client->ip + ":" + std::to_string(client->port) + "] disconnected");
 				Epoll::remove(client->fd);
@@ -152,8 +151,6 @@
 
 	void process_terminated_pids() {
 		for (int pid : terminated_pids) {
-			Log->debug("Processing terminated PID: " + std::to_string(pid));
-
 			for (auto& client_pair : clients) {
 				Client *client = client_pair.second.get();
 				if (client && client->shell_pid == pid && client->shell_running && !client->diying) {
@@ -174,7 +171,6 @@
 						client->slave_fd = -1;
 					}
 
-					Log->debug("Scheduling client removal due to shell termination");
 					client->schedule_removal();
 					break;
 				}

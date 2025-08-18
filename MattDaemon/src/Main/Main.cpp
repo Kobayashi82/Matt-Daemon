@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 22:19:07 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 23:26:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,13 +94,13 @@
 				Log->warning("Daemon: No shell available. Remote shell disabled");
 			}
 
-			Log->debug("Initiating daemon");
+			Log->debug("Daemon: Initiating");
 			if (daemonize()) return (1);
 			Log->info("Daemon: Started");
 
 			if (Epoll::create()) result = 1;
 			else {
-				Log->debug("Epoll initialized");
+				Log->debug("Daemon: Epoll initialized");
 				Socket socket(Options::portNumber);
 				if (socket.create()) result = 1;
 				else {

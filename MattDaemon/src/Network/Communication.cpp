@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 22:18:00 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 23:23:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@
 							return (0);
 						}
 
-						if (msg.find_first_not_of(" \t\n\r") != std::string::npos) Log->log(msg);
+						if (msg.find_first_not_of(" \t\n\r") != std::string::npos) Log->log("Input: " + msg);
 						return (0);
 					}
 

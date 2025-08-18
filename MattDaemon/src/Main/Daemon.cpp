@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/14 23:07:15 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 22:19:42 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 23:24:32 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@
 
 		// 5. umask()
 		umask(022);
-		Log->debug("umask() set");
+		Log->debug("Daemon: umask() set");
 
 		// 6. chdir()
 		if (chdir("/"))	Log->warning("Daemon: chdir() failed");

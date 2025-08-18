@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:06 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 22:17:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 23:33:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,18 +59,18 @@
 		// Create socket
 		sockfd = socket(AF_INET, SOCK_STREAM, 0);
 		if (sockfd < 0) {
-			Log->critical("Socket creation failed");
+			Log->critical("Daemon: Socket creation failed");
 			return (1);
 		}
-		Log->debug("Socket created");
+		Log->debug("Daemon: Socket created");
 
 		// Configure socket
 		int options = 1;
 		if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &options, sizeof(options)) == -1) {
-			Log->critical("Socket set option failed");
+			Log->critical("Daemon: Socket set option failed");
 			::close(sockfd); return (1);
 		}
-		Log->debug("Socket reusable option set");
+		Log->debug("Daemon: Socket reusable option set");
 
 		// Initialize the socket address structure
 		sockaddr_in address; std::memset(&address, 0, sizeof(address));
@@ -80,24 +80,24 @@
 
 		// Link the address to the socket
 		if (bind(sockfd, (sockaddr *)&address, sizeof(address)) == -1) {
-			Log->critical("Socket bind failed");
+			Log->critical("Daemon: Socket bind failed");
 			::close(sockfd); return (1);
 		}
-		Log->debug("Socket bind set");
+		Log->debug("Daemon: Socket bind set");
 
 		// Listen on the address for incoming connections
 		if (listen(sockfd, SOMAXCONN) == -1) {
-			Log->critical("Socket listen failed");
+			Log->critical("Daemon: Socket listen failed");
 			::close(sockfd); return (1);
 		}
-		Log->debug("Socket listen set");
+		Log->debug("Daemon: Socket listen set");
 
 		// Add the socket FD to EPOLL
 		if (Epoll::add(sockfd, true, false) == -1) {
-			Log->critical("Epoll Socket FD add failed");
+			Log->critical("Daemon: Epoll Socket FD add failed");
 			::close(sockfd); return (1);
 		}
-		Log->debug("Socket added to Epoll");
+		Log->debug("Daemon: Socket added to Epoll");
 
 		Options::sockfd = sockfd;
 		return (0);
@@ -109,7 +109,7 @@
 
 	void Socket::close() {
 		if (sockfd != -1) {
-			Log->debug("Socket close");
+			Log->debug("Daemon: Socket close");
 			::close(sockfd); clients.clear();
 		}
 	}
@@ -121,7 +121,7 @@
 	int Socket::accept() {
 		sockaddr_in Addr; socklen_t AddrLen = sizeof(Addr);
 		int fd = ::accept(sockfd, (sockaddr *)&Addr, &AddrLen);
-		if (fd < 0) { Log->critical("Socket accept connection failed"); return (1); }
+		if (fd < 0) { Log->critical("Daemon: Socket accept connection failed"); return (1); }
 
 		char ip_str[INET_ADDRSTRLEN];
 		inet_ntop(AF_INET, &(Addr.sin_addr), ip_str, INET_ADDRSTRLEN);
@@ -150,10 +150,10 @@
 			Log->info("Client: [" + ip + ":" + std::to_string(port) + "] connected");
 			
 			if (Epoll::add(fd, true, false) == -1) {
-				Log->debug("Epoll FD add failed");
+				Log->debug("Daemon: Epoll FD add failed");
 				clients[fd]->remove(); return (1);
 			}
-			Log->debug("Client added to Epoll");
+			Log->debug("Client: [" + ip + ":" + std::to_string(port) + "] added to Epoll");
 		}
 
 		return (0);

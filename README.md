@@ -225,41 +225,38 @@ sudo ./MattDaemon --disable-encryption
 ## 📝 Ejemplos de Log
 
 ```
-[18/08/2025-20:49:54]      [ DEBUG ] - Initiating daemon
+[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Initiating
 [18/08/2025-20:49:54]      [ DEBUG ] - Daemon: First fork() completed
 [18/08/2025-20:49:54]      [ DEBUG ] - Daemon: setsid() completed
 [18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Second fork() completed
 [18/08/2025-20:49:54]      [ DEBUG ] - Daemon: All signal handlers successfully installed
-[18/08/2025-20:49:54]      [ DEBUG ] - umask() set
+[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: umask() set
 [18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Working directory changed
 [18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Standard file descriptors closed
 [18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Lock set
 [18/08/2025-20:49:54]       [ INFO ] - Daemon: Started
-[18/08/2025-20:49:54]      [ DEBUG ] - Epoll initialized
-[18/08/2025-20:49:54]      [ DEBUG ] - Socket created
-[18/08/2025-20:49:54]      [ DEBUG ] - Socket reusable option set
-[18/08/2025-20:49:54]      [ DEBUG ] - Socket bind set
-[18/08/2025-20:49:54]      [ DEBUG ] - Socket listen set
-[18/08/2025-20:49:54]      [ DEBUG ] - Socket added to Epoll
+[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Epoll initialized
+[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Socket created
+[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Socket reusable option set
+[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Socket bind set
+[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Socket listen set
+[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Socket added to Epoll
 [18/08/2025-20:49:54]       [ INFO ] - Daemon: Listening on port 4242
 [18/08/2025-20:50:11]       [ INFO ] - Client: [127.0.0.1:49206] connected
-[18/08/2025-20:50:11]      [ DEBUG ] - Client added to Epoll
+[18/08/2025-20:50:11]      [ DEBUG ] - Client: [127.0.0.1:44438] added to Epoll
 [18/08/2025-20:50:11]       [ INFO ] - Client: [127.0.0.1:49206] wants to open a shell
 [18/08/2025-20:50:14]    [ WARNING ] - Client: [127.0.0.1:49206] authorization failed for user: vzurera
 [18/08/2025-20:50:21]       [ INFO ] - Client: [127.0.0.1:49206] authorization successful for user: vzurera
 [18/08/2025-20:50:21]      [ DEBUG ] - Client: [127.0.0.1:49206] terminal size: 114x28
 [18/08/2025-20:50:21]       [ INFO ] - Client: [127.0.0.1:49206] shell started with PID 48675 and PTY: /dev/pts/6
-[18/08/2025-20:50:25]      [ DEBUG ] - Processing terminated PID: 48675
 [18/08/2025-20:50:25]      [ DEBUG ] - Client: [127.0.0.1:49206] shell process 48675 terminated
-[18/08/2025-20:50:25]      [ DEBUG ] - Scheduling client removal due to shell termination
 [18/08/2025-20:50:25]      [ DEBUG ] - Client: [127.0.0.1:49206] scheduled for deferred removal
-[18/08/2025-20:50:25]      [ DEBUG ] - Processing deferred removal of client: 127.0.0.1:49206
 [18/08/2025-20:50:25]       [ INFO ] - Client: [127.0.0.1:49206] disconnected
 [18/08/2025-20:50:31]       [ INFO ] - Client: [127.0.0.1:44438] connected
-[18/08/2025-20:50:31]      [ DEBUG ] - Client added to Epoll
-[18/08/2025-20:50:36]        [ LOG ] - Mensaje de prueba
+[18/08/2025-20:50:31]      [ DEBUG ] - Client: [127.0.0.1:44438] added to Epoll
+[18/08/2025-20:50:36]        [ LOG ] - Input: Mensaje de prueba
 [18/08/2025-20:50:38]    [ WARNING ] - Client: [127.0.0.1:44438] wants to close the daemon
-[18/08/2025-20:50:38]      [ DEBUG ] - Socket close
+[18/08/2025-20:50:38]      [ DEBUG ] - Daemon: Socket close
 [18/08/2025-20:50:38]       [ INFO ] - Daemon: Closed
 ```
 
