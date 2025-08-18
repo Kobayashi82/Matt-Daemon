@@ -5,8 +5,8 @@
 #                                                     +:+ +:+         +:+      #
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/08/15 16:49:47 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/18 22:59:33 by vzurera-         ###   ########.fr        #
+#    Created: 2025/08/11 19:13:18 by vzurera-          #+#    #+#              #
+#    Updated: 2025/08/18 22:59:52 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,7 +37,7 @@ COUNTER 			= 0
 # ── NAME ── #
 # ────────── #
 
-NAME		= Ben_AFK
+NAME		= MattDaemon
 
 # ─────────── #
 # ── FLAGS ── #
@@ -60,14 +60,16 @@ SRC_DIR		= src/
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= Main/Main.cpp										\
+SRCS		= Main/Main.cpp Main/Daemon.cpp Main/Shell.cpp		\
 																\
 			  Config/Options.cpp Config/Signals.cpp				\
-			  Config/RawMode.cpp								\
+			  Config/Logging.cpp								\
 																\
-			  Security/Password.cpp Security/Encryption.cpp		\
+			  Security/Authentication.cpp						\
+			  Security/Encryption.cpp							\
 																\
-			  Network/Connection.cpp
+			  Network/Socket.cpp Network/Client.cpp				\
+			  Network/Epoll.cpp Network/Communication.cpp
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #
@@ -219,7 +221,7 @@ fclean:
 _title:
 	@clear
 	@printf "\n$(NC)\t$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★\
-	$(INV_CYAN)   $(NC)$(INV_CYAN)$(shell echo $(NAME) | tr a-z A-Z | tr '_' ' ')$(INV_CYAN)    \
+	$(INV_CYAN)  $(NC)$(INV_CYAN)$(shell echo $(NAME) | tr a-z A-Z | tr '_' ' ')$(INV_CYAN)  \
 	$(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(NC)\n"
 	@printf "\t$(WHITE)──────────────────────────\n$(NC)"
 

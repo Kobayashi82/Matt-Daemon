@@ -8,11 +8,11 @@
 !doc/**
 doc/ft_matt-daemon\ 4.1.pdf
 
-!Daemon
-!Daemon/**
-Daemon/build
-Daemon/build/**
-Daemon/MattDaemon
+!MattDaemon
+!MattDaemon/**
+MattDaemon/build
+MattDaemon/build/**
+MattDaemon/MattDaemon
 
 !Ben_AFK
 !Ben_AFK/**
