@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 00:50:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 17:28:16 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 			int					fd;												// File descriptor associated with the client
 			std::string			ip;												// IP address of the client
 			int					port;											// Port number of the client
+			int					sock_fd;										// FD of the socket
 			int					type;											// Type of client (MSG, CLIENT, SHELL)
 			time_t				last_activity;									// Timestamp of the last activity
 			bool				diying;											// Flag indicating client is being removed
@@ -54,8 +55,7 @@
 			int					terminal_rows;									// Terminal rows for PTY size
 
 			// Constructors
-			Client();															// Default constructor
-			Client(int _fd, std::string _ip, int _port);						// Parameterized constructor
+			Client(int _fd, std::string _ip, int _port, int _sockfd);			// Parameterized constructor
 			Client(const Client & Cli);											// Copy constructor
 			~Client();															// Destructor
 

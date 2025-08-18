@@ -6,12 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/14 23:07:15 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 15:20:34 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 17:21:29 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
+	#include "Main/Options.hpp"
 	#include "Main/Signals.hpp"
 	#include "Main/Logging.hpp"
 	#include "Network/Client.hpp"
@@ -64,12 +65,12 @@
 		Log->debug("Daemon: standard file descriptors closed");
 
 		// 8. flock()
-		int lockfd = open("/var/lock/matt_daemon.lock", O_RDWR|O_CREAT|O_TRUNC, 0640);
-		if (lockfd < 0 || flock(lockfd, LOCK_EX|LOCK_NB)) {
+		Options::lockfd = open("/var/lock/matt_daemon.lock", O_RDWR|O_CREAT|O_TRUNC, 0640);
+		if (Options::lockfd < 0 || flock(Options::lockfd, LOCK_EX|LOCK_NB)) {
+			if (Options::lockfd >= 0) close(Options::lockfd);
 			Log->critical("Daemon: already running");
 			std::exit(1);
 		}
-		dprintf(lockfd, "%d\n", getpid());
 		Log->debug("Daemon: lock set");
 
 		return (0);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:15 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 12:39:44 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 17:30:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@
 			static std::string	shellPath;										// Path of the shell to execute
 
 			static int			signum;											// Signal value when a signal is intercepted
+			static int			lockfd;											// FD for daemon lock
+			static int			sockfd;											// FD for the socket
 
 			static int	parse(int argc, char **argv);							// Parse options passed as arguments to the program
 

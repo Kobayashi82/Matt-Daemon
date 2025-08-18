@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 15:21:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 17:22:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,11 @@
 		if (getuid()) { std::cerr << "This program requires admin privileges" << std::endl;														return (2); }
 
 		int lockfd = open("/var/lock/matt_daemon.lock", O_RDWR|O_CREAT|O_TRUNC, 0640);
-		if (lockfd < 0 || flock(lockfd, LOCK_EX|LOCK_NB)) { std::cerr << "Daemon already running\n";											return (2); }
-		close(lockfd);
+		if (lockfd < 0 || flock(lockfd, LOCK_EX|LOCK_NB)) {
+			if (lockfd >= 0) close(lockfd);
+			std::cerr << "Daemon already running\n";
+			return (2);
+		} close(lockfd);
 
 		if (!Socket::is_port_free(Options::portNumber)) { std::cerr << "Port " << Options::portNumber << " is not available\n";					return (2); }
 
@@ -114,6 +117,7 @@
 			result = 1;
 		}
 
+		if (Options::lockfd >= 0) close(Options::lockfd);
 		unlink("/var/lock/matt_daemon.lock");
 		if (!result && Options::signum) result = 128 + Options::signum;
 		return (result);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 11:44:57 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 15:35:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 17:40:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,9 +70,18 @@
 
 		static void sigsev_handler(int sig) {
 			Log->critical("Signal: SIGSEV received. Segmentation fault");
+			
+			for (auto& client_pair : clients) {
+				Client *client = client_pair.second.get();
+				if (client && client->shell_running && client->shell_pid) kill(client->shell_pid, SIGKILL);
+			}
+			Epoll::close();
+			if (Options::lockfd >= 0) close(Options::lockfd);
+			if (Options::sockfd >= 0) close(Options::sockfd);
+			unlink("/var/lock/matt_daemon.lock");
+
 			signal(SIGSEGV, SIG_DFL);
 			raise(SIGSEGV);
-			unlink("/var/lock/matt_daemon.lock");
 			std::exit(128 + sig);
 		}
 

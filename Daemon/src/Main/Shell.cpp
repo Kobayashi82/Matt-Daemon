@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 19:09:14 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 15:40:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 17:40:49 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,20 @@
 		}
 
 		if (pid == 0) {
+			Epoll::close();
+			clients.clear();
 			client->slave_fd = open(pty_name, O_RDWR);
+			if (Options::lockfd >= 0) close(Options::lockfd);
+			if (Options::sockfd >= 0) close(Options::sockfd);
+
+			signal(SIGINT,  SIG_DFL);
+			signal(SIGTERM, SIG_DFL);
+			signal(SIGHUP,  SIG_DFL);
+			signal(SIGQUIT, SIG_DFL);
+			signal(SIGPIPE, SIG_DFL);
+			signal(SIGSEGV, SIG_DFL);
+			signal(SIGCHLD, SIG_DFL);
+
 			if (client->slave_fd == -1) {
 				// Log->debug("Client: [" + client->ip + ":" + std::to_string(client->port) + "] open slave failed");
 				std::exit(1);

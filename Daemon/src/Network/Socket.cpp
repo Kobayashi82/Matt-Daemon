@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:06 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 15:46:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 17:31:00 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,7 @@
 		}
 		Log->debug("Socket added to Epoll");
 
+		Options::sockfd = sockfd;
 		return (0);
 	}
 
@@ -126,7 +127,7 @@
 		std::string ip	= ip_str;
 		int	port		= ntohs(Addr.sin_port);	
 
-		clients.emplace(fd, std::make_unique<Client>(fd, ip, port));
+		clients.emplace(fd, std::make_unique<Client>(fd, ip, port, sockfd));
 
 		if (clients.size() > Options::maxClients) {
 			Log->warning("Client: [" + ip + ":" + std::to_string(port) + "] denied. Maximum clients reached");	

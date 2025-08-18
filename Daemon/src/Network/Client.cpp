@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:01 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 15:19:18 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 17:27:49 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,15 +39,13 @@
 
 #pragma region "Constructors"
 
-    Client::Client() : fd(-1), ip(""), port(0), type(MSG), last_activity(std::time(NULL)) {}
-
-    Client::Client(int _fd, std::string _ip, int _port) : fd(_fd), ip(_ip), port(_port), type(MSG) {
+    Client::Client(int _fd, std::string _ip, int _port, int _sockfd) : fd(_fd), ip(_ip), port(_port), sock_fd(_sockfd), type(MSG) {
 		last_activity = std::time(NULL); diying = false; user = ""; pass = ""; authenticated = false;
-		shell_running = false; shell_pid = 0; master_fd = -1; slave_fd = -1; encryption_index = 0;
+		shell_running = false; shell_pid = 0; master_fd = -1; slave_fd = -1; sock_fd = -1; encryption_index = 0;
 		terminal_cols = 80; terminal_rows = 24;
 	}
 
-    Client::Client(const Client & src) : fd(src.fd), ip(src.ip), port(src.port), type(MSG) {
+    Client::Client(const Client & src) : fd(src.fd), ip(src.ip), port(src.port), sock_fd(src.sock_fd), type(MSG) {
 		last_activity = src.last_activity; diying = src.diying; user = src.user; pass = src.pass; authenticated = src.authenticated;
 		shell_running = src.shell_running; shell_pid = src.shell_pid; master_fd = src.master_fd; slave_fd = src.slave_fd;
 		write_buffer = src.write_buffer; write_sh_buffer = src.write_sh_buffer; encryption_index = src.encryption_index;
@@ -55,14 +53,9 @@
 	}
 
 	Client::~Client() {
-		if (fd >= 0) {
-			Log->info("Client: [" + ip + ":" + std::to_string(port) + "] disconnected");
-			if (shell_running || shell_pid > 0 || master_fd >= 0) shell_close(this);
-
-			Epoll::remove(fd);
-			close(fd); 
-			fd = -1;
-		}
+		if (fd >= 0) close(fd);
+		if (master_fd >= 0) close(master_fd);
+		if (slave_fd >= 0) close(slave_fd);
 	}
 
 #pragma endregion

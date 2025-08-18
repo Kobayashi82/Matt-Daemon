@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 12:15:32 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/16 23:37:52 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 17:29:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@
 	std::string	Options::shellPath			= "";								// Path of the shell to execute
 
 	int			Options::signum				= 0;								// Signal value when a signal is intercepted
+	int			Options::lockfd				= -1;								// FD for daemon lock
+	int			Options::sockfd				= -1;								// FD for the socket
 
 	std::string	Options::_fullName			= "MattDaemon";						// Name and path used to execute the program (same as argv[0])
 
