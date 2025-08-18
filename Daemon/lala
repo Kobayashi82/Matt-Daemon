@@ -1,8 +1,0 @@
-[18/08/2025-18:16:32]       [ INFO ] - Daemon: started
-[18/08/2025-18:16:32]       [ INFO ] - Daemon: listening on port 4242
-[18/08/2025-18:16:34]       [ INFO ] - Client: [127.0.0.1:42768] connected
-[18/08/2025-18:16:34]       [ INFO ] - Client: [127.0.0.1:42768] wants to open a shell
-[18/08/2025-18:16:36]       [ INFO ] - Client: [127.0.0.1:42768] authorization successful for user: vzurera
-[18/08/2025-18:16:36]       [ INFO ] - Client: [127.0.0.1:42768] shell started with PID 18598 and PTY: /dev/pts/6
-[18/08/2025-18:16:57]       [ INFO ] - Signal: SIGTERM received. Closing Daemon
-[18/08/2025-18:16:57]       [ INFO ] - Daemon: closed

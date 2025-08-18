@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 19:29:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 17:53:19 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 18:22:30 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,12 +89,12 @@
 			if (!Options::disabledShell && Options::shellPath.empty() && access("/bin/bash", X_OK) && access("/bin/zsh", X_OK) && access("/bin/sh", X_OK)) {
 				Options::disabledShell = true;
 				std::cerr << "Warning: No shell available. Remote shell disabled\n";
-				Log->warning("No shell available. Remote shell disabled");
+				Log->warning("Daemon: No shell available. Remote shell disabled");
 			}
 
 			Log->debug("Initiating daemon");
 			if (daemonize()) return (1);
-			Log->info("Daemon: started");
+			Log->info("Daemon: Started");
 
 			if (Epoll::create()) result = 1;
 			else {
@@ -102,7 +102,7 @@
 				Socket socket(Options::portNumber);
 				if (socket.create()) result = 1;
 				else {
-					Log->info("Daemon: listening on port " + std::to_string(Options::portNumber));
+					Log->debug("Daemon: Listening on port " + std::to_string(Options::portNumber));
 
 					Epoll::Running = true;
 					while (Epoll::Running) {
@@ -112,7 +112,7 @@
 				Epoll::close();
 			}
 
-			Log->info("Daemon: closed");
+			Log->info("Daemon: Closed");
 		} catch(const std::exception& e) {
 			std::cerr << e.what() << '\n';
 			result = 1;
