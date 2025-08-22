@@ -30,7 +30,7 @@
 	class Options {
 
 		public:
-
+			static bool			gui_mode;
 			static bool			disabledEncryption;								// Disable encrypted communication 
 			static bool			disabledShell;									// Disable remote shell
 			static uint16_t		maxClients;										// Maximum number of clients connected simultaneously

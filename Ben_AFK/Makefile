@@ -47,6 +47,19 @@ CC			= clang++
 CFLAGS		= -Wall -Wextra -Werror -std=c++17
 CEFLAGS		= -lm -lcrypt
 
+# ────────────── #
+# ── GTKMM-4 ── #
+# ────────────── #
+
+GTKMM_PRESENT	= $(shell pkg-config --exists gtkmm-4.0 2>/dev/null && echo "yes" || echo "no")
+
+ifeq ($(GTKMM_PRESENT), yes)
+	GTKMM_CFLAGS	= $(shell pkg-config --cflags gtkmm-4.0)
+	GTKMM_LIBS		= $(shell pkg-config --libs gtkmm-4.0)
+	CFLAGS			+= $(GTKMM_CFLAGS)
+	CEFLAGS			+= $(GTKMM_LIBS)
+endif
+
 # ───────────────── #
 # ── DIRECTORIES ── #
 # ───────────────── #
@@ -67,7 +80,9 @@ SRCS		= Main/Main.cpp										\
 																\
 			  Security/Password.cpp Security/Encryption.cpp		\
 																\
-			  Network/Connection.cpp
+			  Network/Connection.cpp							\
+																\
+			  Gui/MainWindow.cpp
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #
@@ -83,6 +98,12 @@ DEPS		= $(OBJS:.o=.d)
 
 _compile: $(OBJS)
 	@$(MAKE) -s _hide_cursor
+#	Check if gtkmm-4.0 is available
+	@if [ "$(GTKMM_PRESENT)" != "yes" ]; then \
+		printf "\t$(RED)Error: Gtkmm library not found$(NC)\n"; \
+		exit 1; \
+	fi
+
 #	Create folder
 	@mkdir -p $(BLD_DIR)
 
