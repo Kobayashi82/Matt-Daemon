@@ -13,7 +13,6 @@ MainWindow::MainWindow() :
 	_labelIP("IP:"),
 	_labelPort("Port:"),
 	_labelUsername("Username:"),
-	_labelVersion("Ben_AFK v1.0 - Matt_Daemon Client"),
 	_btnConnect("Connect"),
 	_btnDisconnect("Disconnect"),
 	_buttonSend("Send"),
@@ -27,8 +26,6 @@ MainWindow::MainWindow() :
 	set_default_size(500, 400);
 
 	// Widget flags
-	_labelVersion.set_halign(Gtk::Align::CENTER);
-	_labelVersion.set_markup("<b>Ben_AFK v1.0</b> - Matt_Daemon Client");
 	_entryUsername.set_placeholder_text("Username (optional)");
 	_entryUsername.set_text(getenv("USER") ? getenv("USER") : ""); // Current user by default
 	_checkInsecure.set_active(false); // Secure by default
@@ -66,7 +63,6 @@ MainWindow::MainWindow() :
 	_statusLabel.set_text("Disconnected");
 
 	// Add everything to main container
-	_vBox.append(_labelVersion);		// Version at top
 	_vBox.append(_HBoxConnection);		// IP and Port
 	_vBox.append(_userBox);				// Username
 	_vBox.append(_optionsBox);			// Options (insecure checkbox)

@@ -37,7 +37,6 @@ class MainWindow : public Gtk::Window
 		Gtk::Label			_labelIP;				// Label "IP:"
 		Gtk::Label			_labelPort;				// Label "Port:"
 		Gtk::Label			_labelUsername;			// Label "Username:"
-		Gtk::Label			_labelVersion;			// Show version
 		
 		// Connect/disconnect/send buttons
 		Gtk::Button			_btnConnect;			// Connect button
