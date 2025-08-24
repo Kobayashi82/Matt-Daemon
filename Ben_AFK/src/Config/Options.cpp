@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:04 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 22:33:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/24 13:01:38 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@
 			std::cerr << "This is free software: you are free to change and redistribute it.\n";
 			std::cerr << "There is NO WARRANTY, to the extent permitted by law.\n";
 			std::cerr << "\n";
-			std::cerr << "Written by Kobayashi82 (vzurera-).\n";
+			std::cerr << "Written by Kobayashi82 (vzurera-) & Rubén (rdelicad).\n";
 
 			return (1);
 		}
@@ -203,7 +203,7 @@
 			{"insecure",			no_argument,		0, 'k'},	// [-k, --insecure]
 			{"login",				required_argument,	0, 'l'},	// [-l, --login=USER]
 			{"port",				required_argument,	0, 'p'},	// [-p, --port=NUM]
-			{"gui",				no_argument,		0, 'g'},	// [-g, --gui]
+			{"gui",					no_argument,		0, 'g'},	// [-g, --gui]
 
 			{"help",				no_argument,		0, 'h'},	// [-h?, --help]
 			{"usage",				no_argument,		0, 'u'},	// [	--usage]
@@ -212,12 +212,12 @@
 		};
 
 		int opt;
-		while ((opt = getopt_long(argc, argv, "kgl:p:h?uV", long_options, NULL)) != -1) {
+		while ((opt = getopt_long(argc, argv, "kl:p:gh?uV", long_options, NULL)) != -1) {
 			switch (opt) {
 				case 'k':	insecure = true;										break;
-				case 'g':	gui_mode = true;										break;
 				case 'l':	user = std::string(optarg);								break;
 				case 'p':	if (!ft_strtoul(argv, optarg, &port, 65535, false))		break;					return (2);
+				case 'g':	gui_mode = true;										break;
 
 				case '?':	if (std::string(argv[optind - 1]) == "-?")				return (help());		return (invalid());
 				case 'h':															return (help());
