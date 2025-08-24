@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:04 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/24 13:01:38 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/24 13:02:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,7 +226,7 @@
 			}
 		}
 
-		if (optind >= argc) { std::cerr << PROGRAM_NAME << ": Missing host\n";										return (invalid()); }
+		if (optind >= argc) { std::cerr << PROGRAM_NAME << ": Missing host\n";								return (invalid()); }
 
 		if (parseUserHost(std::string(argv[optind])))														return (2);
 
