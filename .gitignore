@@ -16,6 +16,13 @@ Ben_AFK/build
 Ben_AFK/build/**
 Ben_AFK/Ben_AFK
 
+!Casey_AFK
+!Casey_AFK/**
+Casey_AFK/build
+Casey_AFK/build/**
+Casey_AFK/Casey_AFK
+
+
 !Ben_AFK_Term
 !Ben_AFK_Term/**
 Ben_AFK_Term/build

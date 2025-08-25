@@ -37,7 +37,7 @@ COUNTER 			= 0
 # ── NAME ── #
 # ────────── #
 
-NAME		= Ben_AFK
+NAME		= Casey_AFK
 
 # ─────────── #
 # ── FLAGS ── #
@@ -73,15 +73,7 @@ SRC_DIR		= src/
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= Main/Main.cpp										\
-																\
-			  Config/Options.cpp Config/Signals.cpp				\
-			  Config/RawMode.cpp								\
-																\
-			  Security/Password.cpp Security/Encryption.cpp		\
-																\
-			  Network/Connection.cpp							\
-																\
+SRCS		= Main/Main.cpp	Gui/MainWindow.cpp
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #

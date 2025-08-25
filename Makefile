@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-all: MattDaemon Ben_AFK
+all: MattDaemon Ben_AFK Casey_AFK
 
 MattDaemon: daemon
 server: daemon
@@ -27,25 +27,36 @@ client:
 	@$(MAKE) -s -C Ben_AFK all
 	@cp Ben_AFK/Ben_AFK bin/
 
+Casey_AFK: client_gui
+client_gui:
+	@clear
+	@mkdir -p bin
+	@$(MAKE) -s -C Casey_AFK all
+	@cp Casey_AFK/Casey_AFK bin/
+
 re:
 	@clear
 	@$(MAKE) -s -C MattDaemon re
 	@$(MAKE) -s -C Ben_AFK re
+	@$(MAKE) -s -C Casey_AFK re
 
 clean:
 	@clear
 	@$(MAKE) -s -C MattDaemon clean
 	@$(MAKE) -s -C Ben_AFK clean
+	@$(MAKE) -s -C Casey_AFK clean
 
 fclean:
 	@clear
 	@$(MAKE) -s -C MattDaemon fclean
 	@$(MAKE) -s -C Ben_AFK fclean
+	@$(MAKE) -s -C Casey_AFK fclean
 	@rm -rf bin
 
 wipe:
 	@$(MAKE) -s -C MattDaemon wipe
 	@$(MAKE) -s -C Ben_AFK wipe
+	@$(MAKE) -s -C Casey_AFK wipe
 	@rm -rf bin
 
-.PHONY: all MattDaemon daemon server Ben_AFK client fclean wipe re
+.PHONY: all MattDaemon daemon server Ben_AFK client fclean wipe re Casey_AFK

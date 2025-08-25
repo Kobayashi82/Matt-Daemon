@@ -18,9 +18,6 @@
 
 	#include "Network/Connection.hpp"
 
-	#include "Gui/MainWindow.hpp"
-	#include <gtkmm/application.h>
-
 	#include <iostream>															// std::cerr()
 	#include <unistd.h>															// close()
 	#include <errno.h>															// errno, EINTR
@@ -63,18 +60,6 @@
 
 		int result = 0;
 		if ((result = Options::parse(argc, argv))) return (result - 1);
-
-		if (Options::gui_mode) {
-			auto app = Gtk::Application::create("org.benafk.gui");
-			
-			app->signal_activate().connect([&]() {
-				MainWindow* window = new MainWindow();
-				app->add_window(*window);
-				window->show();
-			});
-			
-			return app->run();
-		}
 
 		if (socket_create()) return (1);
 		result = main_loop();
