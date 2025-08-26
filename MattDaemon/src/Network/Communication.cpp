@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/26 11:35:55 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/26 11:53:34 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,16 +83,16 @@
 							}
 
 							if (client->user.empty()) client->user = "Unknown";
+							long n = 10;
 							if (!msg.empty()) {
-								long n = 0;
 								try { n = std::stol(msg); }
 								catch (...) { n = 10; }
+							}
 
-								std::string response = Log->send_Casey_tail(client, n);
-								if (!response.empty()) {
-									client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
-									Epoll::set(client->fd, true, true);
-								}
+							std::string response = Log->send_Casey_tail(client, n);
+							if (!response.empty()) {
+								client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
+								Epoll::set(client->fd, true, true);
 							}
 
 							return (0);
