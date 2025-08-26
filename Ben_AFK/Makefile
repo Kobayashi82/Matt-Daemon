@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/15 16:49:47 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/18 22:59:33 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/26 10:07:47 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,19 +47,6 @@ CC			= clang++
 CFLAGS		= -Wall -Wextra -Werror -std=c++17
 CEFLAGS		= -lm -lcrypt
 
-# ────────────── #
-# ── GTKMM-4 ── #
-# ────────────── #
-
-GTKMM_PRESENT	= $(shell pkg-config --exists gtkmm-4.0 2>/dev/null && echo "yes" || echo "no")
-
-ifeq ($(GTKMM_PRESENT), yes)
-	GTKMM_CFLAGS	= $(shell pkg-config --cflags gtkmm-4.0)
-	GTKMM_LIBS		= $(shell pkg-config --libs gtkmm-4.0)
-	CFLAGS			+= $(GTKMM_CFLAGS)
-	CEFLAGS			+= $(GTKMM_LIBS)
-endif
-
 # ───────────────── #
 # ── DIRECTORIES ── #
 # ───────────────── #
@@ -80,8 +67,7 @@ SRCS		= Main/Main.cpp										\
 																\
 			  Security/Password.cpp Security/Encryption.cpp		\
 																\
-			  Network/Connection.cpp							\
-																\
+			  Network/Connection.cpp
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #
@@ -97,12 +83,6 @@ DEPS		= $(OBJS:.o=.d)
 
 _compile: $(OBJS)
 	@$(MAKE) -s _hide_cursor
-#	Check if gtkmm-4.0 is available
-	@if [ "$(GTKMM_PRESENT)" != "yes" ]; then \
-		printf "\t$(RED)Error: Gtkmm library not found$(NC)\n"; \
-		exit 1; \
-	fi
-
 #	Create folder
 	@mkdir -p $(BLD_DIR)
 
@@ -237,7 +217,6 @@ fclean:
 # ─────────── #
 
 _title:
-	@clear
 	@printf "\n$(NC)\t$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★\
 	$(INV_CYAN)   $(NC)$(INV_CYAN)$(shell echo $(NAME) | tr a-z A-Z | tr '_' ' ')$(INV_CYAN)    \
 	$(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(BG_CYAN)$(FG_YELLOW)★$(INV_CYAN) $(NC)\n"

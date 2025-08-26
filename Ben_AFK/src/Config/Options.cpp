@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 16:49:04 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/24 13:02:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/18 22:33:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@
 	int					Options::retries			= 3;						// Remaining password retry attempts
 	bool				Options::authenticated		= false;					// Authentication state (true if login successful)
 	size_t				Options::decryption_index	= 0;						// Index for continuous decryption key rotation
-	bool				Options::gui_mode			= false;					// Run in GUI mode (launch Gtk interface)
 
 	int					Options::sockfd				= -1;						// Socket file descriptor
 	char				Options::hostname[254];									// IP address or hostname
@@ -49,7 +48,7 @@
 	#pragma region "Help"
 
 		int Options::help() {
-			std::cerr << "Usage: " << PROGRAM_NAME << " [ OPTION... ] HOST...\n";
+			std::cerr << "Usage: " << NAME << " [ OPTION... ] HOST...\n";
 			std::cerr << "\n";
 			std::cerr << " Options:\n";
 			std::cerr << "\n";
@@ -57,7 +56,6 @@
 			std::cerr << "  -l,  --login=USERNAME       Login username                   (default: current user)\n";
 			std::cerr << "  -p,  --port=PORT            Port number to connect to        (default: 4242)\n";
 			std::cerr << "\n";
-			std::cerr << "  -g,  --gui                  Run in graphical (GUI) mode\n";
 			std::cerr << "  -h?, --help                 Display this help message\n";
       		std::cerr << "  -u,  --usage                Display short usage message\n";
   			std::cerr << "  -V,  --version              Show program version\n";
@@ -74,7 +72,8 @@
 	#pragma region "Usage"
 
 		int Options::usage() {
-			std::cerr << "Usage: " << PROGRAM_NAME << " [-k, --insecure] [-g, --gui] [-l USERNAME, --login=USERNAME] [-p PORT, --port=PORT]\n";
+			std::cerr << "Usage: " << NAME << " [-k, --insecure] [-l USERNAME, --login=USERNAME] [-p PORT, --port=PORT]\n";
+			std::cerr << "               [-h? --help] [-u --usage] [-V --version]\n";
 			std::cerr << "               HOST ...\n";
 
 			return (1);
@@ -85,13 +84,13 @@
 	#pragma region "Version"
 
 		int Options::version() {
-			std::cerr << PROGRAM_NAME << " 1.0\n";
+			std::cerr << NAME << " 1.0\n";
 			std::cerr << "Copyright (C) 2025 Kobayashi Corp ⓒ.\n";
 			std::cerr << "License WTFPL: DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE.\n";
 			std::cerr << "This is free software: you are free to change and redistribute it.\n";
 			std::cerr << "There is NO WARRANTY, to the extent permitted by law.\n";
 			std::cerr << "\n";
-			std::cerr << "Written by Kobayashi82 (vzurera-) & Rubén (rdelicad).\n";
+			std::cerr << "Written by Kobayashi82 (vzurera-).\n";
 
 			return (1);
 		}
@@ -203,7 +202,6 @@
 			{"insecure",			no_argument,		0, 'k'},	// [-k, --insecure]
 			{"login",				required_argument,	0, 'l'},	// [-l, --login=USER]
 			{"port",				required_argument,	0, 'p'},	// [-p, --port=NUM]
-			{"gui",					no_argument,		0, 'g'},	// [-g, --gui]
 
 			{"help",				no_argument,		0, 'h'},	// [-h?, --help]
 			{"usage",				no_argument,		0, 'u'},	// [	--usage]
@@ -212,12 +210,11 @@
 		};
 
 		int opt;
-		while ((opt = getopt_long(argc, argv, "kl:p:gh?uV", long_options, NULL)) != -1) {
+		while ((opt = getopt_long(argc, argv, "kl:p:h?uV", long_options, NULL)) != -1) {
 			switch (opt) {
 				case 'k':	insecure = true;										break;
 				case 'l':	user = std::string(optarg);								break;
 				case 'p':	if (!ft_strtoul(argv, optarg, &port, 65535, false))		break;					return (2);
-				case 'g':	gui_mode = true;										break;
 
 				case '?':	if (std::string(argv[optind - 1]) == "-?")				return (help());		return (invalid());
 				case 'h':															return (help());
@@ -226,7 +223,7 @@
 			}
 		}
 
-		if (optind >= argc) { std::cerr << PROGRAM_NAME << ": Missing host\n";								return (invalid()); }
+		if (optind >= argc) { std::cerr << NAME << ": Missing host\n";										return (invalid()); }
 
 		if (parseUserHost(std::string(argv[optind])))														return (2);
 

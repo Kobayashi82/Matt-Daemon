@@ -22,7 +22,7 @@
 
 #pragma region "Defines"
 
-	#define PROGRAM_NAME	"Ben_AFK"											// Name of the program
+	#define NAME	"Ben_AFK"													// Name of the program
 
 #pragma endregion
 
@@ -35,7 +35,6 @@
 			static bool					insecure;								// Allow unencrypted communications
 			static uint16_t				port;									// Port to listen for incoming connections
 			static std::string			user;									// Username to use for login
-			static bool					gui_mode;								// Run in GUI mode (launch Gtk interface)
 			static bool					encryption;								// Server requires encryption (true = encrypted, false = plain)
 			static int					retries;								// Remaining password retry attempts
 			static bool					authenticated;							// Authentication state (true if login successful)
