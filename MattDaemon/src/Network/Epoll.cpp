@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 22:21:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/26 10:11:28 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,7 +179,8 @@
 				if (events[i].events & EPOLLIN) {
 					switch (type) {
 						case MSG:	 	{ Communication::read_client(client);	break; }
-						case CLIENT: 	{ Communication::read_client(client);	break; }
+						case BEN: 		{ Communication::read_client(client);	break; }
+						case CASEY: 	{ Communication::read_client(client);	break; }
 						case SHELL:	 	{ Communication::read_shell(client);	break; }
 					}
 				}
@@ -187,7 +188,8 @@
 				if (events[i].events & EPOLLOUT) {
 					switch (type) {
 						case MSG: 		{ Communication::write_client(client);	break; }
-						case CLIENT: 	{ Communication::write_client(client);	break; }
+						case BEN:	 	{ Communication::write_client(client);	break; }
+						case CASEY:	 	{ Communication::write_client(client);	break; }
 						case SHELL:	 	{ Communication::write_shell(client);	break; }
 					}
 				}

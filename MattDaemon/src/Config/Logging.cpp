@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:53 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 22:20:16 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/26 11:41:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 	#include "Config/Options.hpp"
 	#include "Config/Logging.hpp"
+	#include "Network/Client.hpp"
+	#include "Network/Epoll.hpp"
 
 	#include <cstring>															// strerror()
 	#include <filesystem>														// path(), absolute(), exists(), create_directories()
@@ -90,7 +92,7 @@
 					_logPath = rhs._logPath;
 					_logLevel = rhs._logLevel;
 					createDirectory(_logPath);
-					_logFile.open(_logPath, std::ios::app);
+						_logFile.open(_logPath, std::ios::app);
 					if (!_logFile.is_open()) {
 						std::string errorMsg = "Cannot open log file: " + _logPath + " - " + strerror(errno);
 						throw std::runtime_error(errorMsg);
@@ -156,9 +158,65 @@
 
 	#pragma endregion
 
+	#pragma region "Send to Casey"
+		
+		#pragma region "Add"
+
+			void Tintin_reporter::add(const std::string& log) {
+				if (logs.size() >= MAX_LOGS) logs.pop_front();
+				logs.push_back(log);
+			}
+
+		#pragma endregion
+		
+		#pragma region "Get Last"
+
+			std::string Tintin_reporter::getLast(size_t n) const {
+				if (n > logs.size()) n = logs.size();
+
+				std::ostringstream oss;
+				auto start = logs.end() - n;
+				for (auto it = start; it != logs.end(); ++it) oss << *it;
+
+				return (oss.str());
+			}
+
+		#pragma endregion
+		
+		#pragma region "Send Casey"
+
+			void Tintin_reporter::send_Casey(const std::string& log) {
+				if (log.empty()) return;
+
+				for (auto &pair : clients) {
+					Client *client = pair.second.get();
+
+					if (client && client->type == CASEY) {
+						client->write_buffer.insert(client->write_buffer.end(), log.begin(), log.end());
+						Epoll::set(client->fd, true, true);
+					}
+				}
+			}
+
+		#pragma endregion
+		
+		#pragma region "Send Casey Tail"
+
+			std::string Tintin_reporter::send_Casey_tail(Client *client, long n) {
+				if (!client || client->type != CASEY || n < 1) return ("");
+				size_t lines = n;
+				if (lines > MAX_LOGS) lines = MAX_LOGS;
+
+				return (getLast(lines));
+			}
+
+		#pragma endregion
+
+	#pragma endregion
+
 	#pragma region "Logging"
 
-		void Tintin_reporter::debug(const std::string& msg) {
+		void Tintin_reporter::debug(const std::string& msg, Client *client) {
 			if (_logLevel > DEBUG) return;
 			std::lock_guard<std::mutex> lock(_mutex);
 			try {
@@ -167,10 +225,12 @@
 				if (!_logFile.is_open()) open();
 			}
 			rotateLog();
-			_logFile << "[" << getTimestamp() << "]      [ DEBUG ] - " << msg << std::endl;
+			std::string user = (client && client->type == CASEY && !client->user.empty()) ? client->user + ": " : "";
+			std::string log = "[" + getTimestamp() + "]      [ DEBUG ] - " + user + msg + "\n";
+			add(log); _logFile << log; send_Casey(log);
 		}
 
-		void Tintin_reporter::info(const std::string& msg) {
+		void Tintin_reporter::info(const std::string& msg, Client *client) {
 			if (_logLevel > INFO) return;
 			std::lock_guard<std::mutex> lock(_mutex);
 			try {
@@ -179,10 +239,12 @@
 				if (!_logFile.is_open()) open();
 			}
 			rotateLog();
-			_logFile << "[" << getTimestamp() << "]       [ INFO ] - " << msg << std::endl;
+			std::string user = (client && client->type == CASEY && !client->user.empty()) ? client->user + ": " : "";
+			std::string log = "[" + getTimestamp() + "]      [ INFO ] - " + user + msg + "\n";
+			add(log); _logFile << log; send_Casey(log);
 		}
 
-		void Tintin_reporter::log(const std::string& msg) {
+		void Tintin_reporter::log(const std::string& msg, Client *client) {
 			if (_logLevel > LOG) return;
 			std::lock_guard<std::mutex> lock(_mutex);
 			try {
@@ -191,10 +253,12 @@
 				if (!_logFile.is_open()) open();
 			}
 			rotateLog();
-			_logFile << "[" << getTimestamp() << "]        [ LOG ] - " << msg << std::endl;
+			std::string user = (client && client->type == CASEY && !client->user.empty()) ? client->user + ": " : "";
+			std::string log = "[" + getTimestamp() + "]      [ LOG ] - " + user + msg + "\n";
+			add(log); _logFile << log; send_Casey(log);
 		}
 
-		void Tintin_reporter::warning(const std::string& msg) {
+		void Tintin_reporter::warning(const std::string& msg, Client *client) {
 			if (_logLevel > WARNING) return;
 			std::lock_guard<std::mutex> lock(_mutex);
 			try {
@@ -203,10 +267,12 @@
 				if (!_logFile.is_open()) open();
 			}
 			rotateLog();
-			_logFile << "[" << getTimestamp() << "]    [ WARNING ] - " << msg << std::endl;
+			std::string user = (client && client->type == CASEY && !client->user.empty()) ? client->user + ": " : "";
+			std::string log = "[" + getTimestamp() + "]      [ WARNING ] - " + user + msg + "\n";
+			add(log); _logFile << log; send_Casey(log);
 		}
 
-		void Tintin_reporter::error(const std::string& msg) {
+		void Tintin_reporter::error(const std::string& msg, Client *client) {
 			if (_logLevel > ERROR) return;
 			std::lock_guard<std::mutex> lock(_mutex);
 			try {
@@ -215,10 +281,12 @@
 				if (!_logFile.is_open()) open();
 			}
 			rotateLog();
-			_logFile << "[" << getTimestamp() << "]      [ ERROR ] - " << msg << std::endl;
+			std::string user = (client && client->type == CASEY && !client->user.empty()) ? client->user + ": " : "";
+			std::string log = "[" + getTimestamp() + "]      [ ERROR ] - " + user + msg + "\n";
+			add(log); _logFile << log; send_Casey(log);
 		}
 
-		void Tintin_reporter::critical(const std::string& msg) {
+		void Tintin_reporter::critical(const std::string& msg, Client *client) {
 			if (_logLevel > CRITICAL) return;
 			std::lock_guard<std::mutex> lock(_mutex);
 			try {
@@ -227,7 +295,9 @@
 				if (!_logFile.is_open()) open();
 			}
 			rotateLog();
-			_logFile << "[" << getTimestamp() << "]   [ CRITICAL ] - " << msg << std::endl;
+			std::string user = (client && client->type == CASEY && !client->user.empty()) ? client->user + ": " : "";
+			std::string log = "[" + getTimestamp() + "]      [ CRITICAL ] - " + user + msg + "\n";
+			add(log); _logFile << log; send_Casey(log);
 		}
 
 	#pragma endregion

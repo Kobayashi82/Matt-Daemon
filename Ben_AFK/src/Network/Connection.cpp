@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 21:41:05 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 22:40:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/26 10:12:24 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@
 			close(Options::sockfd); return (1);	
 		}
 
-		send_data("/CLIENT_SHELL_AUTH");
+		send_data("/BEN");
 
 		return (0);
 	}

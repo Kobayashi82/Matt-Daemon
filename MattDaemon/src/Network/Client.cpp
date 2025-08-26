@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:01 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/19 19:26:58 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/26 10:10:38 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@
 			Log->info("Client: [" + ip + ":" + std::to_string(port) + "] connection time-out");
 
 			std::string response;
-			if (type == CLIENT) {
+			if (type == BEN) {
 				if (!Options::disabledEncryption)	response = encrypt_with_index("\n\rConnection time-out\n", encryption_index);
 				else								response = "\n\rConnection time-out\n";
 			} else response = "Connection time-out\n";

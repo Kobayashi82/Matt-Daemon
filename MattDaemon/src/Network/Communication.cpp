@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 23:23:58 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/26 11:35:55 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,43 @@
 							return (0);
 						}
 
-						if (msg == "/CLIENT_SHELL_AUTH") {
-							Log->info("Client: [" + client->ip + ":" + std::to_string(client->port) + "] wants to open a shell");
+						if (msg.substr(0, 6) == "/CASEY") {
+							Log->info("Client: [" + client->ip + ":" + std::to_string(client->port) + "] is a Casey_AFK client");
+							client->type = CASEY;
+
+							size_t pos = msg.find("user=", 6);
+							if (pos != std::string::npos) {
+								pos += 5;
+								size_t end = msg.find_first_of(" \t\n\v\f", pos);
+								if (end == std::string::npos) {
+									client->user = msg.substr(pos);
+									msg.clear();
+								} else {
+									client->user = msg.substr(pos, end - pos);
+									msg = msg.substr(end);
+								}
+							}
+
+							if (client->user.empty()) client->user = "Unknown";
+							if (!msg.empty()) {
+								long n = 0;
+								try { n = std::stol(msg); }
+								catch (...) { n = 10; }
+
+								std::string response = Log->send_Casey_tail(client, n);
+								if (!response.empty()) {
+									client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
+									Epoll::set(client->fd, true, true);
+								}
+							}
+
+							return (0);
+						}
+
+						if (msg == "/BEN") {
+							Log->info("Client: [" + client->ip + ":" + std::to_string(client->port) + "] is a Ben_AFK client");
 							std::string response;
-							client->type = CLIENT;
+							client->type = BEN;
 
 							if (Options::disabledShell) {
 								Log->warning("Client: [" + client->ip + ":" + std::to_string(client->port) + "] shell is disabled, rejecting connection");
@@ -89,7 +122,30 @@
 						return (0);
 					}
 
-					if (client->type == CLIENT) {
+					if (client->type == CASEY) {
+						std::string msg = std::string(buffer, buffer + bytes_read);
+						if (!msg.empty() && msg.back() == '\n') msg.pop_back();
+
+						if (msg.substr(0, 4) == "/LOG") {
+							if (msg.length() > 4) {
+								long n = 0;
+								try { n = std::stol(msg.substr(4)); }
+								catch (...) { n = 10; }
+
+								std::string response = Log->send_Casey_tail(client, n);
+								if (!response.empty()) {
+									client->write_buffer.insert(client->write_buffer.end(), response.begin(), response.end());
+									Epoll::set(client->fd, true, true);
+								}
+							}
+							return (0);
+						}
+
+						if (msg.find_first_not_of(" \t\n\r") != std::string::npos) Log->log(msg, client);
+						return (0);
+					}
+
+					if (client->type == BEN) {
 						std::string msg = std::string(buffer, buffer + bytes_read);
 						try {
 							if (!Options::disabledEncryption) msg = decrypt(msg);
@@ -136,7 +192,7 @@
 									Log->debug("Client: [" + client->ip + ":" + std::to_string(client->port) + "] terminal size: " + std::to_string(client->terminal_cols) + "x" + std::to_string(client->terminal_rows));
 
 									// If authenticated, shell not running and client not dying, start shell
-									if (client->type == CLIENT && client->authenticated && !client->shell_running && !client->diying && !shell_start(client)) return (0);
+									if (client->type == BEN && client->authenticated && !client->shell_running && !client->diying && !shell_start(client)) return (0);
 
 								} catch (const std::exception& e) { Log->warning("Client: [" + client->ip + ":" + std::to_string(client->port) + "] invalid terminal size format"); }
 							}

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:17:12 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/18 22:25:13 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/26 10:10:27 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 
 #pragma region "Enumarators"
 
-	enum e_client_type { MSG, CLIENT, SHELL };
+	enum e_client_type { MSG, BEN, CASEY, SHELL };
 
 #pragma endregion
 
@@ -37,7 +37,7 @@
 			std::string			ip;												// IP address of the client
 			int					port;											// Port number of the client
 			int					sock_fd;										// FD of the socket
-			int					type;											// Type of client (MSG, CLIENT, SHELL)
+			int					type;											// Type of client (MSG, BEN, CASEY, SHELL)
 			time_t				last_activity;									// Timestamp of the last activity
 			bool				diying;											// Flag indicating client is being removed
 			std::string			user;											// Username for authentication
