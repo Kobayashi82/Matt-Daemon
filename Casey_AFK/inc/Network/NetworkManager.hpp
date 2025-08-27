@@ -31,6 +31,7 @@ public:
 
     // Dispatcher for GUI communication
     Glib::Dispatcher& getDispatcher() { return _dispatcher; }
+    Glib::Dispatcher& getDisconnectDispatcher() { return _disconnectDispatcher; }
     std::string getPendingData();
 
 private:
@@ -40,6 +41,7 @@ private:
     std::thread _recvThread;
     std::atomic<bool> _running;
     Glib::Dispatcher _dispatcher;
+    Glib::Dispatcher _disconnectDispatcher;
     std::mutex _dataMutex;
     std::string _pendingData;
 };

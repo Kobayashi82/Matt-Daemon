@@ -63,6 +63,7 @@ MainWindow::MainWindow() :
 
 	// Conectar el dispatcher para comunicación segura entre hilos
 	_networkManager.getDispatcher().connect(sigc::mem_fun(*this, &MainWindow::onLogReceived));
+	_networkManager.getDisconnectDispatcher().connect(sigc::mem_fun(*this, &MainWindow::onConnectionLost));
 
 	setConnectedState(false);
 }
@@ -179,4 +180,10 @@ void MainWindow::quitButton() {
     });
 
     dialog->present();
+}
+
+void MainWindow::onConnectionLost() {
+	_statusLabel.set_text("Connection lost");
+	setConnectedState(false);
+	_networkManager.disconnectFromServer();
 }

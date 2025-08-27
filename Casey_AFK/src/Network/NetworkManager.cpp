@@ -116,10 +116,12 @@ void NetworkManager::receiveDataLoop() {
             _dispatcher.emit();
         } else if (n == 0) {
             _running = false;
+            _disconnectDispatcher.emit();
             break;
         } else {
             std::cerr << "Receive error: " << strerror(errno) << std::endl;
             _running = false;
+            _disconnectDispatcher.emit();
             break;
         }
     }

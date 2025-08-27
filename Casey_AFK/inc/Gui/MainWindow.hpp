@@ -39,6 +39,7 @@ private:
 	void disconnectButton();       // Handles disconnect event
 	void quitButton();             // Handles close server event
 	void sendButton();             // Handles send message event
+	void onConnectionLost();       // Handles connection lost event
 	void setConnectedState(bool connected); // Changes widget states
 	void onLogReceived();          // Handles log arrival from thread
 };
