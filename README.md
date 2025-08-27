@@ -374,7 +374,6 @@ sudo ./MattDaemon --port 1234
 
 ### Cliente Gráfico Casey_AFK
 - **Framework**: GTK 3
-- **Arquitectura**: Cliente-servidor TCP
 - **Funcionalidades**: Visualización de logs, envío de mensajes, control remoto
 - **Compatibilidad**: Linux con entorno gráfico
 
