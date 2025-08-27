@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/26 11:53:34 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/27 18:27:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,12 @@
 						std::string msg = std::string(buffer, buffer + bytes_read);
 						if (!msg.empty() && msg.back() == '\n') msg.pop_back();
 
+						if (msg == "/QUIT") {
+							Log->warning(client->user + ": wants to close the daemon");
+							Epoll::Running = false;
+
+							return (0);
+						}
 						if (msg.substr(0, 4) == "/LOG") {
 							if (msg.length() > 4) {
 								long n = 0;
