@@ -13,7 +13,7 @@
 
 ## 🎯 Descripción
 
-`Matt Daemon` es un proyecto de `42 School` que implementa un daemon completo de comunicación por red. Este daemon funciona como un servicio en segundo plano que escucha en un puerto específico, registra todas las actividades en archivos de log y proporciona capacidades avanzadas de comunicación segura.
+`Matt Daemon` es un proyecto de `42 School` que implementa un daemon completo de comunicación por red. Este daemon funciona como un servicio en segundo plano que escucha en un puerto específico, registra todas las actividades en archivos de log y proporciona capacidades avanzadas de comunicación segura. El proyecto incluye tanto un cliente de shell remoto como un cliente gráfico para gestión de logs.
 
 ## ✨ Características
 
@@ -25,6 +25,7 @@
 - **Control de Timeout**: Gestión de conexiones inactivas
 - **Multi-Cliente**: Permite conexiones simultáneas (por defecto: 3)
 - **Shell Interactivo**: Acceso completo a shell remoto (Ben_AFK)
+- **Cliente Gráfico**: Interfaz GTK para visualización y envío de logs (Casey_AFK)
 
 ## 🔧 Instalación
 
@@ -36,6 +37,10 @@ make
 # Ejecutables generados:
 # MattDaemon    - El daemon principal
 # Ben_AFK       - Cliente de shell remoto
+# Casey_AFK     - Cliente gráfico de logs
+
+# Dependencias para Casey_AFK
+sudo apt-get install libgtk-3-dev
 ```
 
 ## 🖥️ Uso
@@ -152,6 +157,49 @@ quit
 ./Ben_AFK --login admin --port 1234 --insecure localhost
 ```
 
+### Ejecución de Casey_AFK (Cliente Gráfico)
+
+#### Características:
+
+- **Interfaz Gráfica**: Cliente GTK para gestión visual de logs
+- **Conexión Intuitiva**: Interfaz simple para conectar al daemon
+- **Visualización de Logs**: Recibe y muestra los últimos logs del servidor
+- **Envío de Mensajes**: Permite enviar logs personalizados al daemon
+- **Control Remoto**: Capacidad de cerrar el daemon desde la interfaz
+
+#### Uso básico:
+
+```bash
+# Ejecutar cliente gráfico
+./Casey_AFK
+
+# El programa abrirá una ventana con campos para:
+# - Host:    dirección del servidor (ej: localhost)
+# - Puerto:  puerto de conexión (por defecto: 4242)  
+# - Usuario: nombre de usuario para identificación
+```
+
+#### Funcionalidades de la interfaz:
+
+- **Conectar**: Establece conexión con el daemon y recibe logs recientes
+- **Campo de Mensaje**: Área de texto para escribir mensajes personalizados
+- **Enviar Log**: Botón para enviar el mensaje al daemon como entrada de log
+- **Cerrar Servidor**: Botón para enviar la órden de cierre al daemon
+- **Desconectar**: Finaliza la conexión con el daemon
+- **Área de Logs**: Ventana que muestra los logs recibidos del servidor
+
+#### Flujo de trabajo típico:
+
+```bash
+1. Ejecutar el daemon: sudo ./MattDaemon
+2. Abrir Casey_AFK: ./Casey_AFK
+3. Introducir datos de conexión (localhost, 4242, tu_usuario)
+4. Hacer clic en "Conectar"
+5. Ver los logs existentes en el área de visualización
+6. Enviar mensajes usando el campo de texto
+7. Cerrar servidor remotamente si es necesario
+```
+
 ## 🧪 Testing
 
 ### Pruebas Básicas
@@ -222,42 +270,82 @@ sudo ./MattDaemon --disable-encryption
 ./Ben_AFK --insecure localhost
 ```
 
+### Pruebas de Casey_AFK (Cliente Gráfico)
+
+```bash
+# Test de interfaz gráfica
+./Casey_AFK
+# Verificar que la ventana se abre correctamente
+
+# Test de conexión básica
+sudo ./MattDaemon --log-level DEBUG
+./Casey_AFK
+# Conectar usando localhost:4242
+
+# Test de envío de logs
+# 1. Conectar con Casey_AFK
+# 2. Escribir mensaje en el campo de texto
+# 3. Hacer clic en "Enviar Log"
+# 4. Verificar en los logs del daemon
+
+# Test de visualización de logs
+# 1. Enviar varios mensajes con nc o Ben_AFK
+# 2. Conectar con Casey_AFK
+# 3. Verificar que los logs aparecen en la interfaz
+
+# Test de cierre remoto
+./Casey_AFK
+# 1. Conectar al daemon
+# 2. Hacer clic en "Cerrar Servidor"
+# 3. Verificar que el daemon termina correctamente
+
+# Test con puerto personalizado
+sudo ./MattDaemon --port 1234
+./Casey_AFK
+# Cambiar puerto a 1234 en la interfaz y conectar
+
+# Test de manejo de errores
+./Casey_AFK
+# Intentar conectar sin daemon ejecutándose
+# Verificar que muestra error apropiado
+```
+
 ## 📝 Ejemplos de Log
 
 ```
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Initiating
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: First fork() completed
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: setsid() completed
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Second fork() completed
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: All signal handlers successfully installed
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: umask() set
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Working directory changed
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Standard file descriptors closed
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Lock set
-[18/08/2025-20:49:54]       [ INFO ] - Daemon: Started
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Epoll initialized
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Socket created
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Socket reusable option set
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Socket bind set
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Socket listen set
-[18/08/2025-20:49:54]      [ DEBUG ] - Daemon: Socket added to Epoll
-[18/08/2025-20:49:54]       [ INFO ] - Daemon: Listening on port 4242
-[18/08/2025-20:50:11]       [ INFO ] - Client: [127.0.0.1:49206] connected
-[18/08/2025-20:50:11]      [ DEBUG ] - Client: [127.0.0.1:44438] added to Epoll
-[18/08/2025-20:50:11]       [ INFO ] - Client: [127.0.0.1:49206] wants to open a shell
-[18/08/2025-20:50:14]    [ WARNING ] - Client: [127.0.0.1:49206] authorization failed for user: vzurera
-[18/08/2025-20:50:21]       [ INFO ] - Client: [127.0.0.1:49206] authorization successful for user: vzurera
-[18/08/2025-20:50:21]      [ DEBUG ] - Client: [127.0.0.1:49206] terminal size: 114x28
-[18/08/2025-20:50:21]       [ INFO ] - Client: [127.0.0.1:49206] shell started with PID 48675 and PTY: /dev/pts/6
-[18/08/2025-20:50:25]      [ DEBUG ] - Client: [127.0.0.1:49206] shell process 48675 terminated
-[18/08/2025-20:50:25]      [ DEBUG ] - Client: [127.0.0.1:49206] scheduled for deferred removal
-[18/08/2025-20:50:25]       [ INFO ] - Client: [127.0.0.1:49206] disconnected
-[18/08/2025-20:50:31]       [ INFO ] - Client: [127.0.0.1:44438] connected
-[18/08/2025-20:50:31]      [ DEBUG ] - Client: [127.0.0.1:44438] added to Epoll
-[18/08/2025-20:50:36]        [ LOG ] - Input: Mensaje de prueba
-[18/08/2025-20:50:38]    [ WARNING ] - Client: [127.0.0.1:44438] wants to close the daemon
-[18/08/2025-20:50:38]      [ DEBUG ] - Daemon: Socket close
-[18/08/2025-20:50:38]       [ INFO ] - Daemon: Closed
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: Initiating
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: First fork() completed
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: setsid() completed
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: Second fork() completed
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: All signal handlers successfully installed
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: umask() set
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: Working directory changed
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: Standard file descriptors closed
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: Lock set
+[18/08/2025-20:49:54]       [ INFO ]    Daemon: Started
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: Epoll initialized
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: Socket created
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: Socket reusable option set
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: Socket bind set
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: Socket listen set
+[18/08/2025-20:49:54]      [ DEBUG ]    Daemon: Socket added to Epoll
+[18/08/2025-20:49:54]       [ INFO ]    Daemon: Listening on port 4242
+[18/08/2025-20:50:11]       [ INFO ]    Client: [127.0.0.1:49206] connected
+[18/08/2025-20:50:11]      [ DEBUG ]    Client: [127.0.0.1:44438] added to Epoll
+[18/08/2025-20:50:11]       [ INFO ]    Client: [127.0.0.1:49206] wants to open a shell
+[18/08/2025-20:50:14]       [ WARN ]    Client: [127.0.0.1:49206] authorization failed for user: vzurera
+[18/08/2025-20:50:21]       [ INFO ]    Client: [127.0.0.1:49206] authorization successful for user: vzurera
+[18/08/2025-20:50:21]      [ DEBUG ]    Client: [127.0.0.1:49206] terminal size: 114x28
+[18/08/2025-20:50:21]       [ INFO ]    Client: [127.0.0.1:49206] shell started with PID 48675 and PTY: /dev/pts/6
+[18/08/2025-20:50:25]      [ DEBUG ]    Client: [127.0.0.1:49206] shell process 48675 terminated
+[18/08/2025-20:50:25]      [ DEBUG ]    Client: [127.0.0.1:49206] scheduled for deferred removal
+[18/08/2025-20:50:25]       [ INFO ]    Client: [127.0.0.1:49206] disconnected
+[18/08/2025-20:50:31]       [ INFO ]    Client: [127.0.0.1:44438] connected
+[18/08/2025-20:50:31]      [ DEBUG ]    Client: [127.0.0.1:44438] added to Epoll
+[18/08/2025-20:50:36]        [ LOG ]    Input: Mensaje de prueba
+[18/08/2025-20:50:38]       [ WARN ]    Client: [127.0.0.1:44438] wants to close the daemon
+[18/08/2025-20:50:38]      [ DEBUG ]    Daemon: Socket close
+[18/08/2025-20:50:38]       [ INFO ]    Daemon: Closed
 ```
 
 ## 🏗️ Arquitectura Técnica
@@ -284,11 +372,19 @@ sudo ./MattDaemon --disable-encryption
 - **Rotación**: Automática basada en tamaño y cantidad de archivos
 - **Ubicación**: Configurable (por defecto: /var/log/matt_daemon/matt_daemon.log)
 
+### Cliente Gráfico Casey_AFK
+- **Framework**: GTK 3
+- **Arquitectura**: Cliente-servidor TCP
+- **Funcionalidades**: Visualización de logs, envío de mensajes, control remoto
+- **Compatibilidad**: Linux con entorno gráfico
+
 ### Errores Comunes
 - **Permisos insuficientes**: El daemon requiere permisos de root
 - **Puerto ocupado**: Verificar que el puerto especificado esté libre
 - **Archivo bloqueado**: Solo una instancia puede ejecutarse
-- **Host desconocido**: Verificar que el hostname/IP sea válido (Ben_AFK)
+- **Host desconocido**: Verificar que el hostname/IP sea válido (Ben_AFK/Casey_AFK)
+- **Dependencias GTK**: Casey_AFK requiere librerías GTK instaladas
+- **Servidor X no disponible**: Casey_AFK necesita entorno gráfico
 
 ## 📄 Licencia
 
@@ -300,6 +396,6 @@ Este proyecto está licenciado bajo la WTFPL – [Do What the Fuck You Want to P
 
 **🌍 Desarrollado como parte del curriculum de 42 School 🌍**
 
-*"Because background processes need style too"*
+*"Because background processes need style too... and a GUI"*
 
 </div>
