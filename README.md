@@ -30,7 +30,7 @@
 ## 🔧 Instalación
 
 ```bash
-git clone https://github.com/Kobayashi82/Matt-Daemon.git
+git clone https://github.com/Kobayashi82/MattDaemon.git
 cd Matt-Daemon
 make
 
