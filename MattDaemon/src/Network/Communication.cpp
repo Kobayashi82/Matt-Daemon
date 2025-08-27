@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 21:46:19 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/27 18:27:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/27 21:24:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@
 						}
 
 						if (msg.substr(0, 6) == "/CASEY") {
-							Log->info("Client: [" + client->ip + ":" + std::to_string(client->port) + "] is a Casey_AFK client");
+							Log->debug("Client: [" + client->ip + ":" + std::to_string(client->port) + "] is a Casey_AFK client");
 							client->type = CASEY;
 
 							size_t pos = msg.find("user=", 6);
@@ -83,10 +83,10 @@
 							}
 
 							if (client->user.empty()) client->user = "Unknown";
-							long n = 10;
+							long n = Log->MAX_LOGS;
 							if (!msg.empty()) {
 								try { n = std::stol(msg); }
-								catch (...) { n = 10; }
+								catch (...) { n = Log->MAX_LOGS; }
 							}
 
 							std::string response = Log->send_Casey_tail(client, n);
@@ -99,7 +99,7 @@
 						}
 
 						if (msg == "/BEN") {
-							Log->info("Client: [" + client->ip + ":" + std::to_string(client->port) + "] is a Ben_AFK client");
+							Log->debug("Client: [" + client->ip + ":" + std::to_string(client->port) + "] is a Ben_AFK client");
 							std::string response;
 							client->type = BEN;
 

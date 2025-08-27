@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:17 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/26 11:25:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/27 21:23:53 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@
 	class Tintin_reporter {
 
 		public:
+
+		    static constexpr size_t	MAX_LOGS = 255;
 
 			//	Constructors
 			Tintin_reporter(const std::string& logPath, uint8_t logLevel);		// Parameterized constructor
@@ -64,7 +66,6 @@
 			std::mutex		_mutex;												// Mutex for thread-safe logging
 
 			std::deque<std::string>	logs;
-    		static constexpr size_t	MAX_LOGS = 255;
 
 			// Methods
 			void			open();												// Opens or creates the log file in append mode

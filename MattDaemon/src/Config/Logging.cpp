@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:28:53 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/08/26 11:41:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/27 21:08:48 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,7 +226,7 @@
 			}
 			rotateLog();
 			std::string user = (client && client->type == CASEY && !client->user.empty()) ? client->user + ": " : "";
-			std::string log = "[" + getTimestamp() + "]      [ DEBUG ] - " + user + msg + "\n";
+			std::string log = "[" + getTimestamp() + "]\t[ DEBUG ]\t\t" + user + msg + "\n";
 			add(log); _logFile << log; send_Casey(log);
 		}
 
@@ -240,7 +240,7 @@
 			}
 			rotateLog();
 			std::string user = (client && client->type == CASEY && !client->user.empty()) ? client->user + ": " : "";
-			std::string log = "[" + getTimestamp() + "]      [ INFO ] - " + user + msg + "\n";
+			std::string log = "[" + getTimestamp() + "]\t[ INFO ]\t\t" + user + msg + "\n";
 			add(log); _logFile << log; send_Casey(log);
 		}
 
@@ -254,7 +254,7 @@
 			}
 			rotateLog();
 			std::string user = (client && client->type == CASEY && !client->user.empty()) ? client->user + ": " : "";
-			std::string log = "[" + getTimestamp() + "]      [ LOG ] - " + user + msg + "\n";
+			std::string log = "[" + getTimestamp() + "]\t[ LOG ] \t\t" + user + msg + "\n";
 			add(log); _logFile << log; send_Casey(log);
 		}
 
@@ -268,7 +268,7 @@
 			}
 			rotateLog();
 			std::string user = (client && client->type == CASEY && !client->user.empty()) ? client->user + ": " : "";
-			std::string log = "[" + getTimestamp() + "]      [ WARNING ] - " + user + msg + "\n";
+			std::string log = "[" + getTimestamp() + "]\t[ WARN ]\t\t" + user + msg + "\n";
 			add(log); _logFile << log; send_Casey(log);
 		}
 
@@ -282,7 +282,7 @@
 			}
 			rotateLog();
 			std::string user = (client && client->type == CASEY && !client->user.empty()) ? client->user + ": " : "";
-			std::string log = "[" + getTimestamp() + "]      [ ERROR ] - " + user + msg + "\n";
+			std::string log = "[" + getTimestamp() + "]\t[ ERROR ]\t\t" + user + msg + "\n";
 			add(log); _logFile << log; send_Casey(log);
 		}
 
@@ -296,7 +296,7 @@
 			}
 			rotateLog();
 			std::string user = (client && client->type == CASEY && !client->user.empty()) ? client->user + ": " : "";
-			std::string log = "[" + getTimestamp() + "]      [ CRITICAL ] - " + user + msg + "\n";
+			std::string log = "[" + getTimestamp() + "]\t[ CRIT ]\t\t" + user + msg + "\n";
 			add(log); _logFile << log; send_Casey(log);
 		}
 
