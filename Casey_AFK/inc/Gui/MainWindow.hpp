@@ -1,50 +1,44 @@
 #pragma once
 #include <gtkmm.h>
-#include <thread>
-#include <atomic>
-#include <mutex>
-#include <glibmm/dispatcher.h>
+#include "Network/NetworkManager.hpp"
+#include "Log/LogHandler.hpp"
 
 // ===============================
-//  Ventana principal Casey_AFK
+//  Casey_AFK Main Window
 // ===============================
 class MainWindow : public Gtk::Window {
 public:
-	MainWindow();              // Constructor: inicializa la interfaz
+	MainWindow();              // Constructor: initializes the interface
 	virtual ~MainWindow();     // Destructor
 
 private:
-	// --- Widgets principales ---
-	Gtk::Box _vBox;                // Contenedor vertical principal
-	Gtk::Box _HBoxConnection;      // Contenedor horizontal para IP, puerto, usuario y botones
-	Gtk::Label _labelIP;           // Etiqueta "IP:"
-	Gtk::Label _labelPort;         // Etiqueta "Puerto:"
-	Gtk::Label _labelUser;         // Etiqueta "Usuario:"
-	Gtk::Entry _entryIP;           // Entrada de dirección IP o host
-	Gtk::Entry _entryPort;         // Entrada de puerto
-	Gtk::Entry _entryUser;         // Entrada de nombre de usuario
-	Gtk::Button _btnConnect;       // Botón "Conectar"
-	Gtk::Button _btnDisconnect;    // Botón "Desconectar"
-	Gtk::ScrolledWindow _scrolledWindow; // Área de scroll para logs
-	Gtk::TextView _textView;       // Cuadro de texto solo lectura para logs
-	Gtk::Entry _entryMessage;      // Campo de entrada para mensajes
-	Gtk::Button _buttonSend;       // Botón para enviar mensajes
-	Gtk::Label _statusLabel;       // Etiqueta de estado (conectado/desconectado)
+	// --- Main Widgets ---
+	Gtk::Box _vBox;                // Main vertical container
+	Gtk::Box _HBoxConnection;      // Horizontal container for IP, port, user and buttons
+	Gtk::Label _labelIP;           // "IP:" label
+	Gtk::Label _labelPort;         // "Port:" label
+	Gtk::Label _labelUser;         // "Username:" label
+	Gtk::Entry _entryIP;           // IP address or host entry
+	Gtk::Entry _entryPort;         // Port entry
+	Gtk::Entry _entryUser;         // Username entry
+	Gtk::Button _btnConnect;       // "Connect" button
+	Gtk::Button _btnDisconnect;    // "Disconnect" button
+	Gtk::Button _btnQuit;          // "Close Server" button
+	Gtk::ScrolledWindow _scrolledWindow; // Scroll area for logs
+	Gtk::TextView _textView;       // Read-only text area for logs
+	Gtk::Entry _entryMessage;      // Message input field
+	Gtk::Button _buttonSend;       // Send message button
+	Gtk::Label _statusLabel;       // Status label (connected/disconnected)
 
-	// --- Estado de red ---
-	int _sockfd = -1;              // Descriptor del socket
+	// --- Modular Components ---
+	NetworkManager _networkManager; // Handles network connections
+	LogHandler _logHandler;         // Handles log processing
 
-	// --- Hilo y comunicación con GUI ---
-	std::thread _recvThread;       // Hilo de recepción de logs
-	std::atomic<bool> _running;    // Control de ejecución del hilo
-	Glib::Dispatcher _dispatcher;  // Dispatcher para avisar a la GUI
-	std::mutex _logMutex;          // Mutex para acceso a logs pendientes
-	std::string _pendingLogs;      // Buffer de logs pendientes
-
-	// --- Métodos de eventos ---
-	void connectButton();          // Maneja el evento de conectar
-	void disconnectButton();       // Maneja el evento de desconectar
-	void sendButton();             // Maneja el evento de enviar mensaje
-	void setConnectedState(bool connected); // Cambia el estado de los widgets
-	void onLogReceived();          // Maneja la llegada de logs desde el hilo
+	// --- Event Methods ---
+	void connectButton();          // Handles connect event
+	void disconnectButton();       // Handles disconnect event
+	void quitButton();             // Handles close server event
+	void sendButton();             // Handles send message event
+	void setConnectedState(bool connected); // Changes widget states
+	void onLogReceived();          // Handles log arrival from thread
 };

@@ -73,7 +73,7 @@ SRC_DIR		= src/
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= Main/Main.cpp	Gui/MainWindow.cpp
+SRCS		= Main/Main.cpp	Gui/MainWindow.cpp	Network/NetworkManager.cpp	Log/LogHandler.cpp
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #
