@@ -31,10 +31,10 @@
 
 ```bash
 git clone https://github.com/Kobayashi82/MattDaemon.git
-cd Matt-Daemon
+cd MattDaemon
 make
 
-# Ejecutables generados:
+# Ejecutables generados en la carpeta bin/:
 # MattDaemon    - El daemon principal
 # Ben_AFK       - Cliente de shell remoto
 # Casey_AFK     - Cliente gráfico de logs
