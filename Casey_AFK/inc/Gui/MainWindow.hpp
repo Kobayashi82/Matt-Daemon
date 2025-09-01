@@ -23,12 +23,16 @@ private:
 	Gtk::Entry _entryUser;         // Username entry
 	Gtk::Button _btnConnect;       // "Connect" button
 	Gtk::Button _btnDisconnect;    // "Disconnect" button
+	Gtk::Button _btnClearLogs;     // "Clear logs" button
 	Gtk::Button _btnQuit;          // "Close Server" button
 	Gtk::ScrolledWindow _scrolledWindow; // Scroll area for logs
 	Gtk::TextView _textView;       // Read-only text area for logs
 	Gtk::Entry _entryMessage;      // Message input field
 	Gtk::Button _buttonSend;       // Send message button
 	Gtk::Label _statusLabel;       // Status label (connected/disconnected)
+	Gtk::Label _labelNumLogs;	   // "Logs:" label
+	Gtk::Entry _entryLogs;		   // Number logs max
+		
 
 	// --- Modular Components ---
 	NetworkManager _networkManager; // Handles network connections
@@ -42,4 +46,5 @@ private:
 	void onConnectionLost();       // Handles connection lost event
 	void setConnectedState(bool connected); // Changes widget states
 	void onLogReceived();          // Handles log arrival from thread
+	void clearLogsButton();        // Handles clear logs
 };

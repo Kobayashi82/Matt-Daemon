@@ -22,7 +22,7 @@ NetworkManager::~NetworkManager() {
     disconnectFromServer();
 }
 
-bool NetworkManager::connectToServer(const std::string& ip, int port, const std::string& user) {
+bool NetworkManager::connectToServer(const std::string& ip, int port, const std::string& user, int numLogs) {
     // Create socket
     _sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (_sockfd < 0) {
@@ -51,7 +51,8 @@ bool NetworkManager::connectToServer(const std::string& ip, int port, const std:
     }
 
     // Send initial message
-    std::string msg = "/CASEY user=" + user + " 10\n";
+    std::string msg = "/CASEY user=" + user + " " + std::to_string(numLogs) + "\n";
+    
     if (send(_sockfd, msg.c_str(), msg.size(), 0) < 0) {
         std::cerr << "Failed to send initial message" << std::endl;
         ::close(_sockfd);

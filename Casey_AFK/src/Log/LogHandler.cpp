@@ -34,8 +34,8 @@ std::string LogHandler::processLogs(const std::string& rawLogs) {
 }
 
 std::string LogHandler::formatLogLine(const std::string& line) {
-    // Add [LOG] prefix to server messages
-    return "[LOG] " + line;
+    // Server messages without prefix
+    return line;
 }
 
 void LogHandler::appendToDisplay(const std::string& text) {
@@ -44,6 +44,10 @@ void LogHandler::appendToDisplay(const std::string& text) {
 
 std::string LogHandler::getDisplayText() const {
     return _displayText;
+}
+
+void LogHandler::clearDisplay() {
+    _displayText.clear();
 }
 
 std::string LogHandler::formatUserMessage(const std::string& message) {

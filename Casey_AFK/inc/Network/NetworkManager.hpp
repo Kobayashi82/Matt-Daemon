@@ -17,7 +17,7 @@ public:
     virtual ~NetworkManager();
 
     // Connection management
-    bool connectToServer(const std::string& ip, int port, const std::string& user);
+    bool connectToServer(const std::string& ip, int port, const std::string& user, int numLogs = 10);
     void disconnectFromServer();
     bool sendMessage(const std::string& message);
 
@@ -33,6 +33,7 @@ public:
     Glib::Dispatcher& getDispatcher() { return _dispatcher; }
     Glib::Dispatcher& getDisconnectDispatcher() { return _disconnectDispatcher; }
     std::string getPendingData();
+
 
 private:
     void receiveDataLoop();

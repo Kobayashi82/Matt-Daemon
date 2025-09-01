@@ -9,9 +9,11 @@ MainWindow::MainWindow() :
     _labelUser("Username:"),
 	_btnConnect("Connect"),
 	_btnDisconnect("Disconnect"),
+	_btnClearLogs("Clear Logs"),
 	_btnQuit("Close Server"),
 	_buttonSend("Send"),
-	_statusLabel("Disconnected")
+	_statusLabel("Disconnected"),
+	_labelNumLogs("Logs")
 {
 	set_title("Casey_AFK - Graphical log client");
 	set_default_size(1000, 800);
@@ -21,6 +23,7 @@ MainWindow::MainWindow() :
 	_entryIP.set_placeholder_text("IP address or host");
 	_entryPort.set_text("4242");
 	_entryPort.set_placeholder_text("Port (4242)");
+	_entryLogs.set_placeholder_text("");
 
 	// Autocomplete with system user if exists
 	const char* sysuser = getenv("USER");
@@ -34,9 +37,12 @@ MainWindow::MainWindow() :
 	_HBoxConnection.append(_entryPort);
     _HBoxConnection.append(_labelUser);
     _HBoxConnection.append(_entryUser);
+	_HBoxConnection.append(_labelNumLogs);
+	_HBoxConnection.append(_entryLogs);
 	_HBoxConnection.append(_btnConnect);
 	_HBoxConnection.append(_btnDisconnect);
 	_HBoxConnection.append(_btnQuit);
+	_HBoxConnection.append(_btnClearLogs);
 
 	// Ajustar tamaño del área de logs
 	_scrolledWindow.set_child(_textView);
@@ -59,6 +65,7 @@ MainWindow::MainWindow() :
 	_btnConnect.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::connectButton));
 	_btnDisconnect.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::disconnectButton));
 	_btnQuit.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::quitButton));
+	_btnClearLogs.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::clearLogsButton));
 	_buttonSend.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::sendButton));
 
 	// Conectar el dispatcher para comunicación segura entre hilos
@@ -75,13 +82,33 @@ MainWindow::~MainWindow() {
 void MainWindow::connectButton() {
 	std::string ip = _entryIP.get_text();
 	std::string portStr = _entryPort.get_text();
-	int port = portStr.empty() ? 4242 : std::stoi(portStr);
 	std::string user = _entryUser.get_text();
-	if (user.empty()) user = "Unknown";
+	std::string logStr = _entryLogs.get_text();
 
-	if (_networkManager.connectToServer(ip, port, user)) {
+	if (ip == "localhost") {
+		ip = "127.0.0.1";
+	}
+
+	if (user.empty()) {
+		_statusLabel.set_text("Error: Username is required.");
+		return; 
+	}
+	int port = portStr.empty() ? 4242 : std::stoi(portStr);
+	int numLogs = 0;
+	try {
+		numLogs = std::stoi(logStr);
+		if (numLogs < 0) numLogs = 0;
+	} catch (...) {
+		numLogs = 0; 
+	}
+
+	if (_networkManager.connectToServer(ip, port, user, numLogs)) {
 		_statusLabel.set_text("Connected to " + ip + ":" + std::to_string(port));
 		setConnectedState(true);
+		// Limpiar logs viejos al conectar
+		_logHandler.clearDisplay();
+		auto buffer = _textView.get_buffer();
+		buffer->set_text("");
 		_networkManager.startReceiving();
 	} else {
 		_statusLabel.set_text("Cannot connect to server. The server may be closed.");
@@ -99,14 +126,6 @@ void MainWindow::sendButton() {
 	if (!_entryMessage.get_text().empty() && _networkManager.isConnected()) {
 		std::string message = _entryMessage.get_text();
 		if (_networkManager.sendMessage(message)) {
-			std::string formattedMessage = _logHandler.formatUserMessage(message) + "\n";
-			_logHandler.appendToDisplay(formattedMessage);
-			auto buffer = _textView.get_buffer();
-			buffer->set_text(_logHandler.getDisplayText());
-			Glib::signal_idle().connect_once([this]() {
-				auto adjustment = _scrolledWindow.get_vadjustment();
-				adjustment->set_value(adjustment->get_upper() - adjustment->get_page_size());
-			});
 			_entryMessage.set_text("");
 		}
 	}
@@ -115,6 +134,16 @@ void MainWindow::sendButton() {
 void MainWindow::onLogReceived() {
 	std::string rawData = _networkManager.getPendingData();
 	if (!rawData.empty()) {
+		// Check for connection timeout message
+		if (rawData.find("Connection time-out") != std::string::npos) {
+			_statusLabel.set_text("Connection time-out");
+			return;  // Do not process as log
+		}
+		// Check for maximum connection reached message
+		if (rawData.find("Maximun connection reached") != std::string::npos) {
+			_statusLabel.set_text("Maximum connection reached");
+			return;  // Do not process as log
+		}
 		std::string formattedLogs = _logHandler.processLogs(rawData);
 		if (!formattedLogs.empty()) {
 			_logHandler.appendToDisplay(formattedLogs);
@@ -186,4 +215,10 @@ void MainWindow::onConnectionLost() {
 	_statusLabel.set_text("Connection lost");
 	setConnectedState(false);
 	_networkManager.disconnectFromServer();
+}
+
+void MainWindow::clearLogsButton() {
+	_logHandler.clearDisplay(); 
+	auto buffer = _textView.get_buffer();
+	buffer->set_text("");
 }
