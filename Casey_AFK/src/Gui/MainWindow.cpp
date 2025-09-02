@@ -239,7 +239,7 @@ MainWindow::MainWindow() :
 
 		// Configuration of input fields
 		_entryMessage.signal_activate().connect(sigc::mem_fun(*this, &MainWindow::sendButton));
-		_entryIP.set_text("127.0.0.1");
+		_entryIP.set_text("localhost");
 		_entryIP.set_placeholder_text("IP address or host");
 		_entryIP.set_width_chars(15);
 		_entryIP.set_max_width_chars(15);
@@ -253,6 +253,7 @@ MainWindow::MainWindow() :
 		_entryPort.set_hexpand(false);
 		_entryPort.set_halign(Gtk::Align::START);
 
+		_entryLogs.set_text("20");
 		_entryLogs.set_placeholder_text("");
 		_entryLogs.set_width_chars(2);
 		_entryLogs.set_max_width_chars(2);
@@ -266,7 +267,6 @@ MainWindow::MainWindow() :
 	_entryUser.set_placeholder_text("Username");
 	_entryUser.set_width_chars(10);  // Width for usernames
 	_entryUser.set_size_request(100, -1);  // Force width in pixels
-
 
 	// Adjust log area size
 	_scrolledWindow.set_child(_textView);
@@ -311,7 +311,14 @@ MainWindow::MainWindow() :
 	_networkManager.getDispatcher().connect(sigc::mem_fun(*this, &MainWindow::onLogReceived));
 	_networkManager.getDisconnectDispatcher().connect(sigc::mem_fun(*this, &MainWindow::onConnectionLost));
 
+	// Handle window close request to properly disconnect
+	signal_close_request().connect([this]() -> bool {
+		_networkManager.disconnectFromServer();
+		return false; // Allow the window to close
+	}, false);
+
 	setConnectedState(false);
+	_btnConnect.grab_focus();
 }
 
 MainWindow::~MainWindow() {
