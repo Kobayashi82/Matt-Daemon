@@ -1,5 +1,6 @@
 #include "Gui/MainWindow.hpp"
 #include <iostream>
+#include <filesystem>
 
 MainWindow::MainWindow() :
 	_vBox(Gtk::Orientation::VERTICAL),
@@ -346,9 +347,9 @@ void MainWindow::clearLogsButton() {
 
 void MainWindow::loadCss() {
    auto provider = Gtk::CssProvider::create();
-   // Build path to CSS file in HOME
-   const char* home = std::getenv("HOME");
-   std::string cssPath = std::string(home ? home : "") + "/Matt-Daemon/Casey_AFK/res/styles.css";
+   // Build path to CSS file relative to executable directory
+   std::filesystem::path exeDir = std::filesystem::current_path();
+   std::string cssPath = exeDir.string() + "/../res/styles.css";
    provider->load_from_path(cssPath);
    auto display = Gdk::Display::get_default();
    Gtk::StyleContext::add_provider_for_display(
