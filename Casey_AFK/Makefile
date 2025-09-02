@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/15 16:49:47 by vzurera-          #+#    #+#              #
-#    Updated: 2025/08/26 10:08:40 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/09/02 19:27:19 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,9 +47,9 @@ CC			= clang++
 CFLAGS		= -Wall -Wextra -Werror -std=c++17
 CEFLAGS		= -lm -lcrypt
 
-# ────────────── #
+# ───────────── #
 # ── GTKMM-4 ── #
-# ────────────── #
+# ───────────── #
 
 GTKMM_PRESENT	= $(shell pkg-config --exists gtkmm-4.0 2>/dev/null && echo "yes" || echo "no")
 
