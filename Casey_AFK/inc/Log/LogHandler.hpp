@@ -20,10 +20,7 @@ public:
     // Log display
     void appendToDisplay(const std::string& text);
     std::string getDisplayText() const;
-    void clearDisplay();  // Nuevo método para limpiar los logs
-
-    // User message handling
-    std::string formatUserMessage(const std::string& message);
+    void clearDisplay();
 
 private:
     std::string _displayText;

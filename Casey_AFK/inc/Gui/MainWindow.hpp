@@ -2,6 +2,8 @@
 #include <gtkmm.h>
 #include "Network/NetworkManager.hpp"
 #include "Log/LogHandler.hpp"
+#include <gtkmm/cssprovider.h>
+#include <gdkmm/display.h>
 
 // ===============================
 //  Casey_AFK Main Window
@@ -47,4 +49,5 @@ private:
 	void setConnectedState(bool connected); // Changes widget states
 	void onLogReceived();          // Handles log arrival from thread
 	void clearLogsButton();        // Handles clear logs
+	void loadCss();				   // File to CSS
 };

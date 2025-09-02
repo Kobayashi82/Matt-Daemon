@@ -49,7 +49,3 @@ std::string LogHandler::getDisplayText() const {
 void LogHandler::clearDisplay() {
     _displayText.clear();
 }
-
-std::string LogHandler::formatUserMessage(const std::string& message) {
-    return "You: " + message;
-}
