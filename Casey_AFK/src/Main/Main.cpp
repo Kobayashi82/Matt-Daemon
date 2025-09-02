@@ -1,38 +1,23 @@
 #include <gtkmm.h>
-#include <csignal>
 #include "Gui/MainWindow.hpp"
-
-// Global pointer to window for signal handling
-MainWindow* global_window = nullptr;
-
-void signal_handler(int signal) {
-	if (global_window) {
-		// Force disconnect when receiving SIGINT (Ctrl+C) or SIGTERM
-		delete global_window;
-		global_window = nullptr;
-	}
-	exit(signal);
-}
 
 int main() 
 {
-	// Set up signal handlers for proper cleanup
-	signal(SIGINT, signal_handler);
-	signal(SIGTERM, signal_handler);
+	auto app = Gtk::Application::create("org.caseyafk.gui", Gio::Application::Flags::NON_UNIQUE);
 	
-	auto app = Gtk::Application::create("org.caseyafk.gui");
+	MainWindow* window = nullptr;
+	
 	app->signal_activate().connect([&]() {
-		global_window = new MainWindow();
-		app->add_window(*global_window);
-		global_window->show();
+		window = new MainWindow();
+		app->add_window(*window);
+		window->show();
 	});
 	
 	int result = app->run();
 	
-	// Clean up
-	if (global_window) {
-		delete global_window;
-		global_window = nullptr;
+	if (window) {
+		delete window;
+		window = nullptr;
 	}
 	
 	return result;
