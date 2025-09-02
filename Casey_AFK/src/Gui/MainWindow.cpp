@@ -380,16 +380,7 @@ void MainWindow::sendButton() {
 void MainWindow::onLogReceived() {
 	std::string rawData = _networkManager.getPendingData();
 	if (!rawData.empty()) {
-		// Check for connection timeout message
-		if (rawData.find("Connection time-out") != std::string::npos) {
-			_statusLabel.set_text("Connection time-out");
-			return;  // Do not process as log
-		}
-		// Check for maximum connection reached message
-		if (rawData.find("Maximun connection reached") != std::string::npos) {
-			_statusLabel.set_text("Maximum connection reached");
-			return;  // Do not process as log
-		}
+
 		std::string formattedLogs = _logHandler.processLogs(rawData);
 		if (!formattedLogs.empty()) {
 			_logHandler.appendToDisplay(formattedLogs);
